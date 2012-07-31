@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="StatusLamp">
+      <attr name="on_bitmap" format="string" />
+      <attr name="off_bitmap" format="string" />
+  </declare-styleable>    
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stringAppName">Tumanako Dash</string>
+    <string name="stringMotor">Motor</string>
+    <string name="stringBattery">Battery</string>
+    <string name="stringController">Control</string>
+    <string name="stringAccecessory">Acc Batt</string>
+    <string name="stringPrecharge">Pre-Chg</string>
+</resources>
