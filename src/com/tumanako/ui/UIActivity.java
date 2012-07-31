@@ -119,7 +119,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       //textMotorRPM.setLabel("RPM");
       
       //dialMotorRPM.setupDial( 0, 1000, 6, -0.698f, 0.698f,0.5f,0.9f,0.4f );
-      dialMotorRPM.setupDial( 0, 1000, 5, -1.57f, 0.89f, 0.5f, 0.85f, 0.35f, "RPM", 0.6f, 0.6f );
+      dialMotorRPM.setupDial( 0, 1000, 5, -1.57f, 0.89f, 0.5f, 0.85f, 0.4f, "RPM", 0.6f, 0.6f );
       
       textMainBatteryKWh.setLabel("kWh");
       textAccBatteryVlts.setLabel("Vlt");
