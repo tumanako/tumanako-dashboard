@@ -1,6 +1,9 @@
 package com.tumanako.ui;
 
+import com.tumanako.dash.R;
+
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,12 +12,54 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.View;
 
 
 /*************************************************************************************
  * 
  * Dial: Experimental!
+ *
+ * Custom Attributes: 
+ * 
+ *   minimum_scale    - float
+ *   scale_step       - float
+ *   number_divisions - integer
+ *   scale_tick_step  - float
+ *   minimum_angle    - integer
+ *   maximum_angle    - integer
+ *   origin_x         - float
+ *   origin_y         - float
+ *   needle_length    - float
+ *   dial_label       - string
+ *   label_x          - float
+ *   label_y          - float
+ *   red_line         - float
+ *   label_format     - string
+ *   
+ * Note that there must also be a values\attrs.xml file which defines the custom 
+ * attributes.  It should look like this: 
+ *
+    <?xml version="1.0" encoding="utf-8"?>
+     <resources>
+     <declare-styleable name="Dial">
+      <attr name="minimum_scale"     format="float" /> 
+      <attr name="scale_step"        format="float" />
+      <attr name="number_divisions"  format="integer" />
+      <attr name="scale_tick_step"   format="float" />
+      <attr name="minimum_angle"     format="integer" />
+      <attr name="maximum_angle"     format="integer" />
+      <attr name="origin_x"          format="float" />
+      <attr name="origin_y"          format="float" />
+      <attr name="needle_length"     format="float" />
+      <attr name="dial_label"        format="string" />
+      <attr name="label_x"           format="float" />
+      <attr name="label_y"           format="float" />            
+      <attr name="red_line"          format="float" />
+      <attr name="label_format"      format="string" />
+     </declare-styleable>
+     </resources>
+
  * 
  * @author Jeremy Cole-Baker / Riverhead Technology
  *
@@ -25,16 +70,14 @@ import android.view.View;
 public class Dial extends View
   {
 
-  //private int drawingTop = 0;
-  //private int drawingLeft = 0;
   private int drawingWidth = 0;
   private int drawingHeight = 0;
 
   // Internal constants to remember the dial attributes:  
-  private int scaleMin = 0; 
-  private int scaleMax = 0;
+  private float scaleMin = 0f; 
+  private float scaleMax = 0f;
   private float deltaScale = 0f;
-  private int scaleStep = 0; 
+  private float scaleStep = 0f; 
   private float minAngle = 0f; 
   private float maxAngle = 0f;
   private float deltaAngle = 0f;
@@ -42,9 +85,12 @@ public class Dial extends View
   private float fOriginY = 0f;
   private float fNeedleLength = 0f;
   private int numberDivisions = 0;
+  private float tickStep = 0f;
   private String dialLabel;
   private float fLabelX = 0f;
   private float fLabelY = 0f;
+  private float redLine = 0f;
+  private String labelFormat;
 
   
   // Calculated internal values (based on actual size of dial, and generated at runtime): 
@@ -74,61 +120,66 @@ public class Dial extends View
     {
     super(context, atttibutes);
     
-    // Create re-usable drawing objects used to draw the dial: 
-    needlePath = new Path();  
-    needleDrawable = new ShapeDrawable();
-    }
-  
-  
-  
-  /******* Setup Dial Method: **********************************
-   * Establish the dial. This method pre claculates things like where coordinates 
-   * for the labels.  
-   * 
-   * @param thisScaleMin
-   * @param thisScaleStep
-   * @param thisNumberDivisions
-   * @param thisMinAngle
-   * @param thisMaxAngle
-   * @param thisOriginX
-   * @param thisOriginY
-   * @param thisNeedleLength
-   * 
-   */
-  public void setupDial(int thisScaleMin, 
-                        int thisScaleStep, 
-                        int thisNumberDivisions,
-                        float thisMinAngle, 
-                        float thisMaxAngle, 
-                        float thisOriginX,
-                        float thisOriginY,
-                        float thisNeedleLength, 
-                        String thisDialLabel,
-                        float thisLabelX,
-                        float thisLabelY
-                        )
-    {
-    // Store the specified parameters:
-    scaleMin = thisScaleMin; 
-    scaleStep = thisScaleStep; 
-    minAngle = thisMinAngle; 
-    maxAngle = thisMaxAngle;
-    deltaAngle = maxAngle - minAngle; 
-    fOriginX = thisOriginX;
-    fOriginY = thisOriginY;
-    fNeedleLength = thisNeedleLength;
-    numberDivisions = thisNumberDivisions;    
-    dialLabel = thisDialLabel;
-    fLabelX = thisLabelX;
-    fLabelY = thisLabelY;
-
+    // Load custom attributes from XML: 
+    getCustomAttributes(atttibutes);
+    
     // Create the arrays to store pre-calculated scale data:     
     slabelX = new float[numberDivisions];
     slabelY = new float[numberDivisions];
     scaleLabels = new String[numberDivisions];
+
+    // Create re-usable drawing objects used to draw the dial: 
+    needlePath = new Path();  
+    needleDrawable = new ShapeDrawable();
+    
     }
   
   
+  
+  
+  
+  
+  /*********** Extract custom attributes: **************************
+   * Given a set of attributes from the XML layout file, extract
+   * the custom attributes specific to this control: 
+   * @param attrs - Attributes passed in from the XML parser 
+   *****************************************************************/
+  private void getCustomAttributes(AttributeSet attrs)
+    { 
+    TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.Dial );
+
+    scaleMin        = a.getFloat(R.styleable.Dial_minimum_scale, 0f); 
+    scaleStep       = a.getFloat(R.styleable.Dial_scale_step , 1f); 
+    numberDivisions = a.getInt(R.styleable.Dial_number_divisions,5);
+    tickStep        = a.getFloat(R.styleable.Dial_scale_tick_step, 0.5f);
+    
+    minAngle   = ((float)a.getInt(R.styleable.Dial_minimum_angle , -90) / 180f) * (float)Math.PI;  // NOTE: Angle attribute in Degrees; But store Radians. 
+    maxAngle   = ((float)a.getInt(R.styleable.Dial_maximum_angle ,  90) / 180f) * (float)Math.PI;  // 
+    deltaAngle = maxAngle - minAngle; 
+
+    fOriginX      = a.getFloat(R.styleable.Dial_origin_x , 0.5f);
+    fOriginY      = a.getFloat(R.styleable.Dial_origin_y , 0.5f);
+    fNeedleLength = a.getFloat(R.styleable.Dial_needle_length , 0.35f);
+    
+    dialLabel = a.getString(R.styleable.Dial_dial_label);
+    if (dialLabel == null) dialLabel = "";
+
+    fLabelX = a.getFloat(R.styleable.Dial_label_x , 0.5f);
+    fLabelY = a.getFloat(R.styleable.Dial_label_y , 0.3f);
+    
+    redLine = a.getFloat(R.styleable.Dial_red_line , 1f);
+    
+    labelFormat = a.getString(R.styleable.Dial_label_format);
+    if (labelFormat == null) labelFormat = "%.0f";
+    
+    // Recycle the TypedArray: 
+    a.recycle();
+
+    }
+  
+
+  
+  /******* Calculate run-time parameters for drawing scale, etc: ***************/
   private void calcDial()
     {
     // Calculate the needle origin in screen coordinates: 
@@ -141,12 +192,12 @@ public class Dial extends View
     needleLength = (float)drawingWidth * fNeedleLength;   
     
     // Loop through the requested number of scale steps and calculate stuff...
-    int scaleValue = scaleMin;     // Value of initial point on scale.
+    float scaleValue = scaleMin;     // Value of initial point on scale.
     float scaleAngle = minAngle;   // Angle from origin to initial point on scale in Radians (0 = vertical up)
     float scaleAngleStep = (maxAngle - minAngle) / (float)(numberDivisions-1);   // Angle step for each scale step
     for (int n=0; n<numberDivisions; n++)
       {
-      scaleLabels[n] = String.format("%d",scaleValue);
+      scaleLabels[n] = String.format(labelFormat,scaleValue);
       slabelX[n] = needleX(scaleAngle);
       slabelY[n] = needleY(scaleAngle);
       
@@ -192,7 +243,7 @@ public class Dial extends View
    */
   private float needleX(float thisAngle)
     {
-    return originX + (needleLength * (float)Math.sin(thisAngle)); 
+    return originX + (needleLength * FloatMath.sin(thisAngle)); 
     }
 
   
@@ -210,7 +261,7 @@ public class Dial extends View
    */
   private float needleY(float thisAngle)
     {
-    return originY - (needleLength * (float)Math.cos(thisAngle)); 
+    return originY - (needleLength * FloatMath.cos(thisAngle)); 
     }
   
   
@@ -224,8 +275,8 @@ public class Dial extends View
     float x = needleX(needleAngle); 
     float y = needleY(needleAngle);
     needlePath.reset();
-    needlePath.moveTo(originX, originY);                                           // ...Start point!
-    needlePath.lineTo(x,y);                                                        // ...End point! 
+    needlePath.moveTo(originX, originY);             // ...Start point!
+    needlePath.lineTo(x,y);                          // ...End point! 
     }
 
 

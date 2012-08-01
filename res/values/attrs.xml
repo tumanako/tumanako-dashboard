@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
   <declare-styleable name="StatusLamp">
       <attr name="on_bitmap" format="string" />
       <attr name="off_bitmap" format="string" />
+      <attr name="initial_status" format="string" />
   </declare-styleable>    
+  
+  <declare-styleable name="TextWithLabel">
+     <attr name="main_text" format="string" />
+     <attr name="label_text" format="string" />
+     <attr name="label_size" format="integer" />
+  </declare-styleable>  
+ 
+  <declare-styleable name="Dial">
+      <attr name="minimum_scale"     format="float" />
+      <attr name="scale_step"        format="float" />
+      <attr name="number_divisions"  format="integer" />
+      <attr name="scale_tick_step"   format="float" />
+      <attr name="minimum_angle"     format="integer" />
+      <attr name="maximum_angle"     format="integer" />
+      <attr name="origin_x"          format="float" />
+      <attr name="origin_y"          format="float" />
+      <attr name="needle_length"     format="float" />
+      <attr name="dial_label"        format="string" />
+      <attr name="label_x"           format="float" />
+      <attr name="label_y"           format="float" />  
+      <attr name="red_line"          format="float" />                
+      <attr name="label_format"      format="string" />
+  </declare-styleable>
+  
+
 </resources>

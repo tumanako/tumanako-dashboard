@@ -15,14 +15,13 @@
         android:label="@string/stringAppName" >
         <activity
             android:name="com.tumanako.ui.UIActivity"
-            android:label="@string/stringAppName" 
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:label="@string/stringAppName">
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
         </activity>
     </application>
 

@@ -4,6 +4,8 @@
   <item android:id="@+id/menuitemDemoMode"
         android:title="Demo Mode" android:titleCondensed="Demo Mode"/>
     
+  <item android:id="@+id/menuitemStopDemo"
+        android:title="Stop Demo" android:titleCondensed="Stop Demo"/>
   
   <item android:id="@+id/menuitemClose"
         android:title="Close Dashboarde" android:titleCondensed="Close Dashboard"/>  

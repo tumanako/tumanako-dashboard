@@ -1,39 +1,22 @@
 package com.tumanako.ui;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Date;
-
-import com.tumanako.dash.DashData;
 import com.tumanako.dash.R;
-import com.tumanako.sensors.Accelerometer;
 import com.tumanako.sensors.VehicleDataBt;
 import com.tumanako.sensors.NmeaGPS;
 import com.tumanako.sensors.NmeaProcessor;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -41,26 +24,12 @@ import android.widget.Toast;
 public class UIActivity extends Activity implements OnClickListener, OnLongClickListener
     {
     
-    
-    // UI Widgets: 
-    private StatusLamp     lampData;
-    private StatusLamp     lampGPS;
-    private StatusLamp     lampContactor;
-    private StatusLamp     lampFault;
-    private StatusLamp     lampGreenGlobe;
+    public static final String APP_TAG = "TumanakoDash";
 
-    private Dial           dialMotorRPM;
-    
-    //private TextWithLabel  textMotorRPM;
-    private TextWithLabel  textMainBatteryKWh;
-    private TextWithLabel  textAccBatteryVlts;
-    private TextWithLabel  textTMotor;
-    private TextWithLabel  textTController;
-    private TextWithLabel  textTBattery;
-   
+    // HashMap for list of UI Widgets: 
+    private HashMap<String,View> uiWidgets = new HashMap<String,View>();
     
     // Sensors:  
-    //private Accelerometer  mAcceleration;
     private NmeaGPS        mGPS;
     private VehicleDataBt  mVehicleDataSensor;
 
@@ -69,7 +38,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     
     
     //*** Vehicle Data Store: ***
-    private DashData vehicleData = new DashData();   // Create a DashData object to hold data from the vehicle. 
+    //private DashData vehicleData = new DashData();   // Create a DashData object to hold data from the vehicle. 
     
     // Persistent Details: 
     // These get saved when the application goes to the background, 
@@ -77,21 +46,19 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     private double totalEnergy = 0.0;       // Energy Used kWh          } Since last reset
     private double totalDistance = 0.0;     // Distance Travelled (km)  } 
 
-    //private long   lastRecordTime = 0;
-    //private String outputFileName = "";
 
     private static final int UI_UPDATE_EVERY = 500;   // Update the UI every n mSeconds.
       
-    //*** Message types recognised by this class: ***
     public static final int UI_TOAST_MESSAGE = 1;     // Sent by another class when they have a brief message they would like displayed.  
 
-    
-    // ******** Constants for Log File - Not used at the moment. **************************
-    //private static final String SAVE_PATH = "/mnt/sdcard/EnergyLogger/";
-    //private static final long CLOSE_TRIP_AFTER = 300000;   // Start a new trip file if the last record we had was more than this many milliseconds ago
-    //                                                       // (NOTE: Only applies when the app is closed and reopened). 
-    
     private static final String PREFS_NAME = "EnergyLoggerPrefs";
+    
+    
+    // ---------------DEMO MODE CODE -------------------------------
+    private boolean isDemo = false;  // Demo mode flag!
+    // ---------------DEMO MODE CODE -------------------------------  
+
+    
     
     
     // *** Create: Called when the activity is first created: ****
@@ -101,89 +68,47 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main);
       
-      // Obtain handles to UI objects:
-      lampData             = (StatusLamp) findViewById(R.id.lampData);
-      lampGPS              = (StatusLamp) findViewById(R.id.lampGPS);
-      lampContactor        = (StatusLamp) findViewById(R.id.lampContactor);
-      lampFault            = (StatusLamp) findViewById(R.id.lampFault);
-      lampGreenGlobe = (StatusLamp) findViewById(R.id.lampGreenGlobe);
-      
-      dialMotorRPM         = (Dial) findViewById(R.id.demoDial);
-      //textMotorRPM         = (TextWithLabel) findViewById(R.id.textMotorRPM);
-      textMainBatteryKWh   = (TextWithLabel) findViewById(R.id.textMainBatteryKWh);
-      textAccBatteryVlts   = (TextWithLabel) findViewById(R.id.textAccBatteryVlts);
-      textTMotor           = (TextWithLabel) findViewById(R.id.textTMotor);
-      textTController      = (TextWithLabel) findViewById(R.id.textTController);
-      textTBattery         = (TextWithLabel) findViewById(R.id.textTBattery);
+      // --DEBUG!!--
+      Log.i(APP_TAG,"UIActivity -> onCreate()");
+           
+      // Make a list of available UI widgets:
+      uiWidgets.put( "lampData",           findViewById(R.id.lampData)           );
+      uiWidgets.put( "lampGPS",            findViewById(R.id.lampGPS)            );
+      uiWidgets.put( "lampContactor",      findViewById(R.id.lampContactor)      );
+      uiWidgets.put( "lampFault",          findViewById(R.id.lampFault)          );
+      uiWidgets.put( "lampGreenGlobe",     findViewById(R.id.lampGreenGlobe)     );
+      uiWidgets.put( "dialMotorRPM",       findViewById(R.id.dialMotorRPM)       );
+      uiWidgets.put( "dialMainBatteryKWh", findViewById(R.id.dialMainBatteryKWh) );
+      uiWidgets.put( "textAccBatteryVlts", findViewById(R.id.textAccBatteryVlts) );
+      uiWidgets.put( "textTMotor",         findViewById(R.id.textTMotor)         );
+      uiWidgets.put( "textTController",    findViewById(R.id.textTController)    );
+      uiWidgets.put( "textTBattery",       findViewById(R.id.textTBattery)       );
 
-      //textMotorRPM.setLabel("RPM");
       
-      //dialMotorRPM.setupDial( 0, 1000, 6, -0.698f, 0.698f,0.5f,0.9f,0.4f );
-      dialMotorRPM.setupDial( 0, 1000, 5, -1.57f, 0.89f, 0.5f, 0.85f, 0.4f, "RPM", 0.6f, 0.6f );
-      
-      textMainBatteryKWh.setLabel("kWh");
-      textAccBatteryVlts.setLabel("Vlt");
-      textTMotor.setLabel("°C");
-      textTController.setLabel("°C");
-      textTBattery.setLabel("°C");
-      
-      // Attach buttons to general onClick event handler (see below):
-      //( (Button) findViewById(R.id.buttonClose ) ).setOnClickListener(this);      
-        
-      // Add Long Press events to the Total Distance and Total Fuel boxes. This will be used to reset the values. 
-      //textDistanceIndicator.setLongClickable(true);
-
-      // -- Set initial state of status lamps: ---
-      // Note: Turn ON fault to mimic behaviour of traditional cars (i.e. bulb check)... 
-      lampFault.turnOn();
-      
-      // -- Set some default values in text boxes: --
-      //textMotorRPM.setText("0");
-      textMainBatteryKWh.setText("0.0");
-      textAccBatteryVlts.setText("0.0");
-      textTMotor.setText("0.0");
-      textTController.setText("0.0");
-      textTBattery.setText("0.0");
-      
-      
-      // -- Create Sensors: -- 
-      //mAcceleration = new Accelerometer(this, uiMessageHandler);
+      // --------- Create Sensors: ---------------------------------- 
       mGPS               = new NmeaGPS(this, uiMessageHandler);
       mVehicleDataSensor = new VehicleDataBt(uiMessageHandler);
       
-      // -------- Restore Saved Preferences (if any): -----------------------------
+      
+      // -------- Restore Saved Preferences (if any): -------------------
       SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
       totalEnergy    = 25.0;  //settings.getFloat( "totalEnergy", 0 );
       totalDistance  = settings.getFloat( "totalDistance", 0 );
-      /***** Older code not used right now:
-      lastRecordTime = settings.getLong( "lastRecordTime", 0 );
-      float gravityX = settings.getFloat( "gravityX", 0 );
-      float gravityY = settings.getFloat( "gravityY", 0 );
-      float gravityZ = settings.getFloat( "gravityZ", 0 );
-      mAcceleration.setGravityXYZ(new float[] {gravityX,gravityY,gravityZ});
-      ***/
-      // --------------------------------------------------------------------------
       
-
-      /****** Log File Code: Not used right now... ***************
-      // Check file name for output file. If we don't have one, (i.e. just started), or it's
-      // out of date (i.e. new trip), create a new one: 
-      if (  (outputFileName.length() == 0) || 
-            ( (lastRecordTime + CLOSE_TRIP_AFTER) < System.currentTimeMillis() )   )
-        {
-        // Need to generate a new file name:
-        SimpleDateFormat myDateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
-        outputFileName = SAVE_PATH + 
-                         "TripData_" + 
-                         myDateFormat.format(new Date(System.currentTimeMillis())) + 
-                         ".csv";
-        File testFile = new File(outputFileName);
-        if(!testFile.exists()) WriteHeader("");    // If this is a new output file, add a header!
-        }
-      ***********************************************************/
+      
+      // ---------------DEMO MODE CODE -------------------------------
+      isDemo = settings.getBoolean("isDemo", false);
+      // ---------------DEMO MODE CODE -------------------------------
+      
       
       // -- Start Sensor Measurements: --
       StartSensors();
+
+      
+      // ---------------DEMO MODE CODE -------------------------------
+      if (isDemo) startDemo();
+      // ---------------DEMO MODE CODE -------------------------------
+      
       }
 
     
@@ -217,29 +142,31 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       SharedPreferences.Editor editor = settings.edit();
       editor.putFloat( "totalEnergy", (float)totalEnergy );
       editor.putFloat( "totalDistance", (float)totalDistance );
-      /******** Not Used: *******
-      editor.putLong( "lastRecordTime", lastRecordTime );
-      float[] thisGravity = mAcceleration.getGravityXYZ(); 
-      editor.putFloat( "gravityX", thisGravity[0] );
-      editor.putFloat( "gravityY", thisGravity[1] );
-      editor.putFloat( "gravityZ", thisGravity[2] );
-      ***************************/
+      
+      // ---------------DEMO MODE CODE -------------------------------
+      editor.putBoolean("isDemo", isDemo);
+      // ---------------DEMO MODE CODE -------------------------------
+      
       editor.commit();        // Commit the edits!
       }
     
     
+    // ---------------DEMO MODE CODE -------------------------------
+    private void startDemo()
+      {
+      isDemo = true;
+      mVehicleDataSensor.setDemo(true);
+      mGPS.NMEAData.setDemo(true);
+      }
+    private void stopDemo()
+      {
+      isDemo = false;
+      mVehicleDataSensor.setDemo(false);
+      mGPS.NMEAData.setDemo(false);
+      }
+    // ---------------DEMO MODE CODE -------------------------------
     
-    /***** Config Change: *********************************
-     * This would be called on config change such as screen rotation. 
-     * However in the manifest, we've specified that the screen rotation
-     * is locked to 'Portrait' so that doesn't happen anyway. 
-     * TO DO: Design UI to handle different screen rotations in a 
-     * nice way! 
-     *****************************************************/
-    public void onConfigurationChanged(Configuration newConfig)
-      {  super.onConfigurationChanged(newConfig);  } 
     
-
     
     
     /*************** Click Action Handler: *****************************/  
@@ -271,7 +198,6 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
         {
       /****
         case R.id.textviewDistIndicator:
-        case R.id.textviewFuelIndicator:
           totalEnergy    = 0;
           totalDistance  = 0;
           break;
@@ -288,11 +214,18 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       // Handle item selection
       switch (item.getItemId()) 
         {
+        
+        // ---------------DEMO MODE CODE -------------------------------        
         case R.id.menuitemDemoMode:
           ShowMessage("Demo!");
-          mVehicleDataSensor.setDemo(true);
-          mGPS.NMEAData.setDemo(true);
+          startDemo();
           return true;
+        case R.id.menuitemStopDemo:
+          ShowMessage("Stop Demo!");
+          stopDemo();
+          return true;
+        // ---------------DEMO MODE CODE -------------------------------          
+          
         case R.id.menuitemClose:
           finish();
           return true;
@@ -328,28 +261,27 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
           case NmeaProcessor.NMEA_PROCESSOR_DATA_UPDATED:
             // Called by the NmeaGPS object mGPS when updated NMEAData data are available.
             // Get the latest gps speed:  
-            vehicleData.setField( "Speed", mGPS.NMEAData.getSpeed() );
+            //vehicleData.setField( "Speed", mGPS.NMEAData.getSpeed() );
             break;
 
           /****** Data Messages from vehicle data input: **********************************************************/            
-          //case VehicleDataBt.DATA_MOTOR_RPM:         textMotorRPM.setText(        String.format("%.0f", msg.obj) );   break;
-          case VehicleDataBt.DATA_MOTOR_RPM:         dialMotorRPM.setNeedle((Float)msg.obj);                          break;
-          case VehicleDataBt.DATA_MAIN_BATTERY_KWH:  textMainBatteryKWh.setText(  String.format("%.1f", msg.obj) );   break;
-          case VehicleDataBt.DATA_ACC_BATTERY_VLT:   textAccBatteryVlts.setText(  String.format("%.1f", msg.obj) );   break;
-          case VehicleDataBt.DATA_MOTOR_TEMP:        textTMotor.setText(          String.format("%.1f", msg.obj) );   break;
-          case VehicleDataBt.DATA_CONTROLLER_TEMP:   textTController.setText(     String.format("%.1f", msg.obj) );   break;
-          case VehicleDataBt.DATA_MAIN_BATTERY_TEMP: textTBattery.setText(        String.format("%.1f", msg.obj) );   break;
+          case VehicleDataBt.DATA_MOTOR_RPM:         ((Dial)uiWidgets.get("dialMotorRPM")).setNeedle((Float)msg.obj / 1000);                             break;
+          case VehicleDataBt.DATA_MAIN_BATTERY_KWH:  ((Dial)uiWidgets.get("dialMainBatteryKWh") ).setNeedle((Float)msg.obj);                             break;
+          case VehicleDataBt.DATA_ACC_BATTERY_VLT:   ((TextWithLabel)uiWidgets.get("textAccBatteryVlts") ).setText(  String.format("%.1f", msg.obj) );   break;
+          case VehicleDataBt.DATA_MOTOR_TEMP:        ((TextWithLabel)uiWidgets.get("textTMotor")         ).setText(  String.format("%.1f", msg.obj) );   break;
+          case VehicleDataBt.DATA_CONTROLLER_TEMP:   ((TextWithLabel)uiWidgets.get("textTController")    ).setText(  String.format("%.1f", msg.obj) );   break;
+          case VehicleDataBt.DATA_MAIN_BATTERY_TEMP: ((TextWithLabel)uiWidgets.get("textTBattery")       ).setText(  String.format("%.1f", msg.obj) );   break;
           case VehicleDataBt.DATA_CONTACTOR_ON:
-            if (msg.obj.equals(true)) lampContactor.turnOn();
-            else                   lampContactor.turnOff();
+            if (msg.obj.equals(true)) ((StatusLamp)uiWidgets.get("lampContactor")).turnOn();
+            else                      ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
             break;  
           case VehicleDataBt.DATA_FAULT:
-            if (msg.obj.equals(true)) lampFault.turnOn();
-            else                   lampFault.turnOff();
+            if (msg.obj.equals(true)) ((StatusLamp)uiWidgets.get("lampFault")).turnOn();
+            else                      ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
             break;            
           case VehicleDataBt.DATA_PRECHARGE:
-            if (msg.obj.equals(true)) lampGreenGlobe.turnOn();
-            else                   lampGreenGlobe.turnOff();
+            if (msg.obj.equals(true)) ((StatusLamp)uiWidgets.get("lampGreenGlobe")).turnOn();
+            else                      ((StatusLamp)uiWidgets.get("lampGreenGlobe")).turnOff();
             break;  
           /********************************************************************************************************/
           
@@ -402,12 +334,13 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
      public void run()  
        {
        // Set status indicators for NMEAData and Vehicle Connection:
-       if (mGPS.NMEAData.isFixGood())    lampGPS.turnOn();
-       else                              lampGPS.turnOff();
-       if (mVehicleDataSensor.isRunning()) lampData.turnOn();
+       if (mGPS.NMEAData.isFixGood())    ((StatusLamp)uiWidgets.get("lampGPS")).turnOn();
+       else                              ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
+       
+       if (mVehicleDataSensor.isRunning()) ((StatusLamp)uiWidgets.get("lampData")).turnOn();
        else
            {
-           lampData.turnOff();
+           ((StatusLamp)uiWidgets.get("lampData")).turnOff();
            mVehicleDataSensor.resume();                           // Attempt to restart the connection to the vehicle. 
            }
        
