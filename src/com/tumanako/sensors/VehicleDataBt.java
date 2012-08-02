@@ -109,6 +109,7 @@ public class VehicleDataBt implements IDroidSensor
   
   // ---------------DEMO MODE CODE -------------------------------
   private boolean isDemo = false;  // Demo mode flag!
+  private float kWh = 0f; 
   // ---------------DEMO MODE CODE -------------------------------  
   
   
@@ -253,6 +254,7 @@ public class VehicleDataBt implements IDroidSensor
         isRunning = true;  // Pretend we are running.
 
         /***** Generate some fake data  and send it to the UI: ***************/
+        kWh = kWh + 1f;  if (kWh > 30f) kWh = 10f;
         float thisRPM = (float) ((Math.sin( (float)(System.currentTimeMillis() % 12000) / 1909  ) + 0.3) * 3000);
         boolean demoFault = false;
         if (thisRPM < -1500) demoFault = true; 
@@ -260,10 +262,10 @@ public class VehicleDataBt implements IDroidSensor
         boolean demoGreenGlobe = ((System.currentTimeMillis() % 300) > 100);   
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_CONTACTOR_ON,      (thisRPM > 1)   ) );
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_FAULT,             demoFault ) );
-        messageHandler.sendMessage( messageHandler.obtainMessage(DATA_MAIN_BATTERY_KWH,  24.3f ) );
+        messageHandler.sendMessage( messageHandler.obtainMessage(DATA_MAIN_BATTERY_KWH,  kWh ) );
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_ACC_BATTERY_VLT,   12.6f  ) );
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_MOTOR_RPM,         thisRPM   ) );
-        messageHandler.sendMessage( messageHandler.obtainMessage(DATA_MAIN_BATTERY_TEMP, 29.8f  ) );
+        messageHandler.sendMessage( messageHandler.obtainMessage(DATA_MAIN_BATTERY_TEMP, kWh  ) );
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_MOTOR_TEMP,        (thisRPM/4000)+20  ) );
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_CONTROLLER_TEMP,   (thisRPM/4000)+15  ) );
         messageHandler.sendMessage( messageHandler.obtainMessage(DATA_PRECHARGE,         demoGreenGlobe  ) );

@@ -4,5 +4,5 @@
     <string name="stringMotor">Motor</string>
     <string name="stringBattery">Battery</string>
     <string name="stringController">Control</string>
-    <string name="stringAccecessory">Acc Batt: </string>
+    <string name="stringAccecessory">Acc Batt:   </string>
 </resources>

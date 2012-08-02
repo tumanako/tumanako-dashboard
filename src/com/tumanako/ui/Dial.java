@@ -114,7 +114,7 @@ public class Dial extends View
   private Paint needlePaint;
   private Paint scalePaint = new Paint();
   
-  
+    
   // ********** Constructor: ***************************
   public Dial(Context context, AttributeSet atttibutes)
     {
@@ -131,6 +131,8 @@ public class Dial extends View
     // Create re-usable drawing objects used to draw the dial: 
     needlePath = new Path();  
     needleDrawable = new ShapeDrawable();
+  
+    // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  Dial -> Constructor ");
     
     }
   
@@ -204,7 +206,7 @@ public class Dial extends View
       scaleValue = scaleValue + scaleStep;
       scaleAngle = scaleAngle + scaleAngleStep;
       }
-    scaleMax = scaleValue;                          // Max scale value, used later.
+    scaleMax = scaleValue - scaleStep;              // Max scale value, used later.
     deltaScale = (float)scaleMax - (float)scaleMin; // Scale range.
     if (deltaScale == 0f) deltaScale = 1f;          // Oops. ??
     needleLength = needleLength * 0.9f;
@@ -220,7 +222,8 @@ public class Dial extends View
   public void setNeedle(float value)
     {
     needleValue = value;
-    needleAngle = minAngle + ((deltaAngle / deltaScale) * value);
+    needleAngle = minAngle + (((value - scaleMin) / deltaScale) * deltaAngle);
+    invalidate();
     }
   
   
@@ -276,7 +279,7 @@ public class Dial extends View
     float y = needleY(needleAngle);
     needlePath.reset();
     needlePath.moveTo(originX, originY);             // ...Start point!
-    needlePath.lineTo(x,y);                          // ...End point! 
+    needlePath.lineTo(x,y);                          // ...End point!
     }
 
 
@@ -328,13 +331,20 @@ public class Dial extends View
     {
     super.onDraw(canvas);
    
+    // --DEBUG!--
+    //Log.i( UIActivity.APP_TAG, "  Dial -> onDraw() (#" + redrawCount + ")" );
+    //redrawCount++;
+    
     // Determine the chart dimensions, if we haven't already done so: 
     if (drawingWidth == 0)
       {
       // **** Get actual layout parameters: ****
       drawingWidth = this.getWidth();
       drawingHeight = this.getHeight();
-      needleDrawable.setBounds(0,0,drawingWidth,drawingHeight);      
+      
+      // --DEBUG!--Log.i( UIActivity.APP_TAG, "       -> First Time: Set Bounds (" + drawingWidth + " x " + drawingHeight + ")" );
+
+      
       //drawingTop = this.getTop();
       //drawingLeft = this.getLeft();
       // **** Calculate the locations of scale labels, etc: ****
@@ -353,7 +363,7 @@ public class Dial extends View
       needlePaint.setStrokeWidth(3);
       needlePaint.setColor(0xA0F00000);
 
-      needleShape = new PathShape(needlePath,(float)drawingWidth,(float)drawingHeight);
+      needleShape = new PathShape(needlePath,drawingWidth,drawingHeight);
       }
 
     
@@ -369,6 +379,7 @@ public class Dial extends View
     // *** Draw the needle: ****
     makeNeedle();
     
+    needleDrawable.setBounds(0,0,drawingWidth,drawingHeight);
     needleDrawable.setShape(needleShape);
     needleDrawable.draw(canvas);
     
