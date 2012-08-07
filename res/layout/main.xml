@@ -6,7 +6,8 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:id="@+id/layoutMain"
               android:orientation="vertical"     
-              android:keepScreenOn="true"          
+              android:keepScreenOn="true"
+              android:background="@drawable/tiled_bg"          
               android:layout_width="fill_parent"  android:layout_height="fill_parent"  xmlns:app1="http://schemas.android.com/apk/res/com.tumanako.dash">    
 
 
