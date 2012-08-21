@@ -22,7 +22,6 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
-import com.tumanako.dash.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;

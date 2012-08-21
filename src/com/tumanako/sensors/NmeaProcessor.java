@@ -23,8 +23,8 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************************/
 
 
+import android.content.Context;
 import android.location.GpsStatus;
-import android.os.Handler;
 import android.os.SystemClock;
 
 
@@ -48,32 +48,42 @@ import android.os.SystemClock;
  *  First create a NmeaGPS object (see NmeaGPS.java). That class will
  *  create an instance of this class to receive and process NMEA data. 
  *   
+ *  Once up and running, this class generates an intent whenever GPS data are
+ *  updated, used to signal other components that they can request elements
+ *  of the new data by calling getTime(), getLat(), etc as needed.  
+ *   
+ * NOTE: 
+ *  Currently, any other component which wants actual GPS data
+ *  must obtain a reference to this instance (through NmeaGPS class) and
+ *  retrieve the data with calls to getTime(), getLat(), etc. 
+ *  TO DO: Could send out an intent on data update, containing a 
+ *  Bundle of GPS data. That way no direct reference to this instance
+ *  would be needed!
+ *  QUESTION: Would this be wasteful if only some of the GPS values 
+ *  were needed?
+ *    
  * @author Jeremy Cole-Baker / Riverhead Technology
  *
  ***************************************************************/
 
-public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor
+public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListener, IDroidSensor
   {
-    
-  private final Handler messageHandler;
-    // Used to send messages back to UI class.
-
-
+     
   // ****** Information directly from the NMEAData: **********
-  private float  gpsTime   = 0F;           // NMEAData Time (UTC), HHMMSS (e.g. 123542.0 for 12:35:42 pm)
+  private float  gpsTime   = 0f;           // NMEAData Time (UTC), HHMMSS (e.g. 123542.0 for 12:35:42 pm)
   private double gpsLat    = 0.0;          // NMEAData Latitude (Dec. Degrees)
   private double gpsLon    = 0.0;          // NMEAData Longitude (Dec. Degrees)
   private int    gpsQual   = 0;            // NMEAData Fix Quality *
   private int    gpsSats   = 0;            // NMEAData Number of satellites
-  private float  gpsAlt    = 0F;           // NMEAData Altitude (m)
-  private float  gpsTrackT = 0F;           // NMEAData Ground track (Deg, True)
-  private float  gpsSpeed  = 0F;           // NMEAData Grong speed (kph)
+  private float  gpsAlt    = 0f;           // NMEAData Altitude (m)
+  private float  gpsTrackT = 0f;           // NMEAData Ground track (Deg, True)
+  private float  gpsSpeed  = 0f;           // NMEAData Grong speed (kph)
   private String gpsLastGGA = "";          // Will store the last GGA and
   private String gpsLastVTG = "";          // VTG strings received (for debugging)
   
   // ***** Information derived during operation: **********
   private boolean isLastSentence   = false;   // Set to true after the 'GSA' sentence arrives (last in a cycle), and false when any other sentence arrives. 
-  private long    timeLastPosition = 0L;      // System time (mS) for the last position update.
+  private long    timeLastPosition = 0l;      // System time (mS) for the last position update.
   private boolean isFixGood        = false;   // Do we have a current fix? True when we are receiving good NMEA data; false if NMEA data is empty (i.e. no fix)
                                               //  NOTE: This only looks at the last NMEA we received; if NMEA data stop alltogether, isFixGood may still be true. 
                                               //  See IsFixGood() method below (also checks for time since last NMEA data).
@@ -81,9 +91,13 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor
   private static final int NMEA_WAIT_TIMEOUT = 3000;   // If no NMEA sentences received after this many mS, we'll declare that the NMEAData has stopped. 
   
   
-  // ******* Message type constants for messages passed through messageHandler from this class: **********
-  public static final int NMEA_PROCESSOR_DATA_UPDATED  = NMEA_PROCESSOR_ID + 1;
-  public static final int NMEA_PROCESSOR_ERROR         = NMEA_PROCESSOR_ID + 10;
+  // *** GPS Processing / Data Message Type Indicators: ***
+  public static final int NMEA_PROCESSOR_DATA_UPDATED  = NMEA_PROCESSOR_ID + 0;
+  public static final int NMEA_PROCESSOR_ERROR         = NMEA_PROCESSOR_ID + 99;
+  
+  public static final int DATA_GPS_HAS_LOCK            = NMEA_PROCESSOR_ID + 1;
+  public static final int DATA_GPS_TIME                = NMEA_PROCESSOR_ID + 2;
+  public static final int DATA_GPS_SPEED               = NMEA_PROCESSOR_ID + 3;
   
   
   // ---------------DEMO MODE CODE -------------------------------
@@ -91,11 +105,12 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor
   // ---------------DEMO MODE CODE -------------------------------  
 
   
-  //***** Constructor: *******
-  public NmeaProcessor(Handler thisHandler)
+  /************************************************************
+   * Constructor: Sets up a message broadcaster. 
+   ************************************************************/
+  public NmeaProcessor(Context context)
     {
-    // Stores a reference to the provided handler so that messages can be sent.
-    messageHandler = thisHandler;
+    super(context);    // We are extenging the 'TumanakoSensor' class, and we need to call its Constructor here.
     }
 
   
@@ -191,21 +206,26 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor
     }
   
 
+  @Override
   public boolean isOK()
     {  return isFixGood();  }  // Returns the 'Fix Good' indication
 
+  @Override
   public boolean isRunning()
     {  return true;  }        // Always 'true' since this sensor is always ready. 
 
-  public void suspend()
-    {  }   // We don't need to suspend or resume anything for this sensor. (See NmeaGPS class)
-
-  public void resume()
-    {  }   //
-
   
   
   
+  
+  private void sendGPSData()
+    {
+    // Send some useful GPS data as Intents:
+    float fixGood = (isFixGood) ? 1f : 0f;
+    sendFloat(DATA_GPS_HAS_LOCK, fixGood);
+    sendFloat(DATA_GPS_TIME,     gpsTime);
+    sendFloat(DATA_GPS_SPEED,    gpsSpeed);
+    }
   
   
   // ****** NMEA received Method: ************
@@ -218,23 +238,17 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor
     // Overrides normal operation in demo mode: 
     if (isDemo)
       {
-      gpsSpeed  = (float)(Math.cos( (double)(System.currentTimeMillis() % 20000) / 3183  ) + 2) * 20;
-      isFixGood = true;                                  //
-      if (isLastSentence) messageHandler.sendMessage(messageHandler.obtainMessage(NMEA_PROCESSOR_DATA_UPDATED));
+      //gpsSpeed  = (float)(Math.cos( (double)(System.currentTimeMillis() % 20000) / 3183  ) + 2) * 20;
+      isFixGood = true;                    //
+      if (isLastSentence) sendGPSData();   // Send some GPS data as Intents. 
       return;
       }
     // ---------------DEMO MODE CODE -------------------------------      
         
 
-    if (isLastSentence)
-      {
-      // Finished one NMEA sentence cycle. Notify UI Class:
-      messageHandler.sendMessage(messageHandler.obtainMessage(NMEA_PROCESSOR_DATA_UPDATED));
-      }
+    // Finished one NMEA sentence cycle. Notify UI Class:
+    if (isLastSentence) sendGPSData();   // Send some GPS data as Intents. 
     }
-  
-  
-  
   
   
   
