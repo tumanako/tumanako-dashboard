@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-  <item android:id="@+id/menuitemDemoMode"
-        android:title="Demo Mode" android:titleCondensed="Demo Mode"/>
+  <item android:title="Show...">
+        <menu>
+          <item android:id="@+id/menuitemShowPrimary"    android:title="Primary Data"    android:titleCondensed="Primary"   />  
+          <item android:id="@+id/menuitemShowSecondary"  android:title="Secondary Data"  android:titleCondensed="Secondary" />  
+          <item android:id="@+id/menuitemShowSystem"     android:title="System Data"     android:titleCondensed="System"    />  
+        </menu>
+  </item>    
+
+  <item android:id="@+id/menuitemDemoMode" android:title="Demo Mode" android:titleCondensed="Demo Mode" />
       
-  <item android:id="@+id/menuitemClose"
-        android:title="Close Dashboarde" android:titleCondensed="Close Dashboard"/>  
+  <item android:id="@+id/menuitemClose" android:title="Close Dashboard" android:titleCondensed="Close Dashboard" />  
 
 </menu>

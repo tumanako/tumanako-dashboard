@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- PORTRAIT Layout!! -->
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
+                android:id="@+id/layoutSecondaryData"
+                android:orientation="vertical"     
+                android:padding="5dp"        
+                android:layout_width="fill_parent"  android:layout_height="fill_parent" android:layout_weight="0"  >
+  
+      
+      <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="10pt"
+                android:text="Secondary Data" />
+        
+      
+      
+      <LinearLayout android:background="@drawable/round_border" android:layout_margin="3dp" android:padding="3dp" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="horizontal" android:gravity="bottom|center_horizontal" android:layout_weight="0">
+
+          <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="bottom|left"
+                    android:textSize="10pt"
+                    android:padding="3dp"
+                    android:layout_weight="1"
+                    android:text="Drive Time: " />
+         
+          <com.tumanako.ui.TextWithLabel android:id="@+id/textDriveTime"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:gravity="center_horizontal"
+                 android:textSize="18pt"
+                 android:layout_weight="0"
+                 app:main_text="00:00" 
+                 app:label_text="       " />
+         
+      </LinearLayout>          
+          
+
+      
+      
+      <LinearLayout android:background="@drawable/round_border" android:layout_margin="3dp" android:padding="3dp" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="horizontal" android:gravity="bottom|center_horizontal" android:layout_weight="0">
+
+          <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="bottom|left"
+                    android:textSize="10pt"
+                    android:padding="3dp"
+                    android:layout_weight="1"
+                    android:text="Drive Range: " />
+         
+          <com.tumanako.ui.TextWithLabel android:id="@+id/textDriveRange"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:gravity="center_horizontal"
+                 android:textSize="18pt"
+                 android:layout_weight="0"
+                 app:main_text="0" 
+                 app:label_text=" km " />
+         
+      </LinearLayout>
+
+      <LinearLayout android:background="@drawable/round_border" android:layout_margin="3dp" android:padding="3dp" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="horizontal" android:gravity="bottom|center_horizontal" android:layout_weight="0">
+      
+          <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"   android:gravity="bottom|left"
+                    android:textSize="10pt"
+                    android:text="Acc Batt: " 
+                    android:layout_weight="1" />
+        
+          <com.tumanako.ui.TextWithLabel android:id="@+id/textAccBatteryVlts"
+                 android:layout_width="wrap_content"  android:layout_height="wrap_content"
+                 android:gravity="center_horizontal"
+                 android:textSize="18pt"  
+                 app:main_text="00.0" 
+                 app:label_text=" V    "  />
+      
+      </LinearLayout>
+      
+  </LinearLayout>

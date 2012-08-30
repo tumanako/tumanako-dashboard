@@ -12,23 +12,37 @@
      <attr name="label_text" format="string" />
      <attr name="label_size" format="integer" />
   </declare-styleable>  
- 
-  <declare-styleable name="Dial">
+
+  
+  <!-- These attributes are used by the Dial and Bar controls: -->
+  <declare-styleable name="RenderedGauge">
+      <!-- Both: -->
       <attr name="minimum_scale"     format="float" />
       <attr name="scale_step"        format="float" />
       <attr name="number_divisions"  format="integer" />
       <attr name="scale_tick_step"   format="float" />
-      <attr name="minimum_angle"     format="integer" />
-      <attr name="maximum_angle"     format="integer" />
       <attr name="origin_x"          format="float" />
       <attr name="origin_y"          format="float" />
-      <attr name="needle_length"     format="float" />
-      <attr name="dial_label"        format="string" />
-      <attr name="label_x"           format="float" />
-      <attr name="label_y"           format="float" />  
-      <attr name="red_line"          format="float" />                
       <attr name="label_format"      format="string" />
+      <attr name="colours"           format="string" />                
+      <attr name="gauge_label"       format="string" />
+      <attr name="label_x"           format="float" />
+      <attr name="label_y"           format="float" />
+      <attr name="show_scale"        format="boolean" />
+      <attr name="show_ticks"        format="boolean" />
+      <attr name="show_gauge_Label"  format="boolean" />                    
+      <!-- Dial Only: -->
+      <attr name="minimum_angle"     format="integer" />
+      <attr name="maximum_angle"     format="integer" />
+      <attr name="needle_length"     format="float" />
+      <!-- Bar Only: -->
+      <attr name="orientation"       format="string" />
+      <attr name="scale_position"    format="string" />
+      <attr name="bar_across"        format="float" />
+      <attr name="bar_long"          format="float" />
+      <attr name="segment_gap"       format="integer" />
+      
   </declare-styleable>
+        
   
-
 </resources>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- PORTRAIT Layout!! -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
+              android:id="@+id/layoutPrimaryData"
+              android:orientation="vertical"     
+              android:padding="5dp"  
+              android:layout_width="fill_parent"  android:layout_height="fill_parent" android:layout_weight="0"  >    
+
+    
+   
+     
+ <FrameLayout android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:padding="2dp">
+       <com.tumanako.ui.Dial android:id="@+id/dialMotorRPM"
+                 android:layout_width="250dp"
+                 android:layout_height="145dp"
+                 android:background="@drawable/dial_bg"
+                 android:layout_gravity="center"
+                 app:minimum_scale="0" 
+                 app:scale_step="1"
+                 app:number_divisions="5"
+                 app:scale_tick_step="0.5"
+                 app:minimum_angle="-90"
+                 app:maximum_angle="50"
+                 app:origin_x="0.5"
+                 app:origin_y="0.85"
+                 app:needle_length="0.4"
+                 app:gauge_label="x1000/min"
+                 app:label_x="0.6"
+                 app:label_y="0.6" 
+                 app:label_format="%.0f" />
+    <com.tumanako.ui.StatusLamp  android:id="@+id/lampData"  
+                                 android:padding="2dp" 
+                                 android:layout_width="60dp"  android:layout_height="30dp"
+                                 android:layout_gravity="top|left" 
+                                 app:on_bitmap="@drawable/data_on"
+                                 app:off_bitmap="@drawable/data_off"  
+                                 app:initial_status="off"  />      
+    <com.tumanako.ui.StatusLamp  android:id="@+id/lampGPS"
+                                 android:padding="2dp"  
+                                 android:layout_width="60dp"  android:layout_height="30dp"
+                                 android:layout_gravity="top|right"  
+                                 app:on_bitmap="@drawable/gps_on"
+                                 app:off_bitmap="@drawable/gps_off"
+                                 app:initial_status="off"  />
+ </FrameLayout>     
+      
+ 
+ 
+ <FrameLayout android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:padding="2dp">
+    <com.tumanako.ui.Dial android:id="@+id/dialMainBatteryKWh"
+                 android:layout_width="200dp"
+                 android:layout_height="115dp"
+                 android:background="@drawable/dial_bg"
+                 android:layout_gravity="center"
+                 app:minimum_scale="0" 
+                 app:scale_step="10"
+                 app:number_divisions="5"
+                 app:scale_tick_step="5"
+                 app:minimum_angle="-90"
+                 app:maximum_angle="50"
+                 app:origin_x="0.5"
+                 app:origin_y="0.85"
+                 app:needle_length="0.4"
+                 app:gauge_label="kWh"
+                 app:label_x="0.6"
+                 app:label_y="0.6" 
+                 app:label_format="%.0f" />
+    <com.tumanako.ui.StatusLamp  android:id="@+id/lampContactor"
+                                 android:padding="2dp"  
+                                 android:layout_width="60dp"  android:layout_height="60dp"
+                                 android:layout_gravity="top|left"
+                                 app:on_bitmap="@drawable/contactor_on"
+                                 app:off_bitmap="@drawable/contactor_off"  
+                                 app:initial_status="off"  />   
+    <com.tumanako.ui.StatusLamp  android:id="@+id/lampFault"
+                                 android:padding="2dp"  
+                                 android:layout_width="60dp"  android:layout_height="60dp"
+                                 android:layout_gravity="top|right" 
+                                 app:on_bitmap="@drawable/fault_on"
+                                 app:off_bitmap="@drawable/fault_off"  
+                                 app:initial_status="on"  />
+ </FrameLayout>
+ 
+ 
+ <com.tumanako.ui.BarGauge android:id="@+id/barTMotor"
+                 android:layout_width="fill_parent"
+                 android:layout_height="40dp"
+                 android:background="@drawable/bezel"
+                 android:layout_margin="3dp"
+                 app:minimum_scale="20" 
+                 app:scale_step="10"
+                 app:number_divisions="9"
+                 app:scale_tick_step="5"
+                 app:label_format="%.0f" 
+                 app:gauge_label="Mtr °C"
+                 app:label_x="0.22"
+                 app:label_y="0.75"
+                 app:origin_x="0.25"
+                 app:origin_y="0.90"
+                 app:orientation="horizontal"
+                 app:scale_position="left"
+                 app:bar_across="0.4"
+                 app:bar_long="0.70"
+                 app:segment_gap="2"
+                 app:show_scale="true"                 
+                 app:colours="FF3ADF00,FF74DF00,FFA5DF00,FFD7DF01,FFDBA901,FFDF7401,FFDF3A01,FFFF4000,FFFF0000,FFFF0000" />
+
+ <com.tumanako.ui.BarGauge android:id="@+id/barTController"
+                 android:layout_width="fill_parent"
+                 android:layout_height="20dp"
+                 android:background="@drawable/bezel"
+                 android:layout_margin="3dp"
+                 app:minimum_scale="20" 
+                 app:scale_step="10"
+                 app:number_divisions="9"
+                 app:scale_tick_step="5"
+                 app:label_format="%.0f" 
+                 app:gauge_label="Cntl °C"
+                 app:label_x="0.22"
+                 app:label_y="0.75"
+                 app:origin_x="0.25"
+                 app:origin_y="0.90"
+                 app:orientation="horizontal"
+                 app:scale_position="left"
+                 app:bar_across="0.8"
+                 app:bar_long="0.70"
+                 app:segment_gap="2"
+                 app:show_scale="false"                 
+                 app:colours="FF3ADF00,FF74DF00,FFA5DF00,FFD7DF01,FFDBA901,FFDF7401,FFDF3A01,FFFF4000,FFFF0000,FFFF0000" />
+ 
+  <com.tumanako.ui.BarGauge android:id="@+id/barTBattery"
+                 android:layout_width="fill_parent"
+                 android:layout_height="20dp"
+                 android:background="@drawable/bezel"
+                 android:layout_margin="3dp"                 
+                 app:minimum_scale="20" 
+                 app:scale_step="10"
+                 app:number_divisions="9"
+                 app:scale_tick_step="5"
+                 app:label_format="%.0f" 
+                 app:gauge_label="Bat °C"
+                 app:label_x="0.22"
+                 app:label_y="0.75"
+                 app:origin_x="0.25"
+                 app:origin_y="0.90"
+                 app:orientation="horizontal"
+                 app:scale_position="left"
+                 app:bar_across="0.8"
+                 app:bar_long="0.70"
+                 app:segment_gap="2"
+                 app:show_scale="false"                 
+                 app:colours="FF3ADF00,FF74DF00,FFA5DF00,FFD7DF01,FFDBA901,FFDF7401,FFDF3A01,FFFF4000,FFFF0000,FFFF0000" />
+
+  
+  <!-- 
+ 
+     <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"  android:orientation="horizontal"  android:layout_weight="0">
+
+        <LinearLayout android:background="@drawable/round_border" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="vertical" android:gravity="top|center_horizontal" android:layout_weight="1">         
+          <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"
+                    android:textSize="10pt"
+                    android:text="@string/stringController" />
+          <com.tumanako.ui.TextWithLabel android:id="@+id/textTController"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:gravity="center_horizontal"
+                 android:textSize="14pt"
+                 app:main_text="00.0" 
+                 app:label_text=" °C" />
+        </LinearLayout>
+      
+        <LinearLayout android:background="@drawable/round_border" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="vertical" android:gravity="top|center_horizontal" android:layout_weight="1">         
+          <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"
+                    android:textSize="10pt"
+                    android:text="@string/stringBattery" />
+          <com.tumanako.ui.TextWithLabel android:id="@+id/textTBattery"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:gravity="center_horizontal"
+                 android:textSize="14pt"
+                 app:main_text="00.0" 
+                 app:label_text=" °C" />
+        </LinearLayout>
+               
+     </LinearLayout>
+  -->    
+    
+    
+</LinearLayout>
