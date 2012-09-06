@@ -69,10 +69,10 @@ public class BarGauge extends RenderedGauge
 
     // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  Dial -> Constructor ");
     
-    numberBlocks = numberDivisions-1;    // TODO: May need to change if adding 'ticks'. 
+    numberBlocks = numberScaleTicks-1;     
     
     // Array of rectangels for drawing bar: 
-    barRects = new Rect[numberDivisions];  // Will be filled with actual coordinates during calcBar(). 
+    barRects = new Rect[numberScaleTicks];  // Will be filled with actual coordinates during calcBar(). 
     
     // Paint for Bar:
     barPaint = new Paint();
@@ -98,10 +98,11 @@ public class BarGauge extends RenderedGauge
     // for a horizontal bar, barLong is calculated based on drawingWidth. The opposite rule 
     // applies for barAcross.
     //
-    blockValue = scaleStep;   // TODO: Will need to be something else when 'ticks' are implemented...
+    blockValue = tickStep;
 
     int blockX = (int) originX;  // blockX and blockY used below to generate list of rectangles  
     int blockY = (int) originY;  // representing blocks on the bar. Start at Origin x/Origin y.
+    float scaleLong;
     
     if (isVertical)
       {
@@ -111,15 +112,26 @@ public class BarGauge extends RenderedGauge
       // Calculate the dimensions of the bar:
       barAcross = (int)(fBarAcross * drawingWidth);
       barLong = (int)(fBarLong * drawingHeight);
-      blockLong = (int) (barLong / (numberDivisions-1));
-      // Loop through the requested number of scale steps and calculate stuff...
-      for (int n=0; n<numberDivisions; n++)
+      blockLong = (int) (barLong / (numberScaleTicks-1));
+      
+      // Loop through the requested number of tick steps and calculate bar blocks...
+      for (int n=0; n<numberScaleTicks; n++)
         {
         barRects[n] = new Rect(blockX,(blockY-blockLong)+barSegmentGap,(blockX+barAcross),blockY);
-        slabelX[n] = blockX - 3;
-        slabelY[n] = blockY + 5;
         blockY -= blockLong;
         }  // [for ...]
+
+      // Loop through the requested number of scale steps and calculate scale label positions...
+      blockX = (int) originX;
+      blockY = (int) originY;
+      scaleLong = (int) (barLong / (numberDivisions-1));
+      for (int n=0; n<numberDivisions; n++)
+        {
+        slabelX[n] = blockX - 3;
+        slabelY[n] = blockY + 5;
+        blockY -= scaleLong;
+        }  // [for ...]      
+      
       }
     
     else  // [if (isVertical)]
@@ -130,17 +142,27 @@ public class BarGauge extends RenderedGauge
       // Calculate the dimensions of the bar:
       barAcross = (int)(fBarAcross * drawingHeight);
       barLong = (int)(fBarLong * drawingWidth);
-      blockLong = (int) (barLong / (numberDivisions-1));
-      // Loop through the requested number of scale steps and calculate stuff...
-      for (int n=0; n<numberDivisions; n++)
+      blockLong = (int) (barLong / (numberScaleTicks-1));
+      
+      // Loop through the requested number of tick steps and calculate bar blocks...      
+      for (int n=0; n<numberScaleTicks; n++)
         {
         barRects[n] = new Rect(blockX,(blockY-barAcross),(blockX+blockLong)-barSegmentGap,blockY);
-        slabelX[n] = blockX;
-        slabelY[n] = (blockY-barAcross-3);
         blockX += blockLong;
         }  // [for ...]      
+
+      // Loop through the requested number of scale steps and calculate scale label positions...
+      blockX = (int) originX;
+      blockY = (int) originY;
+      scaleLong = (int) (barLong / (numberDivisions-1));
+      for (int n=0; n<numberDivisions; n++)
+        {
+        slabelX[n] = blockX;
+        slabelY[n] = (blockY-barAcross-3);
+        blockX += scaleLong;      
+        }  // [for ...]
+
       }  // [if (isVertical)]
-    
     invalidate();    
     }
 

@@ -21,6 +21,7 @@
       <attr name="scale_step"        format="float" />
       <attr name="number_divisions"  format="integer" />
       <attr name="scale_tick_step"   format="float" />
+      <attr name="scale_tick_size"   format="integer" />
       <attr name="origin_x"          format="float" />
       <attr name="origin_y"          format="float" />
       <attr name="label_format"      format="string" />

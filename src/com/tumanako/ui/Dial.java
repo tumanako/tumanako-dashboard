@@ -76,7 +76,7 @@ public class Dial extends RenderedGauge
     // Paint for needle: 
     needlePaint = new Paint();
     needlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-    needlePaint.setStrokeWidth(3);
+    needlePaint.setStrokeWidth(1);
     needlePaint.setColor(0xA0F00000);
     needlePaint.setAntiAlias(true);
     
@@ -88,8 +88,6 @@ public class Dial extends RenderedGauge
   /******* Calculate run-time parameters for drawing scale, etc: ***************/
   private void calcDial()
     {
-
-
     // Calculate the needle length in screen coordinates: (Initially specified as a % of guage width):
     needleLength = (float)drawingWidth * fNeedleLength;   
     
@@ -98,12 +96,21 @@ public class Dial extends RenderedGauge
     float scaleAngleStep = (maxAngle - minAngle) / (float)(numberDivisions-1);   // Angle step for each scale step
     for (int n=0; n<numberDivisions; n++)
       {
-      slabelX[n] = needleX(scaleAngle);
-      slabelY[n] = needleY(scaleAngle);
+      slabelX[n] = needleX(scaleAngle,needleLength);
+      slabelY[n] = needleY(scaleAngle,needleLength);
       scaleAngle = scaleAngle + scaleAngleStep;
       }
     needleLength = needleLength * 0.9f;
-    
+    // Now calculate locations of scale ticks:
+    scaleAngle = minAngle;   // Angle from origin to initial point on scale in Radians (0 = vertical up)
+    scaleAngleStep = (maxAngle - minAngle) / (float)(numberScaleTicks-1);   // Angle step for each scale tick
+    for (int n=0; n<numberScaleTicks; n++)
+      {
+      tickX[n] = needleX(scaleAngle,needleLength);
+      tickY[n] = needleY(scaleAngle,needleLength);
+      scaleAngle = scaleAngle + scaleAngleStep;
+      }
+    needleLength = needleLength * 0.9f;
     invalidate();    
     }
 
@@ -118,6 +125,9 @@ public class Dial extends RenderedGauge
     {
     super.setValue(value);
     needleAngle = minAngle + (((value - scaleMin) / deltaScale) * deltaAngle);
+
+    makeNeedle();
+    
     invalidate();
     }
   
@@ -136,9 +146,9 @@ public class Dial extends RenderedGauge
    * @return x screen coordinate
    * 
    */
-  private float needleX(float thisAngle)
+  private float needleX(float thisAngle, float thisLength)
     {
-    return originX + (needleLength * FloatMath.sin(thisAngle)); 
+    return originX + (thisLength * FloatMath.sin(thisAngle)); 
     }
 
   
@@ -154,9 +164,9 @@ public class Dial extends RenderedGauge
    * @return y screen coordinate
    * 
    */
-  private float needleY(float thisAngle)
+  private float needleY(float thisAngle, float thisLength)
     {
-    return originY - (needleLength * FloatMath.cos(thisAngle)); 
+    return originY - (thisLength * FloatMath.cos(thisAngle)); 
     }
   
   
@@ -166,12 +176,35 @@ public class Dial extends RenderedGauge
   
   private void makeNeedle()
     {
-    // Make a line to represent the needle: 
+    // Make a line to represent the needle:
+    needlePath.reset();
+    float x;
+    float y; 
+
+/**** Simple Needle: ***    
     float x = needleX(needleAngle); 
     float y = needleY(needleAngle);
-    needlePath.reset();
     needlePath.moveTo(originX, originY);             // ...Start point!
     needlePath.lineTo(x,y);                          // ...End point!
+************************/
+    
+    // **** Prettier Needle: ****
+    /*                                    0                    1                    2             3                   4                   5                  6   */
+    float[] angles  = {              -2.8f,              -1.57f,             -0.04f,           0f,             0.04f,              1.57f,                 2.8f,  }; 
+    float[] lengths = {  0.1f*needleLength,  0.05f*needleLength,  0.93f*needleLength, needleLength, 0.93f*needleLength, 0.05f*needleLength, 0.1f*needleLength  };
+
+    
+    x = needleX(needleAngle+angles[0],lengths[0]);  //
+    y = needleY(needleAngle+angles[0],lengths[0]);  //
+    needlePath.moveTo(x, y);            // ...Start point!   
+    
+    for (int n=1; n<7; n++)
+      {
+      x = needleX(needleAngle+angles[n],lengths[n]);  //
+      y = needleY(needleAngle+angles[n],lengths[n]);  //
+      needlePath.lineTo(x, y);            // ...Next point in sequence!   
+      }
+    
     }
 
 
@@ -190,10 +223,23 @@ public class Dial extends RenderedGauge
       calcDial();
       }
 
+    // *** Draw the scale 'ticks': ***
+    // Draw the scale text (if required):
+    if (showTicks)
+      {
+      for (int n = 0; n < numberScaleTicks; n++)
+        {      
+        if (n < numberColours) tickPaint.setColor(scaleColours[n]);
+        else                   tickPaint.setColor(DEFAULT_TICK_COLOUR );
+        canvas.drawCircle( tickX[n], tickY[n], tickSize, tickPaint);
+        }
+      }  
+    
+   
     // *** Draw the needle: ****
-    makeNeedle();
+    needlePaint.setColor(0xA0F00000);
     canvas.drawPath(needlePath, needlePaint);
-
+    
     }
   
   }  // [Class]

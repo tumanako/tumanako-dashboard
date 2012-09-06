@@ -21,6 +21,7 @@
                  app:scale_step="1"
                  app:number_divisions="5"
                  app:scale_tick_step="0.5"
+                 app:scale_tick_size="3"
                  app:minimum_angle="-90"
                  app:maximum_angle="50"
                  app:origin_x="0.5"
@@ -29,7 +30,8 @@
                  app:gauge_label="x1000/min"
                  app:label_x="0.6"
                  app:label_y="0.6" 
-                 app:label_format="%.0f" />
+                 app:label_format="%.0f" 
+                 app:colours="FF404040,FFA0A0A0,FF404040,FFA0A0A0,FF404040,FFDBB893,FFDF7401,FFFFA58C,FFFF3700,FFFF0000" />
     <com.tumanako.ui.StatusLamp  android:id="@+id/lampData"  
                                  android:padding="2dp" 
                                  android:layout_width="60dp"  android:layout_height="30dp"
@@ -58,6 +60,7 @@
                  app:scale_step="10"
                  app:number_divisions="5"
                  app:scale_tick_step="5"
+                 app:scale_tick_size="3"
                  app:minimum_angle="-90"
                  app:maximum_angle="50"
                  app:origin_x="0.5"
@@ -66,7 +69,8 @@
                  app:gauge_label="kWh"
                  app:label_x="0.6"
                  app:label_y="0.6" 
-                 app:label_format="%.0f" />
+                 app:label_format="%.0f" 
+                 app:colours="FFFF0000,FFFF0000,FFDF7401,FFDF7401,FF00D0+00,FF00D000,FF00D000,FF00D000,FF00D000,FF00D000" />
     <com.tumanako.ui.StatusLamp  android:id="@+id/lampContactor"
                                  android:padding="2dp"  
                                  android:layout_width="60dp"  android:layout_height="60dp"
@@ -90,8 +94,8 @@
                  android:background="@drawable/bezel"
                  android:layout_margin="3dp"
                  app:minimum_scale="20" 
-                 app:scale_step="10"
-                 app:number_divisions="9"
+                 app:scale_step="20"
+                 app:number_divisions="5"
                  app:scale_tick_step="5"
                  app:label_format="%.0f" 
                  app:gauge_label="Mtr °C"
@@ -105,7 +109,7 @@
                  app:bar_long="0.70"
                  app:segment_gap="2"
                  app:show_scale="true"                 
-                 app:colours="FF3ADF00,FF74DF00,FFA5DF00,FFD7DF01,FFDBA901,FFDF7401,FFDF3A01,FFFF4000,FFFF0000,FFFF0000" />
+                 app:colours="FF3ADF00,FF3ADF00,FF74DF00,FF74DF00,FFA5DF00,FFA5DF00,FFD7DF01,FFD7DF01,FFDBA901,FFDBA901,FFDF7401,FFDF7401,FFDF3A01,FFDF3A01,FFFF4000,FFFF4000,FFFF0000,FFFF0000,FFFF0000,FFFF0000" />
 
  <com.tumanako.ui.BarGauge android:id="@+id/barTController"
                  android:layout_width="fill_parent"
@@ -113,8 +117,8 @@
                  android:background="@drawable/bezel"
                  android:layout_margin="3dp"
                  app:minimum_scale="20" 
-                 app:scale_step="10"
-                 app:number_divisions="9"
+                 app:scale_step="20"
+                 app:number_divisions="5"
                  app:scale_tick_step="5"
                  app:label_format="%.0f" 
                  app:gauge_label="Cntl °C"
@@ -128,7 +132,7 @@
                  app:bar_long="0.70"
                  app:segment_gap="2"
                  app:show_scale="false"                 
-                 app:colours="FF3ADF00,FF74DF00,FFA5DF00,FFD7DF01,FFDBA901,FFDF7401,FFDF3A01,FFFF4000,FFFF0000,FFFF0000" />
+                 app:colours="FF3ADF00,FF3ADF00,FF74DF00,FF74DF00,FFA5DF00,FFA5DF00,FFD7DF01,FFD7DF01,FFDBA901,FFDBA901,FFDF7401,FFDF7401,FFDF3A01,FFDF3A01,FFFF4000,FFFF4000,FFFF0000,FFFF0000,FFFF0000,FFFF0000" />
  
   <com.tumanako.ui.BarGauge android:id="@+id/barTBattery"
                  android:layout_width="fill_parent"
@@ -136,8 +140,8 @@
                  android:background="@drawable/bezel"
                  android:layout_margin="3dp"                 
                  app:minimum_scale="20" 
-                 app:scale_step="10"
-                 app:number_divisions="9"
+                 app:scale_step="20"
+                 app:number_divisions="5"
                  app:scale_tick_step="5"
                  app:label_format="%.0f" 
                  app:gauge_label="Bat °C"
@@ -151,7 +155,7 @@
                  app:bar_long="0.70"
                  app:segment_gap="2"
                  app:show_scale="false"                 
-                 app:colours="FF3ADF00,FF74DF00,FFA5DF00,FFD7DF01,FFDBA901,FFDF7401,FFDF3A01,FFFF4000,FFFF0000,FFFF0000" />
+                 app:colours="FF3ADF00,FF3ADF00,FF74DF00,FF74DF00,FFA5DF00,FFA5DF00,FFD7DF01,FFD7DF01,FFDBA901,FFDBA901,FFDF7401,FFDF7401,FFDF3A01,FFDF3A01,FFFF4000,FFFF4000,FFFF0000,FFFF0000,FFFF0000,FFFF0000" />
 
   
   <!-- 
