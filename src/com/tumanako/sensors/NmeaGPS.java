@@ -28,6 +28,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import com.tumanako.dash.IDashMessages;
+
 
 /*********************************************************************************************
  * NMEA NMEAData Receiver: 
@@ -41,7 +43,7 @@ import android.os.Bundle;
  *
  *********************************************************************************************/
 
-public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidSensor 
+public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages 
   {
 
   private LocationManager mLocationManager;
@@ -53,7 +55,6 @@ public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidS
   // ***** Constructor: *******
   public NmeaGPS(Context context)
     {
-    super(context);    // We are extenging the 'TumanakoSensor' class, and we need to call its Constructor here.
     // Create a LocationManager object to get location data from NMEAData: 
     mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     // Create an NMEA Processor to receive and process NMEA sentences: 
@@ -70,11 +71,10 @@ public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidS
   // ******* Is the NMEAData OK / available? *******************
   // Note - NMEAData status found to be slow in changing. It's better to look at   
   // isFixGood() method of NMEAData object to see if a fix is available.
-  @Override
   public boolean isOK()
     {  return isAvailable;  }
 
-  @Override
+
   public boolean isRunning()
     {  return isAvailable;  }
 
@@ -84,7 +84,6 @@ public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidS
    * Returns a string with a data summary (useful for debugging):
    * @return String representing class data 
    ******************************************************************/
-  @Override  
   public String toString()
     {  return NMEAData.toString();  }
 
@@ -93,7 +92,6 @@ public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidS
   
   
   // Start getting NMEAData updates:
-  @Override
   public void resume()
     {
     // Register the listener with the Location Manager to receive location updates:
@@ -105,7 +103,6 @@ public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidS
 
   
   // Stop the NMEAData listener (saves batteries):
-  @Override
   public void suspend()
     {
     mLocationManager.removeNmeaListener(NMEAData);
@@ -149,6 +146,12 @@ public class NmeaGPS extends TumanakoSensor implements LocationListener, IDroidS
     else
       {  isAvailable = false;  }
     }
+
+
+
+
+  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
+    {  }
 
  
   

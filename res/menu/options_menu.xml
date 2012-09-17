@@ -6,6 +6,7 @@
           <item android:id="@+id/menuitemShowPrimary"    android:title="Primary Data"    android:titleCondensed="Primary"   />  
           <item android:id="@+id/menuitemShowSecondary"  android:title="Secondary Data"  android:titleCondensed="Secondary" />  
           <item android:id="@+id/menuitemShowSystem"     android:title="System Data"     android:titleCondensed="System"    />  
+          <item android:id="@+id/menuitemShowCharge"     android:title="Charge Node"     android:titleCondensed="Charging"  />
         </menu>
   </item>    
 

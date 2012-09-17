@@ -23,8 +23,12 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************************/
 
 
+import com.tumanako.dash.DashMessages;
+import com.tumanako.dash.IDashMessages;
+
 import android.content.Context;
 import android.location.GpsStatus;
+import android.os.Bundle;
 import android.os.SystemClock;
 
 
@@ -66,7 +70,7 @@ import android.os.SystemClock;
  *
  ***************************************************************/
 
-public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListener, IDroidSensor
+public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDashMessages
   {
      
   // ****** Information directly from the NMEAData: **********
@@ -92,13 +96,14 @@ public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListe
   
   
   // *** GPS Processing / Data Message Type Indicators: ***
-  public static final int NMEA_PROCESSOR_DATA_UPDATED  = NMEA_PROCESSOR_ID + 0;
-  public static final int NMEA_PROCESSOR_ERROR         = NMEA_PROCESSOR_ID + 99;
+  public static final String NMEA_PROCESSOR_DATA_UPDATED  = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 0  );
+  public static final String NMEA_PROCESSOR_ERROR         = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 99 );
   
-  public static final int DATA_GPS_HAS_LOCK            = NMEA_PROCESSOR_ID + 1;
-  public static final int DATA_GPS_TIME                = NMEA_PROCESSOR_ID + 2;
-  public static final int DATA_GPS_SPEED               = NMEA_PROCESSOR_ID + 3;
+  public static final String DATA_GPS_HAS_LOCK            = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 1  );
+  public static final String DATA_GPS_TIME                = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 2  );
+  public static final String DATA_GPS_SPEED               = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 3  );
   
+ 
   
   // ---------------DEMO MODE CODE -------------------------------
   private boolean isDemo = false;  // Demo mode flag!
@@ -109,9 +114,7 @@ public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListe
    * Constructor: Sets up a message broadcaster. 
    ************************************************************/
   public NmeaProcessor(Context context)
-    {
-    super(context);    // We are extenging the 'TumanakoSensor' class, and we need to call its Constructor here.
-    }
+    {  }
 
   
   
@@ -184,7 +187,6 @@ public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListe
    * Returns a string with a data summary (useful for debugging):
    * @return String representing class data 
    ******************************************************************/
-  @Override 
   public String toString()
     {
     // Return a summary of NMEAData data as a string (for debugging).
@@ -206,11 +208,9 @@ public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListe
     }
   
 
-  @Override
   public boolean isOK()
     {  return isFixGood();  }  // Returns the 'Fix Good' indication
 
-  @Override
   public boolean isRunning()
     {  return true;  }        // Always 'true' since this sensor is always ready. 
 
@@ -222,9 +222,10 @@ public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListe
     {
     // Send some useful GPS data as Intents:
     float fixGood = (isFixGood) ? 1f : 0f;
-    sendFloat(DATA_GPS_HAS_LOCK, fixGood);
-    sendFloat(DATA_GPS_TIME,     gpsTime);
-    sendFloat(DATA_GPS_SPEED,    gpsSpeed);
+    Bundle gpsData = new Bundle();
+    gpsData.putFloat(DATA_GPS_HAS_LOCK, fixGood);
+    gpsData.putFloat(DATA_GPS_TIME,     gpsTime);
+    gpsData.putFloat(DATA_GPS_SPEED,    gpsSpeed);
     }
   
   
@@ -364,6 +365,31 @@ public class NmeaProcessor extends TumanakoSensor implements GpsStatus.NmeaListe
       { 
       return 0.0;  // On error, give up and return 0.0
       }
+    }
+
+
+
+  public void messageReceived(String action, int message, Float floatData,
+      String stringData, Bundle data)
+    {
+    // TODO Auto-generated method stub
+    
+    }
+
+
+
+  public void suspend()
+    {
+    // TODO Auto-generated method stub
+    
+    }
+
+
+
+  public void resume()
+    {
+    // TODO Auto-generated method stub
+    
     }
 
   

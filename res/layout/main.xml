@@ -26,6 +26,7 @@
    <include layout="@layout/primary_data" />
    <include layout="@layout/secondary_data" />
    <include layout="@layout/system_data" />
+   <include layout="@layout/charge_node" />
 
 
   </FrameLayout>

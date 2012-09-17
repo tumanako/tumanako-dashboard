@@ -24,17 +24,15 @@ package com.tumanako.ui;
 
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
-import com.tumanako.sensors.DataService;
-import com.tumanako.sensors.IDroidSensor;
-import com.tumanako.sensors.VehicleData;
-import com.tumanako.sensors.NmeaProcessor;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.graphics.DashPathEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
@@ -48,9 +46,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.Button;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
+import android.widget.TextView;
+import android.webkit.WebView;
+
+import com.tumanako.dash.ChargeNode;
+import com.tumanako.dash.DashMessages;
+import com.tumanako.dash.IDashMessages;
+import com.tumanako.sensors.DataService;
+import com.tumanako.sensors.IDroidSensor;
+import com.tumanako.sensors.NmeaProcessor;
+import com.tumanako.sensors.VehicleData;
 
 /*********************************************************
  * Main UI Activity: 
@@ -60,7 +69,7 @@ import android.widget.Toast;
  *
  ********************************************************/
 
-public class UIActivity extends Activity implements OnClickListener, OnLongClickListener, OnTouchListener   //, ServiceConnection
+public class UIActivity extends Activity implements OnClickListener, OnLongClickListener, OnTouchListener,IDashMessages    //, ServiceConnection
     {
     
     public static final String APP_TAG = "TumanakoDash";
@@ -69,7 +78,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     private TabHost tabHost;
     private int currentTab = 0;
     private static final int MIN_TAB = 0;
-    private static final int MAX_TAB = 2;
+    private static final int MAX_TAB = 3;
     private GestureDetector gestureDetector;
     
     
@@ -79,8 +88,9 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     // Intent - used to start Data Service:
     private Intent  dataIntent;
 
-    // Message Broadcaster to send Tntents to data service: 
-    private LocalBroadcastManager messageBroadcaster;    
+    // Message Broadcaster to send Intents to data service: 
+    // private LocalBroadcastManager messageBroadcaster;
+    private DashMessages dashMessages;
 
     
     // UI Timer Handler: 
@@ -94,10 +104,16 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     private static final String PREFS_NAME = "TumanakoDashPrefs";
     
     
+    public static final int TUMANAKO_UI = 1;
+    public static final String UI_INTENT_IN  = "com.tumanako.ui.intentin";      
+    public static final String UI_INTENT_OUT  = "com.tumanako.ui.intentout";
+    
+        
     // ---------------DEMO MODE CODE -------------------------------
     private boolean isDemo = false;  // Demo mode flag!
     // ---------------DEMO MODE CODE -------------------------------  
 
+    private ChargeNode chargeNode;
     
     
     
@@ -127,9 +143,14 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       spec3.setIndicator("System");
       spec3.setContent(R.id.layoutSystemData);
       
+      TabSpec spec4=tabHost.newTabSpec("Charge Node");
+      spec4.setIndicator("Charging");
+      spec4.setContent(R.id.layoutChaqrgeNode);
+
       tabHost.addTab(spec1);
       tabHost.addTab(spec2);
       tabHost.addTab(spec3);
+      tabHost.addTab(spec4);
 
       
       // --DEBUG!!--
@@ -146,8 +167,6 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       uiWidgets.put( "barTMotor",          findViewById(R.id.barTMotor)          );
       uiWidgets.put( "barTController",     findViewById(R.id.barTController)     );
       uiWidgets.put( "barTBattery",        findViewById(R.id.barTBattery)        );
-      //uiWidgets.put( "textTController",    findViewById(R.id.textTController)    );
-      //uiWidgets.put( "textTBattery",       findViewById(R.id.textTBattery)       );
       // Secondary Data: 
       uiWidgets.put( "textDriveTime",      findViewById(R.id.textDriveTime)      );
       uiWidgets.put( "textDriveRange",     findViewById(R.id.textDriveRange)     );
@@ -156,18 +175,32 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       uiWidgets.put( "lampPreCharge",      findViewById(R.id.lampPreCharge)      );      
       uiWidgets.put( "textMainBattVlts",   findViewById(R.id.textMainBattVlts)   );
       uiWidgets.put( "textMainBattAH",     findViewById(R.id.textMainBattAH)     );
-      
+      // Charge Node: 
+      uiWidgets.put( "webChargeNodeContent", findViewById(R.id.webChargeNodeContent) );
+      uiWidgets.put( "buttonConnectToNode",  findViewById(R.id.buttonConnectToNode)  );
+      uiWidgets.put( "buttonChargeStart",    findViewById(R.id.buttonChargeStart)    );
+      uiWidgets.put( "buttonChargeStop",     findViewById(R.id.buttonChargeStop)     );
+      uiWidgets.put( "textChargeCurrent",    findViewById(R.id.textChargeCurrent)    );
+      uiWidgets.put( "textChargeAH",         findViewById(R.id.textChargeAH)         );
       
       // ---- Connect click and gesture listeners: -------
       gestureDetector = new GestureDetector(new SimpleSwiper(this));
       tabHost.setOnTouchListener(this);
+      
+      ((Button)uiWidgets.get("buttonConnectToNode")).setOnClickListener(this);
+      ((Button)uiWidgets.get("buttonChargeStart")).setOnClickListener(this);
+      ((Button)uiWidgets.get("buttonChargeStop")).setOnClickListener(this);
+      
 
       // ---- Create a Data Service intent: ------
       dataIntent = new Intent(this, com.tumanako.sensors.DataService.class);
       
-      messageBroadcaster = LocalBroadcastManager.getInstance(this);  
+      //messageBroadcaster = LocalBroadcastManager.getInstance(this);  
       // Get a Broadcast Manager so we can send out messages to other parts of the app.
-
+      dashMessages = new DashMessages( this, this, UI_INTENT_IN );
+      
+      chargeNode = new ChargeNode(this);
+      
       
       // -------- Restore Saved Preferences (if any): -------------------
       /***
@@ -244,17 +277,13 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       {
       // Send 'DEMO' intent to data service:
       Log.i(APP_TAG,"UIActivity -> startDemo()");
-      Intent intent = new Intent(DataService.DATA_SERVICE_DEMO);
-      intent.putExtra(DataService.SERVICE_DEMO_SETTO,true);
-      messageBroadcaster.sendBroadcast(intent);
+      dashMessages.sendData( DataService.DATA_SERVICE, DataService.DATA_SERVICE_DEMO,1f, null, null );
       isDemo = true;
       }
     private void stopDemo()
       {
-      // Send 'DEMO' intent to data service: 
-      Intent intent = new Intent(DataService.DATA_SERVICE_DEMO);
-      intent.putExtra(DataService.SERVICE_DEMO_SETTO,false);
-      messageBroadcaster.sendBroadcast(intent);
+      // Send 'DEMO' intent to data service:
+      dashMessages.sendData( DataService.DATA_SERVICE, DataService.DATA_SERVICE_DEMO,0f, null, null );
       isDemo = false;
       }  
     // ---------------DEMO MODE CODE -------------------------------
@@ -304,8 +333,6 @@ Log.i(APP_TAG,"UIActivity -> uiReset()");
       ((BarGauge)uiWidgets.get("barTMotor"))               .setValue (  0f );
       ((BarGauge)uiWidgets.get("barTController"))          .setValue (  0f );
       ((BarGauge)uiWidgets.get("barTBattery"))             .setValue (  0f );
-      //((TextWithLabel)uiWidgets.get("textTController"))    .setText   (  "0.0"  );
-      //((TextWithLabel)uiWidgets.get("textTBattery"))       .setText   (  "0.0"  );
       ((StatusLamp)uiWidgets.get("lampData")).turnOff();
       ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
       ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
@@ -318,6 +345,10 @@ Log.i(APP_TAG,"UIActivity -> uiReset()");
       ((TextWithLabel)uiWidgets.get("textMainBattVlts"))  .setText   (  "0.0"   );
       ((TextWithLabel)uiWidgets.get("textMainBattAH"))    .setText   (  "0.0"   );
       ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
+      // Charge Node:
+      ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
+      ((TextWithLabel)uiWidgets.get("textChargeCurrent"))   .setText   ( "0"       );
+      ((TextWithLabel)uiWidgets.get("textChargeAH"))        .setText   ( "0.0"     );
       }
 
     
@@ -352,13 +383,19 @@ Log.i(APP_TAG,"UIActivity -> uiReset()");
       //  (i.e. the button) and takes the appropriate action.  
       switch (MyView.getId())
         {
-        // Now done with the menu, but we might want to use buttons later...
-        //case R.id.buttonClose: 
-        //  finish();
-        //  break;
+        case R.id.buttonConnectToNode:
+          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CONNECT, null, null, null );
+          break;
+        case R.id.buttonChargeStart:
+          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTART, null, null, null );
+          break;
+        case R.id.buttonChargeStop:
+          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTOP, null, null, null );
+          break;
         }
       } 
     
+        
     // **** LOOOONG Click Action Handler: ************** 
     public boolean onLongClick(View MyView)
       {
@@ -396,6 +433,10 @@ Log.i(APP_TAG,"UIActivity -> uiReset()");
           tabHost.setCurrentTab(2);
           currentTab = 2;
           return true;
+        case R.id.menuitemShowCharge:
+          tabHost.setCurrentTab(3);
+          currentTab = 3;
+          return true;          
           
         // ---------------DEMO MODE CODE -------------------------------        
         case R.id.menuitemDemoMode:
@@ -456,10 +497,14 @@ Log.i(APP_TAG,"UIActivity -> uiReset()");
 Log.i(APP_TAG,"UIActivity -> onResume()");
 Log.i(APP_TAG,"     State: currentTab = " + currentTab + "; isDemo = " + isDemo );
       super.onResume();
+      dashMessages.resume();
+      chargeNode.resume();
+      
       // Register to receive messages via Intents:
-      LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,  new IntentFilter(IDroidSensor.SENSOR_INTENT_ACTION));
+      //LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,  new IntentFilter(IDroidSensor.SENSOR_INTENT_ACTION));
         // We are registering an observer (messageReceiver) to receive Intents
         // with actions named IDroidSensor.SENSOR_INTENT_ACTION (see IDroidSensor.java for constant defn.).
+
       // Start the data server (in case it's not already going; doesn't matter if it is). 
       startService(dataIntent);
       uiReset();
@@ -500,8 +545,8 @@ Log.i(APP_TAG,"UIActivity -> Restore State: currentTab = " + currentTab + "; isD
       {
 Log.i(APP_TAG,"UIActivity -> onPause()");      
       super.onPause();
-      // Unregister listener since the activity is about to be closed or stopped.
-      LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+      dashMessages.suspend();
+      chargeNode.suspend();
       uiTimer.removeCallbacks(uiTimerTask);      // ...Make sure there is no active callback already....
       }
 
@@ -538,98 +583,8 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
     
     
     
-    
-    
-    
-    
-    
-    
-
-    
-    /*******************************************************************************
-     * Declare a Broadcast Receiver to catch intents sent from the data service:
-     * Calle whenever an intent is sent with action IDroidSensor.SENSOR_INTENT_ACTION
-     * (actual constant value defined in IDroidSensor.java)
-     *******************************************************************************/
-    private BroadcastReceiver messageReceiver = new BroadcastReceiver() 
-      {
-      @Override
-      public void onReceive(Context context, Intent intent) 
-        {
-        
-        int whatSensor = intent.getIntExtra( IDroidSensor.SENSOR_INTENT_FROMID, IDroidSensor.IDROIDSENSOR_UNKNOWN_ID);  
-           // Get the 'From ID' out of the intent.
-           // If the intent was generated by a sensor or data source implimenting 'IDroidSensor', this should
-           // be one of the integers representing a sensor data element, using a constant from the particular 
-           // sensor class or from IDroidSensor. A value of IDroidSensor.IDROIDSENSOR_UNKNOWN_ID indicates that 
-           // no IDroidSensor.SENSOR_INTENT_FROMID was specified in the Intent extra data. That shouldn't happen. 
-
-        int dataType = intent.getIntExtra( IDroidSensor.SENSOR_INTENT_DATATYPE, IDroidSensor.SENSOR_UNKNOWN_DATATYPE);
-           // Get the data trype for this sensor. See constants in IDroidSensor.
-
-        // If this is a float data value, get the data. If no data element was set as
-        // an extra field named IDroidSensor.SENSOR_INTENT_VALUE, this just gets a value of 0.
-        float valueFloat = 0f;
-        if (dataType == IDroidSensor.SENSOR_FLOAT_DATA) valueFloat = intent.getFloatExtra( IDroidSensor.SENSOR_INTENT_VALUE, 0f );
-        
-        //Log.i(APP_TAG, String.format( "UIActivity -> Intent Rec... What = %d; Value = %.1f", whatIntent, valueFloat) );
-        
-        switch (whatSensor)
-          {
-
-          // case VehicleData.DATA_MOTOR_TEMP:        ((TextWithLabel)uiWidgets.get("textTMotor"))         .setText   (  String.format("%.1f", valueFloat) );   break;
-          // case VehicleData.DATA_CONTROLLER_TEMP:   ((TextWithLabel)uiWidgets.get("textTController"))    .setText   (  String.format("%.1f", valueFloat) );   break;
-          // case VehicleData.DATA_MAIN_BATTERY_TEMP: ((TextWithLabel)uiWidgets.get("textTBattery"))       .setText   (  String.format("%.1f", valueFloat) );   break;
-          
-          //****** Data Messages from vehicle data input: **********************************************************            
-          case VehicleData.DATA_MOTOR_RPM:         ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue  ( valueFloat / 1000                  );   break;
-          case VehicleData.DATA_MAIN_BATTERY_KWH:  ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue  ( valueFloat                         );   break;
-
-          case VehicleData.DATA_MOTOR_TEMP:        ((BarGauge)uiWidgets.get("barTMotor"))               .setValue  ( valueFloat );                           break;
-          case VehicleData.DATA_CONTROLLER_TEMP:   ((BarGauge)uiWidgets.get("barTController"))          .setValue  ( valueFloat );                           break;
-          case VehicleData.DATA_MAIN_BATTERY_TEMP: ((BarGauge)uiWidgets.get("barTBattery"))             .setValue  ( valueFloat );                           break;
-          
-          case VehicleData.DATA_ACC_BATTERY_VLT:   ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText   (  String.format("%.1f", valueFloat) );   break;
-
-          case VehicleData.DATA_DRIVE_TIME:        ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText   (  String.format("%1d:%02d", getHours(valueFloat), getMinutes(valueFloat) ) ); break;
-          case VehicleData.DATA_DRIVE_RANGE:       ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText   (  String.format("%.0f", valueFloat) );   break;
-          
-          case VehicleData.DATA_MAIN_BATTERY_VLT:  ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText   (  String.format("%.1f", valueFloat) );   break;
-          case VehicleData.DATA_MAIN_BATTERY_AH:   ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText   (  String.format("%.1f", valueFloat) );   break;
-          
-          case VehicleData.DATA_DATA_OK:
-            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampData")).turnOn();
-            else                  ((StatusLamp)uiWidgets.get("lampData")).turnOff();
-            break;
-          case NmeaProcessor.DATA_GPS_HAS_LOCK:
-            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampGPS")).turnOn();
-            else                  ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
-            break;  
-          case VehicleData.DATA_CONTACTOR_ON:
-            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampContactor")).turnOn();
-            else                  ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
-            break;  
-          case VehicleData.DATA_FAULT:
-            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampFault")).turnOn();
-            else                  ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
-            break;            
-          case VehicleData.DATA_PRECHARGE:
-            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOn();
-            else                  ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
-            break;  
-          //********************************************************************************************************
-                  
-          case VehicleData.VEHICLE_DATA_ERROR:
-            // Vehicle Data Connection Error. For now, just ignore...
-            //ShowMessage( msg.obj.toString() );
-            break;
-            
-        }  // [switch]
-      }  // [onReceive()...]
-    };  // [messageReceiver Inner Class]
-    
-    
-    
+       
+     
  
     
     
@@ -646,15 +601,101 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
      // update the UI:
      public void run()  
        {
-       
-       // Send Keep Alive to data service: 
-       Intent intent = new Intent(DataService.DATA_SERVICE_KEEPALIVE);
-       messageBroadcaster.sendBroadcast(intent);
+       // Send Keep Alive to data service:
+       dashMessages.sendData(DataService.DATA_SERVICE, DataService.DATA_SERVICE_KEEPALIVE, null, null, null);
        // Start the timer for next UI Uodate:     
        uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
        uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
        } 
      };
+
+
+
+
+
+    public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
+      {
+      // --DEBUG!-- Log.i(APP_TAG, String.format( "UIActivity -> Message Rec; Mesage: %d; ", message) + action);
+      // --DEBUG!-- if (stringData != null) Log.i(APP_TAG, "stringData -> " + stringData);
+      
+
+      if (message == DashMessages.CHARGE_NODE_ID)
+        {
+        // Data Message from Charge Node... 
+        // If string data is included in the Intent, assume it's some HTML for the webview control to display: 
+        //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadUrl(stringData);
+        if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(stringData, "text/html", null);        
+        // Get the Current and AH values from the data: 
+        Float chargeCurrent = data.getFloat(ChargeNode.CHARGE_CURRENT, 0.0f);
+        Float chargeAH      = data.getFloat(ChargeNode.CHARGE_AH, 0.0f);
+        // Update the UI: 
+        ((TextWithLabel)uiWidgets.get("textChargeCurrent"))      .setText   ( String.format("%.0f",chargeCurrent) );
+        ((TextWithLabel)uiWidgets.get("textChargeAH"))           .setText   ( String.format("%.1f",chargeAH)      );
+        }
+
+      
+      if (message == DashMessages.VEHICLE_DATA_ID)
+        {
+        // ******************** Data from the Vehicle Data senor: ************************************
+        Set<String> keys = data.keySet();               // Get a list of data keys in the bundle of submitted data. 
+        Iterator<String> myIterator = keys.iterator();  // This is an iterator to iterate over the list.
+        String key;
+        float valueFloat; 
+        while (myIterator.hasNext())
+          {
+          key = myIterator.next();
+          valueFloat = data.getFloat(key, 0.0f);
+          
+          //****** Data Messages from vehicle data input: **********************************************************            
+          if (key.equals(VehicleData.DATA_MOTOR_RPM))         ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue  ( valueFloat / 1000  );
+          if (key.equals(VehicleData.DATA_MAIN_BATTERY_KWH))  ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue  ( valueFloat         );  
+  
+          if (key.equals(VehicleData.DATA_MOTOR_TEMP))        ((BarGauge)uiWidgets.get("barTMotor"))               .setValue  ( valueFloat );                          
+          if (key.equals(VehicleData.DATA_CONTROLLER_TEMP))   ((BarGauge)uiWidgets.get("barTController"))          .setValue  ( valueFloat );                          
+          if (key.equals(VehicleData.DATA_MAIN_BATTERY_TEMP)) ((BarGauge)uiWidgets.get("barTBattery"))             .setValue  ( valueFloat );                          
+            
+          if (key.equals(VehicleData.DATA_ACC_BATTERY_VLT))   ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText   (  String.format("%.1f", valueFloat) );  
+  
+          if (key.equals(VehicleData.DATA_DRIVE_TIME))        ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText   (  String.format("%1d:%02d", getHours(valueFloat), getMinutes(valueFloat) ) );
+          if (key.equals(VehicleData.DATA_DRIVE_RANGE))       ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText   (  String.format("%.0f", valueFloat) );  
+            
+          if (key.equals(VehicleData.DATA_MAIN_BATTERY_VLT))  ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText   (  String.format("%.1f", valueFloat) );  
+          if (key.equals(VehicleData.DATA_MAIN_BATTERY_AH))   ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText   (  String.format("%.1f", valueFloat) );  
+            
+          if (key.equals(VehicleData.DATA_DATA_OK))
+            {
+            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampData")).turnOn();
+            else                  ((StatusLamp)uiWidgets.get("lampData")).turnOff();
+            }
+             
+          if (key.equals(NmeaProcessor.DATA_GPS_HAS_LOCK))
+            {
+            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampGPS")).turnOn();
+            else                  ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
+            }
+               
+          if (key.equals(VehicleData.DATA_CONTACTOR_ON))
+            {
+            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampContactor")).turnOn();
+            else                  ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
+            }
+               
+          if (key.equals(VehicleData.DATA_FAULT))
+            {
+            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampFault")).turnOn();
+            else                  ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
+            }
+                         
+          if (key.equals(VehicleData.DATA_PRECHARGE))
+            {
+            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOn();
+            else                  ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
+            }
+          //********************************************************************************************************
+
+          }  // [while...]
+        }  // [if (message == VehicleData.VEHICLE_DATA_ID)]
+      }  // [function]
    
      
      

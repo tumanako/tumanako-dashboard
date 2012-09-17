@@ -22,8 +22,14 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
+import com.tumanako.dash.DashMessages;
+import com.tumanako.dash.IDashMessages;
+import com.tumanako.ui.UIActivity;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 
 
@@ -48,7 +54,7 @@ import android.os.Handler;
  ***************************************************************/
 
 
-public class VehicleData extends TumanakoSensor implements IDroidSensor 
+public class VehicleData implements IDroidSensor, IDashMessages 
   {
 
   private final Handler updateTimer = new Handler();       // Message handler for sensor update timer (sends data periodically)
@@ -62,31 +68,26 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
    
   private static final String VEHICLEDATA_PREFS_NAME = "TumanakoDashVehicleData";
   
-  // ** General Message Type Indicators: **
-  // One of these constants will be supplied as a 'SENSOR_INTENT_FROMID' parameter whenever an 
-  // intent is sent to the rest of the application. Indicates what the intent is for.
-  public static final int VEHICLE_DATA_UPDATED = VEHICLE_DATA_ID + 0;
-  public static final int VEHICLE_DATA_ERROR   = VEHICLE_DATA_ID + 99;
-
+  
   // *** Vehicle Data Message Type Indicators: ***
   // Primary Driver Data:
-  public static final int DATA_DATA_OK             = VEHICLE_DATA_ID +  1;        // Is the connection OK?  
-  public static final int DATA_CONTACTOR_ON        = VEHICLE_DATA_ID +  2;        // Main contactor on (i.e. Inverter On!) (indicator light)
-  public static final int DATA_FAULT               = VEHICLE_DATA_ID +  3;        // Fault (Warning symbol light)
-  public static final int DATA_MAIN_BATTERY_KWH    = VEHICLE_DATA_ID +  4;        // Main Battery kWh remaining (fuel gauge dial)
-  public static final int DATA_ACC_BATTERY_VLT     = VEHICLE_DATA_ID +  5;        // Accessory battery DC voltage (dial)
-  public static final int DATA_MOTOR_RPM           = VEHICLE_DATA_ID +  6;        // Motor Rpm (dial)
-  public static final int DATA_MAIN_BATTERY_TEMP   = VEHICLE_DATA_ID +  7;        // Main Battery Temperature (Bar)
-  public static final int DATA_MOTOR_TEMP          = VEHICLE_DATA_ID +  8;        // Motor Temperature (Bar)
-  public static final int DATA_CONTROLLER_TEMP     = VEHICLE_DATA_ID +  9;        // Controller Temperature (Bar)
+  public static final String DATA_DATA_OK             = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  1);        // Is the connection OK?
+  public static final String DATA_CONTACTOR_ON        = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  2);        // Main contactor on (i.e. Inverter On!) (indicator light)
+  public static final String DATA_FAULT               = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  3);        // Fault (Warning symbol light)
+  public static final String DATA_MAIN_BATTERY_KWH    = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  4);        // Main Battery kWh remaining (fuel gauge dial)
+  public static final String DATA_ACC_BATTERY_VLT     = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  5);        // Accessory battery DC voltage (dial)
+  public static final String DATA_MOTOR_RPM           = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  6);        // Motor Rpm (dial)
+  public static final String DATA_MAIN_BATTERY_TEMP   = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  7);        // Main Battery Temperature (Bar)
+  public static final String DATA_MOTOR_TEMP          = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  8);        // Motor Temperature (Bar)
+  public static final String DATA_CONTROLLER_TEMP     = String.format( "%d", DashMessages.VEHICLE_DATA_ID +  9);        // Controller Temperature (Bar)
   // Secondary Driver Data:
-  public static final int DATA_DRIVE_TIME          = VEHICLE_DATA_ID + 10;        // Drive time remaining (in decimal hours, i.e. 1.5 = 1 Hr 30 Min )
-  public static final int DATA_DRIVE_RANGE         = VEHICLE_DATA_ID + 11;        // Range remaining (in km)
+  public static final String DATA_DRIVE_TIME          = String.format( "%d", DashMessages.VEHICLE_DATA_ID + 10);        // Drive time remaining (in decimal hours, i.e. 1.5 = 1 Hr 30 Min )
+  public static final String DATA_DRIVE_RANGE         = String.format( "%d", DashMessages.VEHICLE_DATA_ID + 11);        // Range remaining (in km)
   // Technical System Data:
-  public static final int DATA_PRECHARGE           = VEHICLE_DATA_ID + 12;        // pre-charge indicator
-  public static final int DATA_MAIN_BATTERY_VLT    = VEHICLE_DATA_ID + 13;        // Main Battery Voltage
-  public static final int DATA_MAIN_BATTERY_AH     = VEHICLE_DATA_ID + 14;        // Main Battery Amp hour
-  public static final int DATA_AIR_TEMP            = VEHICLE_DATA_ID + 15;        // Air Temperature
+  public static final String DATA_PRECHARGE           = String.format( "%d", DashMessages.VEHICLE_DATA_ID + 12);        // pre-charge indicator
+  public static final String DATA_MAIN_BATTERY_VLT    = String.format( "%d", DashMessages.VEHICLE_DATA_ID + 13);        // Main Battery Voltage
+  public static final String DATA_MAIN_BATTERY_AH     = String.format( "%d", DashMessages.VEHICLE_DATA_ID + 14);        // Main Battery Amp hour
+  public static final String DATA_AIR_TEMP            = String.format( "%d", DashMessages.VEHICLE_DATA_ID + 15);        // Air Temperature
 
   
   // ---------------DEMO MODE CODE -------------------------------
@@ -100,11 +101,12 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
   private float avgEnergyPerHour = 0f;   // Calculated Values relating to estimated range. 
   private float avgEnergyPerKm = 0f;     // We'll update these once we have data from the vehicle. 
   
+  private DashMessages dashMessages;
   
   // ************** Constructor: *****************************************
   public VehicleData(Context context)
     {
-    super(context);    // We are extending the 'TumanakoSensor' class, and we need to call its Constructor here. 
+    dashMessages = new DashMessages(context, this, null);    // We are extending the 'DashMessages' class, and we need to call its Constructor here. 
     sensorContext = context;
     }
 
@@ -114,11 +116,9 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
   
   
   /********** Public Methods: *****************************************************************************/
-  @Override
   public boolean isOK()
     {  return isRunning;  }  // Basically, if we're not running, We're not OK (i.e. not yet connected). 
 
-  @Override
   public boolean isRunning()
     {  return isRunning;  }
 
@@ -127,7 +127,6 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
    * Returns a string with a data summary (useful for debugging):
    * @return String representing class data 
    ******************************************************************/
-  @Override  
   public String toString()
     {  return lastData;  }
 
@@ -145,12 +144,12 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
     }
   // ---------------DEMO MODE CODE -------------------------------
   
-  @Override
   public void suspend()
     {
     // Stop the update timer if it's running:
     updateTimer.removeCallbacks(updateTimerTask);   // Stops the sensor read timer.
-
+    dashMessages.suspend();
+    
     // ---------------DEMO MODE CODE -------------------------------
     isDemo = false;
     // ---------------DEMO MODE CODE -------------------------------    
@@ -165,13 +164,14 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
     }
 
   
-  @Override
   public void resume()
     {
     // ****** Restore data relating to our current status: ******
     SharedPreferences settings = sensorContext.getSharedPreferences(VEHICLEDATA_PREFS_NAME, 0);
     avgEnergyPerHour = settings.getFloat( "avgEnergyPerHour", 0f );
     avgEnergyPerKm   = settings.getFloat( "avgEnergyPerKm",   0f );
+    
+    dashMessages.resume();
     
     // Remove any existing timer callbacks: 
     updateTimer.removeCallbacks(updateTimerTask);             // Clear Update Timer.    
@@ -235,21 +235,23 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
        float preCharge = ((System.currentTimeMillis() % 300) > 100)  ? 1f : 0f;
        float driveTime  = (avgEnergyPerHour > 0f)  ?  (kWh / avgEnergyPerHour) : 99.99f; 
        float driveRange = (avgEnergyPerKm   > 0f)  ?  (kWh / avgEnergyPerKm)   : 9999f;
-       sendFloat(DATA_CONTACTOR_ON,      contactorOn       );
-       sendFloat(DATA_FAULT,             demoFault         );
-       sendFloat(DATA_MAIN_BATTERY_KWH,  kWh               );
-       sendFloat(DATA_ACC_BATTERY_VLT,   12.6f             );
-       sendFloat(DATA_MOTOR_RPM,         thisRPM           );
-       sendFloat(DATA_MAIN_BATTERY_TEMP, 60-(thisRPM/100)  );
-       sendFloat(DATA_MOTOR_TEMP,        (thisRPM/56)+25   );
-       sendFloat(DATA_CONTROLLER_TEMP,   (thisRPM/100)+35  );
-       sendFloat(DATA_PRECHARGE,         preCharge         );
-       sendFloat(DATA_MAIN_BATTERY_VLT,  133.5f            );
-       sendFloat(DATA_MAIN_BATTERY_AH,   189.4f            );
-       sendFloat(DATA_AIR_TEMP,          19.6f             );
-       sendFloat(DATA_DATA_OK,           1f                );
-       sendFloat(DATA_DRIVE_TIME,        driveTime         );
-       sendFloat(DATA_DRIVE_RANGE,       driveRange        );
+       Bundle vehicleData = new Bundle();
+       vehicleData.putFloat(DATA_CONTACTOR_ON,      contactorOn       );
+       vehicleData.putFloat(DATA_FAULT,             demoFault         );
+       vehicleData.putFloat(DATA_MAIN_BATTERY_KWH,  kWh               );
+       vehicleData.putFloat(DATA_ACC_BATTERY_VLT,   12.6f             );
+       vehicleData.putFloat(DATA_MOTOR_RPM,         thisRPM           );
+       vehicleData.putFloat(DATA_MAIN_BATTERY_TEMP, 60-(thisRPM/100)  );
+       vehicleData.putFloat(DATA_MOTOR_TEMP,        (thisRPM/56)+25   );
+       vehicleData.putFloat(DATA_CONTROLLER_TEMP,   (thisRPM/100)+35  );
+       vehicleData.putFloat(DATA_PRECHARGE,         preCharge         );
+       vehicleData.putFloat(DATA_MAIN_BATTERY_VLT,  133.5f            );
+       vehicleData.putFloat(DATA_MAIN_BATTERY_AH,   189.4f            );
+       vehicleData.putFloat(DATA_AIR_TEMP,          19.6f             );
+       vehicleData.putFloat(DATA_DATA_OK,           1f                );
+       vehicleData.putFloat(DATA_DRIVE_TIME,        driveTime         );
+       vehicleData.putFloat(DATA_DRIVE_RANGE,       driveRange        );
+       dashMessages.sendData( UIActivity.UI_INTENT_IN, DashMessages.VEHICLE_DATA_ID, null, null, vehicleData );
        /**********************************************************************/
        }
      // ---------------DEMO MODE CODE -------------------------------
@@ -258,6 +260,13 @@ public class VehicleData extends TumanakoSensor implements IDroidSensor
      } 
    };
    /***************************************************************************************************************/
+
+
+  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
+    {
+    // TODO Auto-generated method stub
+    
+    }
 
    
     

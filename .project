@@ -3,7 +3,6 @@
 	<name>TumanakoDash</name>
 	<comment></comment>
 	<projects>
-		<project>DroidSensors</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
