@@ -28,7 +28,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+
 
 
 
@@ -38,7 +38,16 @@ import android.util.Log;
  * This class provides a generic framework for passing messages between 
  * parts of the Tumanako app, using Intents.    
  * 
- * @author Jeremy
+ * Each DashMessage class instance is configured to receive intents
+ * with a particular identifier as specified by the intentActionFilter
+ * passed to the constructor. 
+ * 
+ * Intents passed to a DashMessages class should include an integer 
+ * extra value identified by the string DASHMESSAGE_MESSAGE (const 
+ * defined below). The VALUE of this integer tells us the source of the 
+ * received message.   
+ * 
+ * @author Jeremy Cole-Baker / Riverhead Technology
  *
  *************************************************************************/
 
@@ -51,27 +60,17 @@ public class DashMessages extends BroadcastReceiver
     // Will be used to send and receive intents from other parts of the app (E.g. UI)
 
   
-  /******** Intent Content Strings: *******************
-   * String constants to identify the data fields sent 
-   * in each intent. 
-   ***************************************************/
-    
-  public static final String DASHMESSAGE_MESSAGE = "com.tumanako.dash.message";
   
-  public static final String DASHMESSAGE_FLOAT   = "com.tumanako.dash.value.float";
-  public static final String DASHMESSAGE_STRING  = "com.tumanako.dash.value.string";
-  public static final String DASHMESSAGE_DATA    = "com.tumanako.dash.value.data";
+  /*** String Identifiers to identify different elements of the Intent structure we are using: ****/
+  public static final String DASHMESSAGE_MESSAGE = "com.tumanako.dash.message";   // This is the name of the integer field in the received intent, which tells us the source of the message. 
   
   
-  /**** Message ID Constants: ***********************************************
-   * These integer IDs are used as the 'value' of the DASHMESSAGE_MESSAGE
-   * field in an intent. They idenitify the source of the message.    
-   **************************************************************************/
-  public static final int DASHMESSAGE_UNSPECIFIED  =   0;
-  public static final int NMEA_GPS_SENSOR_ID       = 300;
-  public static final int NMEA_PROCESSOR_ID        = 400;
-  public static final int VEHICLE_DATA_ID          = 500;
-  public static final int CHARGE_NODE_ID           = 1000;
+  /*** Extra Data Field Identifiers: ***********************************************
+   * These are used as names for extra data included in the intent.  
+   *********************************************************************************/
+  private static final String DASHMESSAGE_FLOAT   = "f";
+  private static final String DASHMESSAGE_STRING  = "s";
+  private static final String DASHMESSAGE_DATA    = "d";
   
   private String actionFilter = null; 
   
@@ -109,7 +108,7 @@ public class DashMessages extends BroadcastReceiver
     // Get the 'What Message?' from the intent. This is an integer sent by other parts
     // of the app, which identifies what they are trying to say to us: (note: meaning is defined by derived classes).
     String action = intent.getAction();
-    int message = intent.getIntExtra( DASHMESSAGE_MESSAGE, DASHMESSAGE_UNSPECIFIED);
+    int message = intent.getIntExtra( DASHMESSAGE_MESSAGE, 0);
     
     Float floatData = null;
     String stringData = null;

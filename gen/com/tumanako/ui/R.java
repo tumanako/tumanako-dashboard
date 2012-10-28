@@ -8,6 +8,10 @@
 package com.tumanako.ui;
 
 public final class R {
+    public static final class array {
+        public static final int listArray=0x7f040000;
+        public static final int listValues=0x7f040001;
+    }
     public static final class attr {
         /** <p>Must be a floating point value, such as "<code>1.2</code>".
 <p>This may also be a reference to a resource (in the form
@@ -245,6 +249,11 @@ containing a value of this type.
          */
         public static final int show_ticks=0x7f010013;
     }
+    public static final class dimen {
+        public static final int padding_large=0x7f050002;
+        public static final int padding_medium=0x7f050001;
+        public static final int padding_small=0x7f050000;
+    }
     public static final class drawable {
         public static final int bezel=0x7f020000;
         public static final int contactor_off=0x7f020001;
@@ -258,62 +267,74 @@ containing a value of this type.
         public static final int gps_on=0x7f020009;
         public static final int greenglobe_off=0x7f02000a;
         public static final int greenglobe_on=0x7f02000b;
-        public static final int ic_launcher=0x7f02000c;
-        public static final int icon_car=0x7f02000d;
-        public static final int main_bg=0x7f02000e;
-        public static final int round_border=0x7f02000f;
-        public static final int tiled_bg=0x7f020010;
+        public static final int ic_action_search=0x7f02000c;
+        public static final int ic_launcher=0x7f02000d;
+        public static final int icon_car=0x7f02000e;
+        public static final int main_bg=0x7f02000f;
+        public static final int round_border=0x7f020010;
+        public static final int tiled_bg=0x7f020011;
     }
     public static final class id {
-        public static final int barTBattery=0x7f060011;
-        public static final int barTController=0x7f060010;
-        public static final int barTMotor=0x7f06000f;
-        public static final int buttonChargeStart=0x7f060003;
-        public static final int buttonChargeStop=0x7f060004;
-        public static final int buttonConnectToNode=0x7f060002;
-        public static final int dialMainBatteryKWh=0x7f06000c;
-        public static final int dialMotorRPM=0x7f060009;
-        public static final int lampContactor=0x7f06000d;
-        public static final int lampData=0x7f06000a;
-        public static final int lampFault=0x7f06000e;
-        public static final int lampGPS=0x7f06000b;
-        public static final int lampPreCharge=0x7f060017;
-        public static final int layoutChaqrgeNode=0x7f060000;
-        public static final int layoutPrimaryData=0x7f060008;
-        public static final int layoutSecondaryData=0x7f060012;
-        public static final int layoutSystemData=0x7f060016;
-        public static final int menuitemClose=0x7f06001f;
-        public static final int menuitemDemoMode=0x7f06001e;
-        public static final int menuitemShowCharge=0x7f06001d;
-        public static final int menuitemShowPrimary=0x7f06001a;
-        public static final int menuitemShowSecondary=0x7f06001b;
-        public static final int menuitemShowSystem=0x7f06001c;
-        public static final int tabhost=0x7f060007;
-        public static final int textAccBatteryVlts=0x7f060015;
-        public static final int textChargeAH=0x7f060006;
-        public static final int textChargeCurrent=0x7f060005;
-        public static final int textDriveRange=0x7f060014;
-        public static final int textDriveTime=0x7f060013;
-        public static final int textMainBattAH=0x7f060019;
-        public static final int textMainBattVlts=0x7f060018;
-        public static final int webChargeNodeContent=0x7f060001;
+        public static final int barTBattery=0x7f080011;
+        public static final int barTController=0x7f080010;
+        public static final int barTMotor=0x7f08000f;
+        public static final int buttonChargeStart=0x7f080003;
+        public static final int buttonChargeStop=0x7f080004;
+        public static final int buttonConnectToNode=0x7f080002;
+        public static final int dialMainBatteryKWh=0x7f08000c;
+        public static final int dialMotorRPM=0x7f080009;
+        public static final int lampContactor=0x7f08000d;
+        public static final int lampData=0x7f08000a;
+        public static final int lampFault=0x7f08000e;
+        public static final int lampGPS=0x7f08000b;
+        public static final int lampPreCharge=0x7f080018;
+        public static final int layoutChaqrgeNode=0x7f080000;
+        public static final int layoutPrimaryData=0x7f080008;
+        public static final int layoutSecondaryData=0x7f080012;
+        public static final int layoutSystemData=0x7f080017;
+        public static final int listBluetoothDevices=0x7f080016;
+        public static final int menu_settings=0x7f080022;
+        public static final int menuitemClose=0x7f080021;
+        public static final int menuitemDemoMode=0x7f08001f;
+        public static final int menuitemSettings=0x7f080020;
+        public static final int menuitemShowCharge=0x7f08001e;
+        public static final int menuitemShowPrimary=0x7f08001b;
+        public static final int menuitemShowSecondary=0x7f08001c;
+        public static final int menuitemShowSystem=0x7f08001d;
+        public static final int tabhost=0x7f080007;
+        public static final int textAccBatteryVlts=0x7f080015;
+        public static final int textChargeAH=0x7f080006;
+        public static final int textChargeCurrent=0x7f080005;
+        public static final int textDriveRange=0x7f080014;
+        public static final int textDriveTime=0x7f080013;
+        public static final int textMainBattAH=0x7f08001a;
+        public static final int textMainBattVlts=0x7f080019;
+        public static final int webChargeNodeContent=0x7f080001;
     }
     public static final class layout {
         public static final int charge_node=0x7f030000;
         public static final int main=0x7f030001;
         public static final int primary_data=0x7f030002;
         public static final int secondary_data=0x7f030003;
-        public static final int system_data=0x7f030004;
+        public static final int settings=0x7f030004;
+        public static final int settings_page=0x7f030005;
+        public static final int system_data=0x7f030006;
     }
     public static final class menu {
-        public static final int options_menu=0x7f050000;
+        public static final int options_menu=0x7f070000;
+        public static final int set_prefs=0x7f070001;
+        public static final int settings_page=0x7f070002;
     }
     public static final class string {
-        public static final int stringAccecessory=0x7f040004;
-        public static final int stringAppName=0x7f040000;
-        public static final int stringBattery=0x7f040002;
-        public static final int stringController=0x7f040003;
-        public static final int stringMotor=0x7f040001;
+        public static final int hello_world=0x7f060005;
+        public static final int menu_settings=0x7f060006;
+        public static final int stringAccecessory=0x7f060004;
+        public static final int stringAppName=0x7f060000;
+        public static final int stringBattery=0x7f060002;
+        public static final int stringController=0x7f060003;
+        public static final int stringMotor=0x7f060001;
+        public static final int title_activity_set_prefs=0x7f060007;
+        public static final int title_activity_settings=0x7f060008;
     }
     public static final class styleable {
         /**  These attributes are used by the Dial and Bar controls: 

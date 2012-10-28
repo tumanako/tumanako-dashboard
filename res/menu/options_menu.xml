@@ -11,7 +11,7 @@
   </item>    
 
   <item android:id="@+id/menuitemDemoMode" android:title="Demo Mode" android:titleCondensed="Demo Mode" />
-      
+  <item android:id="@+id/menuitemSettings" android:title="Settings" android:titleCondensed="Settings..." />    
   <item android:id="@+id/menuitemClose" android:title="Close Dashboard" android:titleCondensed="Close Dashboard" />  
 
 </menu>

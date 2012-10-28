@@ -96,12 +96,12 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   
   
   // *** GPS Processing / Data Message Type Indicators: ***
-  public static final String NMEA_PROCESSOR_DATA_UPDATED  = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 0  );
-  public static final String NMEA_PROCESSOR_ERROR         = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 99 );
+  public static final String NMEA_PROCESSOR_DATA_UPDATED  = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 0  );
+  public static final String NMEA_PROCESSOR_ERROR         = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 99 );
   
-  public static final String DATA_GPS_HAS_LOCK            = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 1  );
-  public static final String DATA_GPS_TIME                = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 2  );
-  public static final String DATA_GPS_SPEED               = String.format("%d", DashMessages.NMEA_PROCESSOR_ID + 3  );
+  public static final String DATA_GPS_HAS_LOCK            = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 1  );
+  public static final String DATA_GPS_TIME                = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 2  );
+  public static final String DATA_GPS_SPEED               = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 3  );
   
  
   
