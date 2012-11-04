@@ -150,7 +150,7 @@ public class VehicleData extends Thread implements IDashMessages
   public VehicleData(Context context)
     {
     
-Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
+    // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
 
     vehicledataContext = context; 
     
@@ -217,7 +217,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
   private void stopVehicleData()
     {
     // *** Stop the vehicle sensor... ***
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
+    // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
     btClose();   // Close the BT connection 
     // Stop the update timer if it's running:
     watchdogTimer.removeCallbacks(watchdogTimerTask);       // Stop timer.
@@ -293,15 +293,16 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
     String dataPart = thisData.substring(5);   // Get the part AFTER the tag.
     String[] splitData = dataPart.split(",");  // Split the data at the comma characters. 
     
-    float motorRPM    = 0f;
-    float tMotor      = 0f;
-    float tController = 0f;
-    float tPack       = 0f;
-    float voltPack    = 0f;
-    float voltAcc     = 0f;
-    float kWh         = 0f;
-    float contactorOn = 0f;
-    float faultOn     = 0f;
+    float motorRPM     = 0f;
+    float tMotor       = 0f;
+    float tController  = 0f;
+    float tPack        = 0f;
+    float voltPack     = 0f;
+    float voltAcc      = 0f;
+    float kWh          = 0f;
+    float contactorOn  = 0f;
+    float faultOn      = 0f;
+    float motorReverse = 0f;
     
     // Extract each value from the string (now expanded to an array). 
     // For simplicity, all values are sent as floating point. 
@@ -323,6 +324,9 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
     catch (Exception e)
       { }
     
+    motorReverse = (motorRPM < 0) ? 1f : 0f;  // This turns on the reverse indicator lamp if the RPM is negative. 
+    motorRPM = Math.abs(motorRPM);            // Convert negative RPM into positive for display. 
+    
     // Make the data up into a 'Bundle', using the data type indicators
     // defined above as 'keys': 
     Bundle vehicleData = new Bundle();
@@ -331,6 +335,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
     vehicleData.putFloat("DATA_MAIN_BATTERY_KWH",  kWh               );
     vehicleData.putFloat("DATA_ACC_BATTERY_VLT",   voltAcc           );
     vehicleData.putFloat("DATA_MOTOR_RPM",         motorRPM          );
+    vehicleData.putFloat("DATA_MOTOR_REVERSE",     motorReverse      );
     vehicleData.putFloat("DATA_MAIN_BATTERY_TEMP", tPack             );
     vehicleData.putFloat("DATA_MOTOR_TEMP",        tMotor            );
     vehicleData.putFloat("DATA_CONTROLLER_TEMP",   tController       );
@@ -367,7 +372,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
      /***** Make sure the bluetooth adaptor is on: *******/ 
      if (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON)
        {
-       dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
+       //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
        return false;
        }
 //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Adaptor is ON! ");
@@ -393,7 +398,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
      
      catch (IOException ioe)
        {
-Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );        
+//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );        
        // Our attempt to open a BT connection caused an IO exception. This could be due to a bug in 
        // the bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
        // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android ) 
@@ -409,7 +414,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Ge
          {
          // Still having errors connecting! Give up. 
          e.printStackTrace();
-         Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error Persisted. Giving up. ");        
+         Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");        
          Log.i(com.tumanako.ui.UIActivity.APP_TAG, e.getMessage());
          return false;  // Give up.
          }            
@@ -445,7 +450,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Ge
    /************** Bluetooth socket close / cleanup: ******************************************************/   
    private void btClose()
      {
- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> btClose(); ");    
+     // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> btClose(); ");    
      try
        {
        if (btStreamIn != null)  btStreamIn.close();

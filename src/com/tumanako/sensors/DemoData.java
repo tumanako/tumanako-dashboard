@@ -134,8 +134,8 @@ public class DemoData implements IDashMessages
      /***** Generate some fake data  and send it to the UI: ***************/
      kWh = kWh + 1f;  if (kWh > 30f) kWh = 10f;
      float thisRPM = ((android.util.FloatMath.sin((float)(System.currentTimeMillis() % 12000) / 1909f  ) + 0.3f) * 3000f);
-     float demoFault = (thisRPM < -1500)                                ? 1f : 0f;
-     if (thisRPM < 0) thisRPM = 0;
+     float demoFault   = (thisRPM < -1500)                              ? 1f : 0f;
+     float demoReverse = (thisRPM < 0)                                  ? 1f : 0f;  
      float contactorOn = (thisRPM > 1)                                  ? 1f : 0f;
      float preCharge = ((System.currentTimeMillis() % 300) > 100)  ? 1f : 0f;
      float driveTime  = (avgEnergyPerHour > 0f)  ?  (kWh / avgEnergyPerHour) : 99.99f; 
@@ -145,7 +145,8 @@ public class DemoData implements IDashMessages
      vehicleData.putFloat("DATA_FAULT",             demoFault         );
      vehicleData.putFloat("DATA_MAIN_BATTERY_KWH",  kWh               );
      vehicleData.putFloat("DATA_ACC_BATTERY_VLT",   12.6f             );
-     vehicleData.putFloat("DATA_MOTOR_RPM",         thisRPM           );
+     vehicleData.putFloat("DATA_MOTOR_RPM",         Math.abs(thisRPM) );
+     vehicleData.putFloat("DATA_MOTOR_REVERSE",     demoReverse       );
      vehicleData.putFloat("DATA_MAIN_BATTERY_TEMP", 60-(thisRPM/100)  );
      vehicleData.putFloat("DATA_MOTOR_TEMP",        (thisRPM/56)+25   );
      vehicleData.putFloat("DATA_CONTROLLER_TEMP",   (thisRPM/100)+35  );

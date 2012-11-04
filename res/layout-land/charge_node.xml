@@ -1,120 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!-- LANDSCAPE Layout!! -->
 
-<LinearLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
     android:id="@+id/layoutChaqrgeNode"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="5dp" >
-    
-    
-    
-    
-    
+
+    <!-- Left Column: -->
+
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.75"
-        android:gravity="center"
-        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.6"
+        android:gravity="left"
+        android:orientation="vertical"
         android:padding="5dp" >
 
-        <WebView
-            android:id="@+id/webChargeNodeContent"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="0.7" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Charge Station"
+            android:textSize="10pt" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="User: "
+            android:textSize="8pt" />
+
+        <EditText
+            android:id="@+id/editTextUser"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:inputType="text"
+            android:text="jeremy@rhtech.co.nz" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="Password: "
+            android:textSize="8pt" />
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:inputType="textPassword"
+            android:text="tumanakotest99" />
+    </LinearLayout>
+
+    <!-- Right Column: -->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.4"
+        android:gravity="left"
+        android:orientation="vertical"
+        android:padding="5dp" >
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="0.3"
-            android:gravity="center"
-            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|left"
+            android:orientation="horizontal"
             android:padding="5dp" >
-            <Button
-                android:id="@+id/buttonConnectToNode"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.34"
-                android:text="Connect" />
-            <Button
-                android:id="@+id/buttonChargeStart"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.33"
-                android:text="START Charge" />
-            <Button
-                android:id="@+id/buttonChargeStop"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.33"
-                android:text="STOP Charge" />
-        </LinearLayout>
-        
-    </LinearLayout>
-    
-    
-  
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.25"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="5dp" >
-            
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_margin="3dp"
-            android:layout_weight="0.5"
-            android:background="@drawable/round_border"
-            android:padding="6dp" >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left"
-                android:text="Rate:"
-                android:textSize="10pt" />
-            <com.tumanako.ui.TextWithLabel
-                android:id="@+id/textChargeCurrent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:textSize="14pt"
-                app:label_text=" A  "
-                app:main_text="00.0" />
-        </FrameLayout>
 
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_margin="3dp"
-            android:layout_weight="0.5"
-            android:background="@drawable/round_border"
-            android:padding="6dp" >
+            <com.tumanako.ui.StatusLamp
+                android:id="@+id/lampChargeNodeOnline"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                app:off_bitmap="@drawable/greenglobe_off"
+                app:on_bitmap="@drawable/greenglobe_on" />
+
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left"
-                android:text="Total:"
-                android:textSize="10pt" />
-            <com.tumanako.ui.TextWithLabel
-                android:id="@+id/textChargeAH"
+                android:layout_height="fill_parent"
+                android:gravity="left"
+                android:text=" Connected "
+                android:textSize="8pt" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|left"
+            android:orientation="horizontal"
+            android:padding="5dp" >
+
+            <com.tumanako.ui.StatusLamp
+                android:id="@+id/lampCharging"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                app:off_bitmap="@drawable/greenglobe_off"
+                app:on_bitmap="@drawable/greenglobe_on" />
+
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:textSize="14pt"
-                app:label_text=" AH "
-                app:main_text="00.0" />
-        </FrameLayout> 
-        
+                android:layout_height="fill_parent"
+                android:gravity="left"
+                android:text=" Charging "
+                android:textSize="8pt" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/buttonConnectToNode"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Connect" />
+
+        <Button
+            android:id="@+id/buttonChargeStart"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="START Charge" />
+
+        <Button
+            android:id="@+id/buttonChargeStop"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="STOP Charge" />
     </LinearLayout>
-    
+
 </LinearLayout>

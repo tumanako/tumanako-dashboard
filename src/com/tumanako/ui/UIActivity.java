@@ -47,6 +47,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
@@ -134,26 +135,26 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       tabHost = (TabHost)findViewById(R.id.tabhost);
       tabHost.setup();
 
-      TabSpec spec1=tabHost.newTabSpec("Main Data");
-      spec1.setContent(R.id.layoutPrimaryData);
-      spec1.setIndicator("Main");
+      TabSpec tabMainData = tabHost.newTabSpec("Main Data");
+      tabMainData.setContent(R.id.layoutPrimaryData);
+      tabMainData.setIndicator("Main");
 
-      TabSpec spec2=tabHost.newTabSpec("Secondary Data");
-      spec2.setIndicator("Secondary");
-      spec2.setContent(R.id.layoutSecondaryData);
+      TabSpec tabSecondaryData = tabHost.newTabSpec("Secondary Data");
+      tabSecondaryData.setIndicator("Secondary");
+      tabSecondaryData.setContent(R.id.layoutSecondaryData);
 
-      TabSpec spec3=tabHost.newTabSpec("System Data");
-      spec3.setIndicator("System");
-      spec3.setContent(R.id.layoutSystemData);
+      TabSpec tabSystemData = tabHost.newTabSpec("System Data");
+      tabSystemData.setIndicator("System");
+      tabSystemData.setContent(R.id.layoutSystemData);
       
-      TabSpec spec4=tabHost.newTabSpec("Charge Node");
-      spec4.setIndicator("Charging");
-      spec4.setContent(R.id.layoutChaqrgeNode);
+      TabSpec tabChargeNode = tabHost.newTabSpec("Charge Node");
+      tabChargeNode.setIndicator("Charging");
+      tabChargeNode.setContent(R.id.layoutChaqrgeNode);
 
-      tabHost.addTab(spec1);
-      tabHost.addTab(spec2);
-      tabHost.addTab(spec3);
-      tabHost.addTab(spec4);
+      tabHost.addTab(tabMainData);
+      tabHost.addTab(tabSecondaryData);
+      tabHost.addTab(tabSystemData);
+      tabHost.addTab(tabChargeNode);
 
       
       // --DEBUG!!--
@@ -165,6 +166,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       uiWidgets.put( "lampGPS",            findViewById(R.id.lampGPS)            );
       uiWidgets.put( "lampContactor",      findViewById(R.id.lampContactor)      );
       uiWidgets.put( "lampFault",          findViewById(R.id.lampFault)          );
+      uiWidgets.put( "lampReverse",        findViewById(R.id.lampReverse)        );
       uiWidgets.put( "dialMotorRPM",       findViewById(R.id.dialMotorRPM)       );
       uiWidgets.put( "dialMainBatteryKWh", findViewById(R.id.dialMainBatteryKWh) );
       uiWidgets.put( "barTMotor",          findViewById(R.id.barTMotor)          );
@@ -178,13 +180,17 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       uiWidgets.put( "lampPreCharge",      findViewById(R.id.lampPreCharge)      );      
       uiWidgets.put( "textMainBattVlts",   findViewById(R.id.textMainBattVlts)   );
       uiWidgets.put( "textMainBattAH",     findViewById(R.id.textMainBattAH)     );
-      // Charge Node: 
-      uiWidgets.put( "webChargeNodeContent", findViewById(R.id.webChargeNodeContent) );
+      // Charge Node:
+      uiWidgets.put( "editTextUser",         findViewById(R.id.editTextUser)         );
+      uiWidgets.put( "editTextPassword",     findViewById(R.id.editTextPassword)     );
+      //uiWidgets.put( "webChargeNodeContent", findViewById(R.id.webChargeNodeContent) );
+      uiWidgets.put( "lampChargeNodeOnline", findViewById(R.id.lampChargeNodeOnline) );
+      uiWidgets.put( "lampCharging",         findViewById(R.id.lampCharging)         );
       uiWidgets.put( "buttonConnectToNode",  findViewById(R.id.buttonConnectToNode)  );
       uiWidgets.put( "buttonChargeStart",    findViewById(R.id.buttonChargeStart)    );
       uiWidgets.put( "buttonChargeStop",     findViewById(R.id.buttonChargeStop)     );
-      uiWidgets.put( "textChargeCurrent",    findViewById(R.id.textChargeCurrent)    );
-      uiWidgets.put( "textChargeAH",         findViewById(R.id.textChargeAH)         );
+      //uiWidgets.put( "textChargeCurrent",    findViewById(R.id.textChargeCurrent)    );
+      //uiWidgets.put( "textChargeAH",         findViewById(R.id.textChargeAH)         );
       
       // ---- Connect click and gesture listeners: -------
       gestureDetector = new GestureDetector(new SimpleSwiper(this));
@@ -338,6 +344,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
       ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
       ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
+      ((StatusLamp)uiWidgets.get("lampReverse")).turnOff();
       // Secondary Data: 
       ((TextWithLabel)uiWidgets.get("textDriveTime"))     .setText   (  "00:00" );
       ((TextWithLabel)uiWidgets.get("textDriveRange"))    .setText   (  "0"     );
@@ -346,13 +353,16 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       ((TextWithLabel)uiWidgets.get("textMainBattVlts"))  .setText   (  "0.0"   );
       ((TextWithLabel)uiWidgets.get("textMainBattAH"))    .setText   (  "0.0"   );
       ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
-      // Charge Node:
-      ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
-      ((TextWithLabel)uiWidgets.get("textChargeCurrent"))   .setText   ( "0"       );
-      ((TextWithLabel)uiWidgets.get("textChargeAH"))        .setText   ( "0.0"     );
       }
-
-    
+    private void chargeNodeUIReset()
+      {
+      // Charge Node UI Reset:
+      ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
+      ((StatusLamp)uiWidgets.get("lampCharging")).turnOff();
+      //((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
+      //((TextWithLabel)uiWidgets.get("textChargeCurrent"))   .setText   ( "0"       );
+      //((TextWithLabel)uiWidgets.get("textChargeAH"))        .setText   ( "0.0"     );
+      }
     
     
     
@@ -381,17 +391,23 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       // Process button click events for this activity: 
       //  This general OnClick handler is called for all the buttons. 
       //  The code checks the ID of the view which generated the event
-      //  (i.e. the button) and takes the appropriate action.  
+      //  (i.e. the button) and takes the appropriate action.
+      
+      /*** Get the User and Password values from the Charge Node form and place in a bundle: ***/
+      Bundle chargeUIData = new Bundle();
+      chargeUIData.putString("j_username", ((EditText)uiWidgets.get("editTextUser")).getText().toString() );
+      chargeUIData.putString("j_password", ((EditText)uiWidgets.get("editTextPassword")).getText().toString() );
+      
       switch (viewClicked.getId())
         {
         case R.id.buttonConnectToNode:
-          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CONNECT, null, null, null );
+          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CONNECT, null, null, chargeUIData );  // Send intent to ChargeNode class, including the login details. 
           break;
         case R.id.buttonChargeStart:
-          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTART, null, null, null );
+          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTART, null, null, chargeUIData );
           break;
         case R.id.buttonChargeStop:
-          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTOP, null, null, null );
+          dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTOP, null, null, chargeUIData );
           break;
         }
       } 
@@ -609,9 +625,18 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
        // Send Keep Alive to data service, etc:
        dashMessages.sendData(DataService.DATA_SERVICE, DataService.DATA_SERVICE_KEEPALIVE, null, null, null);
        dashMessages.sendData(VehicleData.VEHICLE_DATA, VehicleData.VEHICLE_DATA_KEEPALIVE, null, null, null);
+       if (currentTab == 3) dashMessages.sendData(ChargeNode.CHARGE_NODE_INTENT,ChargeNode.CHARGE_NODE_KEEPALIVE, null, null, null);
+         // Note: We only sent keepalives to the Charge Node class when the user is on the charge node page. 
+         // The effect of this is that they will disconnect from the charger if they leave the charge node page.
+         // May want to change later - depends on how the charging interface works (this is just a demo).  
        // Update UI Reset Counter:
        uiResetCounter++;
-       if (uiResetCounter > UI_RESET_AFTER) uiReset();   // Reset the UI if we receive no data for a certain time interval.          
+       if (uiResetCounter > UI_RESET_AFTER) 
+         {
+         uiReset();   // Reset the UI if we receive no data for a certain time interval.
+         if ( (chargeNode != null) && (chargeNode.getConnectionStatus() == ChargeNode.STATUS_OFFLINE) ) chargeNodeUIReset();
+           // ...Only reset the Charge Node UI page if it's not connected to a charge node...
+         }
        // Start the timer for next UI Uodate:     
        uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
        uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
@@ -636,13 +661,17 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
         // Data Message from Charge Node... 
         // If string data is included in the Intent, assume it's some HTML for the webview control to display: 
         //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadUrl(stringData);
-        if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(stringData, "text/html", null);        
+        //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(stringData, "text/html", null);        
         // Get the Current and AH values from the data: 
-        Float chargeCurrent = data.getFloat(ChargeNode.CHARGE_CURRENT, 0.0f);
-        Float chargeAH      = data.getFloat(ChargeNode.CHARGE_AH, 0.0f);
-        // Update the UI: 
-        ((TextWithLabel)uiWidgets.get("textChargeCurrent"))      .setText   ( String.format("%.0f",chargeCurrent) );
-        ((TextWithLabel)uiWidgets.get("textChargeAH"))           .setText   ( String.format("%.1f",chargeAH)      );
+        //Float chargeCurrent = data.getFloat(ChargeNode.CHARGE_CURRENT, 0.0f);
+        //Float chargeAH      = data.getFloat(ChargeNode.CHARGE_AH, 0.0f);
+        // Get the status lamp values: 
+        if (data.getFloat(ChargeNode.CONNECTION_STATUS, 0.0f) == 0.0f ) ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
+        else                                                            ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOn();
+        if (data.getFloat(ChargeNode.CHARGE_STATUS, 0.0f) == 0.0f ) ((StatusLamp)uiWidgets.get("lampCharging")).turnOff();
+        else                                                            ((StatusLamp)uiWidgets.get("lampCharging")).turnOn();
+        //((TextWithLabel)uiWidgets.get("textChargeCurrent"))      .setText   ( String.format("%.0f",chargeCurrent) );
+        //((TextWithLabel)uiWidgets.get("textChargeAH"))           .setText   ( String.format("%.1f",chargeAH)      );
         }
 
       
@@ -703,6 +732,13 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
             if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOn();
             else                  ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
             }
+          
+          if (key.equals("DATA_MOTOR_REVERSE"))
+            {
+            if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampReverse")).turnOn();
+            else                  ((StatusLamp)uiWidgets.get("lampReverse")).turnOff();
+            }
+
           //********************************************************************************************************
 
           }  // [while...]

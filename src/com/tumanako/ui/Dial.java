@@ -124,7 +124,7 @@ public class Dial extends RenderedGauge
   public void setValue(float value)
     {
     super.setValue(value);
-    needleAngle = minAngle + (((value - scaleMin) / deltaScale) * deltaAngle);
+    needleAngle = minAngle + (((gaugeValue - scaleMin) / deltaScale) * deltaAngle);
 
     makeNeedle();
     

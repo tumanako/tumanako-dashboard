@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!-- LANDSCAPE Layout!! -->
 
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabhost"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-<TabHost xmlns:android="http://schemas.android.com/apk/res/android"  
-         android:id="@+id/tabhost"  
-         android:layout_width="fill_parent"  android:layout_height="fill_parent" >
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:keepScreenOn="true"
+        android:orientation="vertical" >
 
-    
- <LinearLayout android:orientation="vertical"     
-               android:keepScreenOn="true"
-               android:layout_width="fill_parent"  android:layout_height="fill_parent"  >    
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            android:gravity="top|center_horizontal" />
 
-   
-    
-  <TabWidget android:id="@android:id/tabs"
-             android:layout_width="fill_parent"  android:layout_height="10dp" android:gravity="top|center_horizontal" />
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/tiled_bg"
+            android:padding="5dp" >
 
-  <FrameLayout android:id="@android:id/tabcontent"
-               android:background="@drawable/tiled_bg"
-               android:layout_width="fill_parent"  android:layout_height="fill_parent"
-               android:padding="5dp" >             
-    
+            <!-- Include layout files for each of the 'tabs' -->
 
-   <!-- Include layout files for each of the 'tabs' -->
-      
-   <include layout="@layout/primary_data" />
-   <include layout="@layout/secondary_data" />
-   <include layout="@layout/system_data" />
-   <include layout="@layout/charge_node" />
+            <include layout="@layout/primary_data" />
 
-  </FrameLayout>
-        
- </LinearLayout>
+            <include layout="@layout/secondary_data" />
+
+            <include layout="@layout/system_data" />
+
+            <include layout="@layout/charge_node" />
+        </FrameLayout>
+    </LinearLayout>
 
 </TabHost>

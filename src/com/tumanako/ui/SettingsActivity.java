@@ -2,6 +2,7 @@ package com.tumanako.ui;
 
 import java.util.Set;
 
+import com.tumanako.dash.ChargeNode;
 import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.IDashMessages;
 import com.tumanako.sensors.DataService;
@@ -141,6 +142,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, I
      // Send Keep Alive to data service, etc:
      dashMessages.sendData(DataService.DATA_SERVICE, DataService.DATA_SERVICE_KEEPALIVE, null, null, null);
      dashMessages.sendData(VehicleData.VEHICLE_DATA, VehicleData.VEHICLE_DATA_KEEPALIVE, null, null, null);
+     //dashMessages.sendData(ChargeNode.CHARGE_NODE_INTENT,ChargeNode.CHARGE_NODE_KEEPALIVE, null, null, null);
      uiTimer.postDelayed(uiTimerTask, UPDATE_EVERY);  // ...Callback later!
      } 
    };
