@@ -89,36 +89,22 @@ public class ChargeNode implements IDashMessages
   public static final int STATUS_NOT_CHARGING = 3;
   public static final int STATUS_CHARGING     = 4;
   
-  public static final String CHARGE_NODE_DEFAULT_HTML = 
-              "<html><body>" +
-                "<p><b>Charge Station</b></p>" +
-                "<ol><li>Use the Wi-Fi settings on your device to connect to the Wi-Fi hotspot provided by the charging station.</li>" +
-                    "<li>Press 'Connect' to connect to the charge station and check prices!</li></ol>" +
-               "</body></html>";
-  
-  public static final String CHARGE_NODE_CONNECT_HTML = 
-      "<html><body>" +
-        "<p><b>Charge Station</b></p>" +
-        "<p>Connecting...</p>" +
-       "</body></html>";  
-  
-
-  public static final String CHARGE_NODE_CONNECTED_HTML = 
-      "<html><body>" +
-        "<p><b>Charge Station</b></p>" +
-        "<p>Connected!</p>" +
-       "</body></html>";  
+  public static final String CHARGE_NODE_DEFAULT_HTML    = "<html><body></body></html>";
+  public static final String CHARGE_NODE_CONNECT_HTML    = "<html><body><p>Connecting...</p></body></html>";  
+  public static final String CHARGE_NODE_CONNECTED_HTML  = "<html><body><p>Connected!</p></body></html>";  
+  public static final String CHARGE_NODE_LOGINERROR_HTML = "<html><body><p>Login Error.</p></body></html>";
+  public static final String CHARGE_NODE_UPDATING_HTML   = "<html><body><p>Updating...</p></body></html>";
+  public static final String CHARGE_NODE_OK_HTML         = "<html><body><p>OK</p></body></html>";
 
   private static final String LOGIN_URL = "http://data.solarnetwork.net/solarreg/j_spring_security_check";                                // URL to send username and password to for login. 
   private static final String PING_URL = "http://data.solarnetwork.net/solarquery/hardwareControlData.json?nodeId=30&mostRecent=true";    // URL to get status updates
   
   private DashMessages dashMessages;
-  private Context nodeContext;
- 
+  
   
   private static final int UPDATE_TIME = 500;              // UI Update timer interval (mS)
   private static final int SEND_PING_EVERY = 10;           // Send a 'ping' to get data from the server every n intervals of the update timer
-  private static final int WATCHDOG_OVERFLOW = 4;          // Max watchdog counter value - the chargenode timer will automatically stop if we don't get a 'keepalive' message.   
+  private static final int WATCHDOG_OVERFLOW = 8;          // Max watchdog counter value - the chargenode timer will automatically stop if we don't get a 'keepalive' message.   
   
   private final Handler updateTimer = new Handler();       // Message handler for update timer (sends data periodically)
   
@@ -139,9 +125,8 @@ public class ChargeNode implements IDashMessages
   /****** Constructor ***********************/
   public ChargeNode(Context context)
     {
-    nodeContext = context;
     dashMessages = new DashMessages(context,this,CHARGE_NODE_INTENT);
-    weakContext = new WeakReference<Context>(nodeContext);    
+    weakContext = new WeakReference<Context>(context);    
     resume();      // Start the update timer!    
     }
   
@@ -162,8 +147,8 @@ public class ChargeNode implements IDashMessages
   
   public void resume()
     {
-    chargeStatus = STATUS_NOT_CHARGING;
-    connectionStatus = STATUS_OFFLINE;
+    //chargeStatus = STATUS_NOT_CHARGING;
+    //connectionStatus = STATUS_OFFLINE;
     timerStart();                      // ...Restarts the update timer.
     }
 
@@ -207,67 +192,35 @@ public class ChargeNode implements IDashMessages
       
       /************** Messages from the UI: ****************************/
       case CHARGE_NODE_CONNECT:
-        if ( (data != null) && (data.containsKey("j_username")) && (data.containsKey("j_password")) )     // A bundle containing 'USER' and 'PASSWORD' strings must be supplied to connect. 
+        // This is actually Connect OR Disconnect (depending on current status).
+        if (connectionStatus == STATUS_CONNECTED)
           {
-          // Start a new network thread to connect to the server:
-          /******** Login: ********************************/
-          dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null,CHARGE_NODE_CONNECT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING,0f,0f) );   // Clear old UI data.
-          requestQueue.add( new ChargerHTTPConn( weakContext,
-                                            CHARGE_NODE_INTENT,
-                                            LOGIN_URL,
-                                            data,                       // Username and password are supplied as the 'Post Data' for the HTTP connection.  
-                                            cookieData, 
-                                            false, CHARGE_NODE_HTML_DATA)  );        
-          /*********************************************************/          
-          connectionStatus = STATUS_CONNECTING;
-          timerStart();    // Make sure the update timer is running! 
+          // Already connected. Need to disconnect:
+          doChargeSet(0);  // Turn off the charger if it's on. 
+          connectionStatus = STATUS_OFFLINE;
+          dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null,CHARGE_NODE_DEFAULT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING,0f,0f) );   // Tell the UI we have disconnected. 
+          }
+        else  // [if (connectionStatus == STATUS_CONNECTED)]
+          {
+          // Need to connect!
+          if ( (data != null) && (data.containsKey("j_username")) && (data.containsKey("j_password")) )     // A bundle containing 'USER' and 'PASSWORD' strings must be supplied to connect. 
+            {
+            dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null,CHARGE_NODE_CONNECT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING,0f,0f) );   // Clear old UI data.            
+            doLogin(data);
+            connectionStatus = STATUS_CONNECTING;
+            timerStart();    // Make sure the update timer is running! 
+            }
           }
         break;
         
-        
-        
 
       case CHARGE_NODE_CHARGESTART:
-        if ( (data != null) && (data.containsKey("j_username")) && (data.containsKey("j_password")) )     // A bundle containing 'USER' and 'PASSWORD' strings must be supplied to connect. 
-          {
-          /******** Login: ********************************
-          requestQueue.add( new ChargerHTTPConn( weakContext,
-                                            CHARGE_NODE_INTENT,
-                                            LOGIN_URL,
-                                            data,                       // Username and password are supplied as the 'Post Data' for the HTTP connection.  
-                                            cookieData, 
-                                            false, CHARGE_NODE_HTML_DATA)  );  */        
-          /******** Charge Control: ********************************/
-          requestQueue.add( new ChargerHTTPConn( weakContext,
-                                            CHARGE_NODE_INTENT, 
-                                            "http://data.solarnetwork.net/solarreg/u/instr/add.json", 
-                                            makeChargeControl(1),
-                                            cookieData,
-                                            false, CHARGE_NODE_HTML_DATA)  );     
-          /*********************************************************/
-          }
+        if (connectionStatus == STATUS_CONNECTED) doChargeSet(1);  // Turn ON the charger!  
         break;
       
         
       case CHARGE_NODE_CHARGESTOP:
-        if ( (data != null) && (data.containsKey("j_username")) && (data.containsKey("j_password")) )     // A bundle containing 'USER' and 'PASSWORD' strings must be supplied to connect. 
-          {
-          /******** Login: ********************************
-          requestQueue.add( new ChargerHTTPConn( weakContext,
-                                            CHARGE_NODE_INTENT,
-                                            LOGIN_URL,
-                                            data,                       // Username and password are supplied as the 'Post Data' for the HTTP connection.  
-                                            cookieData, 
-                                            false, CHARGE_NODE_HTML_DATA)  );  */        
-          /******** Charge Control: ********************************/        
-          requestQueue.add( new ChargerHTTPConn( weakContext,
-                                            CHARGE_NODE_INTENT, 
-                                            "http://data.solarnetwork.net/solarreg/u/instr/add.json", 
-                                            makeChargeControl(0),
-                                            cookieData,
-                                            false, CHARGE_NODE_HTML_DATA)  );     
-          /*********************************************************/
-          }
+        if (connectionStatus == STATUS_CONNECTED) doChargeSet(0);  // Turn off the charger!  
         break;
       
         
@@ -281,10 +234,22 @@ public class ChargeNode implements IDashMessages
           {
           // --DEBUG!--
 Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
-          // DEBUG: Normally we'd check the response from the server here, but it's a bit confused at the moment. 
-          // We'll just assume that ANY response means we're loged on! 
-          connectionStatus = STATUS_CONNECTED;
-          dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
+          // Check the r4esponse code. Should be 200 if we logged in OK:
+          if (data.getInt("ResponseCode",999) == 200)
+            {
+            // Connected OK!
+            connectionStatus = STATUS_CONNECTED;
+            dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_CONNECTED_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
+            timerStart();   // Make sure timer is running (for PING updates). 
+            }
+          else
+            {
+            // Login error. 
+            connectionStatus = STATUS_OFFLINE;
+            chargeStatus = STATUS_NOT_CHARGING;
+            dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_LOGINERROR_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
+            timerStop();
+            }
           }
           
         //serverPage = new String(stringData);
@@ -310,7 +275,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Re
             for ( int i=0; i<jsonDataSection.length(); i++ )
               {
               JSONObject jsonDataItem = jsonDataSection.getJSONObject(i);
-              if ( (jsonDataItem.has("sourceId")) && (jsonDataItem.getString("sourceId").equals("/power/switch/1") ) )
+              if ( (jsonDataItem.has("sourceId")) && (jsonDataItem.getString("sourceId").equals("/power/switch/2") ) )
                 {
                 Log.i("HTTPConn", "  FOUND!!! Value = " + String.format("%d", jsonDataItem.getInt("integerValue") ) );
                 if (jsonDataItem.getInt("integerValue") == 1)
@@ -322,7 +287,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Re
                   {
                   chargeStatus = STATUS_NOT_CHARGING;
                   }
-                dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
+                dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_OK_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
                 }
               //--DEBUG!!--Log.i("HTTPConn", "  sourceId: " + jsonDataItem.getString("sourceId") + "\n  integerValue: " + String.format("%d", jsonDataItem.getInt("integerValue") )  );  
               }  // [for...]
@@ -330,9 +295,9 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Re
           catch (Exception e)
             {  
             e.printStackTrace();
-            chargeStatus = STATUS_NOT_CHARGING;
-            connectionStatus = STATUS_OFFLINE;
-            dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) ); 
+            //chargeStatus = STATUS_NOT_CHARGING;
+            //connectionStatus = STATUS_OFFLINE;
+            //dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) ); 
             Log.i(com.tumanako.ui.UIActivity.APP_TAG, "Error Parsing JSON Data!"  );
             }
           
@@ -359,9 +324,9 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> XML Data Message." );
 */
         
       case ChargerHTTPConn.CONN_ERROR:
-        chargeStatus = STATUS_NOT_CHARGING;
-        connectionStatus = STATUS_OFFLINE;
-        dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
+        //chargeStatus = STATUS_NOT_CHARGING;
+        //connectionStatus = STATUS_OFFLINE;
+        //dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
         break;
       
       }
@@ -458,13 +423,14 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Watchdog Overflow. Sto
              {
              pingCounter = 0;
 Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Ping! " );
+             dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_UPDATING_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
              requestQueue.add( new ChargerHTTPConn(weakContext,CHARGE_NODE_INTENT,PING_URL,null,cookieData,false,CHARGE_NODE_JSON_DATA)  );     
              }
            break;
            
          default: 
          }  // [switch (status)]
-       timerStart();  // Restarts the timer. 
+       if (connectionStatus != STATUS_OFFLINE) timerStart();  // Restarts the timer. 
        
        }  // [if (watchdogCounter >= WATCHDOG_OVERFLOW)...else]
      
@@ -481,6 +447,38 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Ping! " );
   
  
   /********** Controls: ************************************************************/
+   
+   
+   
+  /******** Login: ********************************/
+  private void doLogin(Bundle dataReceived)
+    {
+    requestQueue.add( new ChargerHTTPConn( weakContext,
+                                            CHARGE_NODE_INTENT,
+                                            LOGIN_URL,
+                                            dataReceived,                       // Username and password are supplied as the 'Post Data' for the HTTP connection.  
+                                            cookieData, 
+                                            false, 
+                                            CHARGE_NODE_HTML_DATA)  );        
+    }
+   
+  
+  
+  /******** Charge Start / Stop: ********************************/
+  private void doChargeSet(int newSetting)
+    {
+    requestQueue.add( new ChargerHTTPConn( weakContext,
+                                            CHARGE_NODE_INTENT, 
+                                            "http://data.solarnetwork.net/solarreg/u/instr/add.json", 
+                                            makeChargeControl(newSetting),
+                                            cookieData,
+                                            false, 
+                                            CHARGE_NODE_HTML_DATA)  );    
+    }
+  
+  
+  
+  
   
   private Bundle makeChargeData(int conStatus, int chgStatus, float current, float ah)
     {
@@ -503,7 +501,7 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Ping! " );
     Bundle chargeData = new Bundle();
     chargeData.putString( "nodeId",              "30"                       );
     chargeData.putString( "topic",               "SetControlParameter"      );
-    chargeData.putString( "parameters[0].name",  "/power/switch/1"          );
+    chargeData.putString( "parameters[0].name",  "/power/switch/2"          );
     chargeData.putString( "parameters[0].value", String.format("%d",setTo)  );
     return chargeData;
     }

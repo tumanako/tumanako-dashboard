@@ -101,7 +101,8 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     
     private int uiResetCounter = 0;               // Use this to count uiTimer intervals during which no data have been received. 
     private static final int UI_RESET_AFTER = 6;  // If the counter exceeds UI_RESET_AFTER, reset the UI (i.e. clear old data which we assume is no longer valid). 
-    
+    private int chargeNodeResetCounter = 0; 
+    private static final int CHARGENODE_RESET_AFTER = 20;
       
     public static final int UI_TOAST_MESSAGE = 1;     // Sent by another class when they have a brief message they would like displayed.  
 
@@ -117,7 +118,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     private boolean isDemo = false;  // Demo mode flag!
     // ---------------DEMO MODE CODE -------------------------------  
 
-    private ChargeNode chargeNode;
+    
     
     
     
@@ -183,15 +184,12 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       // Charge Node:
       uiWidgets.put( "editTextUser",         findViewById(R.id.editTextUser)         );
       uiWidgets.put( "editTextPassword",     findViewById(R.id.editTextPassword)     );
-      //uiWidgets.put( "webChargeNodeContent", findViewById(R.id.webChargeNodeContent) );
+      uiWidgets.put( "webChargeNodeContent", findViewById(R.id.webChargeNodeContent) );
       uiWidgets.put( "lampChargeNodeOnline", findViewById(R.id.lampChargeNodeOnline) );
       uiWidgets.put( "lampCharging",         findViewById(R.id.lampCharging)         );
       uiWidgets.put( "buttonConnectToNode",  findViewById(R.id.buttonConnectToNode)  );
       uiWidgets.put( "buttonChargeStart",    findViewById(R.id.buttonChargeStart)    );
       uiWidgets.put( "buttonChargeStop",     findViewById(R.id.buttonChargeStop)     );
-      //uiWidgets.put( "textChargeCurrent",    findViewById(R.id.textChargeCurrent)    );
-      //uiWidgets.put( "textChargeAH",         findViewById(R.id.textChargeAH)         );
-      
       // ---- Connect click and gesture listeners: -------
       gestureDetector = new GestureDetector(new SimpleSwiper(this));
       tabHost.setOnTouchListener(this);
@@ -206,10 +204,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       
       // Get a Broadcast Manager so we can send out messages to other parts of the app.
       dashMessages = new DashMessages( this, this, UI_INTENT_IN );
-      
-      chargeNode = new ChargeNode(this);
-      
-      
+
       // -------- Restore Saved Preferences (if any): -------------------
       /***
       SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -357,11 +352,12 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     private void chargeNodeUIReset()
       {
       // Charge Node UI Reset:
+      //--DEBUG!--
+Log.i(APP_TAG,"UIActivity -> chargeNodeUIReset()");
       ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
       ((StatusLamp)uiWidgets.get("lampCharging")).turnOff();
-      //((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
-      //((TextWithLabel)uiWidgets.get("textChargeCurrent"))   .setText   ( "0"       );
-      //((TextWithLabel)uiWidgets.get("textChargeAH"))        .setText   ( "0.0"     );
+      ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
+      ((Button)uiWidgets.get("buttonConnectToNode")).setText("Connect");
       }
     
     
@@ -519,7 +515,7 @@ Log.i(APP_TAG,"UIActivity -> onResume()");
 Log.i(APP_TAG,"     State: currentTab = " + currentTab + "; isDemo = " + isDemo );
       super.onResume();
       dashMessages.resume();
-      chargeNode.resume();
+      
       
       // Register to receive messages via Intents:
       //LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,  new IntentFilter(IDroidSensor.SENSOR_INTENT_ACTION));
@@ -567,7 +563,6 @@ Log.i(APP_TAG,"UIActivity -> Restore State: currentTab = " + currentTab + "; isD
 Log.i(APP_TAG,"UIActivity -> onPause()");      
       super.onPause();
       dashMessages.suspend();
-      chargeNode.suspend();
       uiTimer.removeCallbacks(uiTimerTask);      // ...Make sure there is no active callback already....
       }
 
@@ -633,10 +628,15 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
        uiResetCounter++;
        if (uiResetCounter > UI_RESET_AFTER) 
          {
+         uiResetCounter = 0;
          uiReset();   // Reset the UI if we receive no data for a certain time interval.
-         if ( (chargeNode != null) && (chargeNode.getConnectionStatus() == ChargeNode.STATUS_OFFLINE) ) chargeNodeUIReset();
-           // ...Only reset the Charge Node UI page if it's not connected to a charge node...
          }
+       chargeNodeResetCounter++;       
+       if (chargeNodeResetCounter > CHARGENODE_RESET_AFTER) 
+         {
+         chargeNodeResetCounter = 0;
+         chargeNodeUIReset();
+         }       
        // Start the timer for next UI Uodate:     
        uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
        uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
@@ -661,13 +661,22 @@ Log.i(APP_TAG,"UIActivity -> onStop()");
         // Data Message from Charge Node... 
         // If string data is included in the Intent, assume it's some HTML for the webview control to display: 
         //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadUrl(stringData);
-        //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(stringData, "text/html", null);        
+        chargeNodeResetCounter = 0;
+        if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(stringData, "text/html", null);        
         // Get the Current and AH values from the data: 
         //Float chargeCurrent = data.getFloat(ChargeNode.CHARGE_CURRENT, 0.0f);
         //Float chargeAH      = data.getFloat(ChargeNode.CHARGE_AH, 0.0f);
         // Get the status lamp values: 
-        if (data.getFloat(ChargeNode.CONNECTION_STATUS, 0.0f) == 0.0f ) ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
-        else                                                            ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOn();
+        if (data.getFloat(ChargeNode.CONNECTION_STATUS, 0.0f) == 0.0f ) 
+          {
+          ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
+          ((Button)uiWidgets.get("buttonConnectToNode")).setText("Connect");
+          }
+        else                                                            
+          {
+          ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOn();
+          ((Button)uiWidgets.get("buttonConnectToNode")).setText("Disconnect");
+          }
         if (data.getFloat(ChargeNode.CHARGE_STATUS, 0.0f) == 0.0f ) ((StatusLamp)uiWidgets.get("lampCharging")).turnOff();
         else                                                            ((StatusLamp)uiWidgets.get("lampCharging")).turnOn();
         //((TextWithLabel)uiWidgets.get("textChargeCurrent"))      .setText   ( String.format("%.0f",chargeCurrent) );

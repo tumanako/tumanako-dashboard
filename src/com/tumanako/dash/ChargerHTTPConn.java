@@ -284,14 +284,34 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
         if (readChr > -1) httpReceivedData.append((char)readChr);
         Thread.sleep(0);  // Give up CPU time (allows for slow data rate). 
         }
-          
+      
+      responseCode = serverConn.getResponseCode();  // Get the response code.
+      
       /*********** HTTP Connection Debug Info: **********************************/           
-      Log.i("HTTPConn", "Code:" + serverConn.getResponseCode() );
+      Log.i("HTTPConn", "Code:" + responseCode );
       Log.i("HTTPConn", "Message:" + serverConn.getResponseMessage() );
       Log.i("HTTPConn", "Redirect To: " + serverConn.getHeaderField("Location") );
-      //Log.i("HTTPConn", "Response:" + httpReceivedData );
+     // Log.i("HTTPConn", "Response:" + httpReceivedData );
       /**************************************************************************/
-      responseCode = serverConn.getResponseCode();  // Get the response code. 
+      
+      /*********** SolarNode Login Hack: *****************************************
+       * The following code decides whether this is a successful result when connecting to a 
+       * SolarNode station. We receive: 
+       *   Login OK:   Redirect to "add.json"
+       *                       Or: "/solarreg/u/home"
+ 
+       *   Login FAIL: Redirect to "login.do"
+       *   
+       * In either case, we don't want to follow the redirect, just set the status accordingly.
+       * We'll use 200 for OK (HTTP OK) and 999 for login failed. 
+       *  
+       * "PING" data requests seem to return Status 200 (OK) and JSON data even if not logged in...
+       * 
+       ***************************************************************************/
+      if (responseCode == 302) responseCode = 200;                                         // For a start, just change redirects to "OK".  
+      if ((serverConn.getHeaderField("Location") != null) && (serverConn.getHeaderField("Location").contains("login.do"))) responseCode = 999;  // Login Failed! Change to our own error. 
+      /***************************************************************************/
+             
       streamIn.close();
       serverConn.disconnect();
       // Add any cookies from the request to any data we have: 

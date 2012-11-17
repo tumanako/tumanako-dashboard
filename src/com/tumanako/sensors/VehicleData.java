@@ -370,7 +370,7 @@ public class VehicleData extends Thread implements IDashMessages
      {
      
      /***** Make sure the bluetooth adaptor is on: *******/ 
-     if (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON)
+     if ((bluetoothAdapter == null) || (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON))
        {
        //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
        return false;

@@ -56,6 +56,12 @@
             android:ems="8"
             android:inputType="textPassword"
             android:text="tumanakotest99" />
+
+        <WebView
+            android:id="@+id/webChargeNodeContent"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.0" />
     </LinearLayout>
 
     <!-- Right Column: -->

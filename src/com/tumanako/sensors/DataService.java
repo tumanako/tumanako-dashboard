@@ -22,6 +22,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
+import com.tumanako.dash.ChargeNode;
 import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.IDashMessages;
 
@@ -84,7 +85,9 @@ public class DataService extends Service implements IDashMessages
    ****************************************************/
   public NmeaGPS     deviceGPS;                               
   public VehicleData vehicleData;
+  public ChargeNode  chargeNode;
 
+  
   private final Handler updateTimer = new Handler();  // Internal update timer: creates a 'refresh' interval on which we will do things.
   private int watchdogCounter = 0;                    // Used to track sensor events; must be explicitly reset periodically by client applications. 
   
@@ -153,10 +156,12 @@ public class DataService extends Service implements IDashMessages
     {
     deviceGPS.resume();
     startVehicleData();
+    chargeNode.resume();
     }
   private void stopSensors()
     {
     deviceGPS.suspend();
+    chargeNode.suspend();
     // ---------------DEMO MODE CODE -------------------------------
     setDemo(false);
     // ---------------DEMO MODE CODE -------------------------------    
@@ -268,6 +273,7 @@ public class DataService extends Service implements IDashMessages
       deviceGPS    = new NmeaGPS(this);
       dashMessages = new DashMessages(this, this, DATA_SERVICE);
       demoData     = new DemoData(this);
+      chargeNode   = new ChargeNode(this);
       }
 
     
@@ -335,6 +341,7 @@ public class DataService extends Service implements IDashMessages
       stopSensors();          // Stop the sensors.
       deviceGPS = null;
       vehicleData = null;
+      chargeNode = null;
       }
 
 
