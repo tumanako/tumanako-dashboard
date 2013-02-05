@@ -46,6 +46,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TabHost;
@@ -161,6 +162,11 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       // --DEBUG!!--
       Log.i(APP_TAG,"UIActivity -> onCreate()");
            
+      // **** Calc height of dials based on width: ****************
+      //int thisWidth =   ((Dial) findViewById(R.id.dialMotorRPM)).getWidth();
+      //((Dial) findViewById(R.id.dialMotorRPM)).setLayoutParams(new LayoutParams(thisWidth, (int)((double)thisWidth * 0.58)));
+      
+      
       // ********** Make a list of available UI widgets: *****************************
       // Primary Data:
       uiWidgets.put( "lampData",           findViewById(R.id.lampData)           );

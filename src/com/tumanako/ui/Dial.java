@@ -34,6 +34,7 @@ import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.ViewGroup.LayoutParams;
 
 
 
@@ -50,8 +51,6 @@ import android.util.Log;
 public class Dial extends RenderedGauge
   {
 
-  private boolean isFirstDraw = true; 
-  
   // Calculated internal values (based on actual size of dial, and generated at runtime): 
   private float needleLength = 0f;  // Length of needle in screen coordinates
 
@@ -112,6 +111,26 @@ public class Dial extends RenderedGauge
       }
     needleLength = needleLength * 0.9f;
     invalidate();    
+    }
+
+  
+  
+  
+  // ********************** onMeasure: ************************************
+  // Overrides the onMeasure, and we'll use this to correct issues with 
+  // aspect ratio of semi-circular dials: 
+  @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) 
+    {
+    // Call the parent class onMeasure FIRST: (see RenderedGauge)
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    
+    // Now correct the aspect ratio by adjusting the width:  
+    int newWidth = (int)( (float)getMeasuredHeight() * 1.72f );
+    int newHeight = (int)( (float)getMeasuredWidth() / 1.72f );    
+    
+    if (newWidth < getMeasuredWidth()) setMeasuredDimension(newWidth,  getMeasuredHeight() );
+    else                               setMeasuredDimension(getMeasuredWidth(),  newHeight);
     }
 
   
@@ -207,22 +226,30 @@ public class Dial extends RenderedGauge
     
     }
 
+  
+  
+  
+  @Override
+  protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+    {
+    super.onLayout(changed, left, top, right, bottom);
+    // Layout Time: We should now have measurements for our view area, so we can calculate positions 
+    // and sizes for dial elements: 
+    // **** Get actual layout parameters: ****
+    if (changed)
+      {
+      Log.i( UIActivity.APP_TAG, "  Dial -> onLayout Changed!! ");      
+      calcDial();
+      }
+    }
 
   
   
   @Override 
   protected void onDraw(Canvas canvas)
     {
-   
     super.onDraw(canvas);
    
-    // Determine the chart dimensions, if we haven't already done so: 
-    if (isFirstDraw)
-      {
-      isFirstDraw = false;
-      calcDial();
-      }
-
     // *** Draw the scale 'ticks': ***
     // Draw the scale text (if required):
     if (showTicks)

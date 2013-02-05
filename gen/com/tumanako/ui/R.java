@@ -289,12 +289,12 @@ containing a value of this type.
         public static final int editTextUser=0x7f080001;
         public static final int lampChargeNodeOnline=0x7f080003;
         public static final int lampCharging=0x7f080004;
-        public static final int lampContactor=0x7f080010;
-        public static final int lampData=0x7f08000c;
+        public static final int lampContactor=0x7f08000e;
+        public static final int lampData=0x7f08000d;
         public static final int lampFault=0x7f080011;
-        public static final int lampGPS=0x7f08000d;
+        public static final int lampGPS=0x7f080010;
         public static final int lampPreCharge=0x7f08001b;
-        public static final int lampReverse=0x7f08000e;
+        public static final int lampReverse=0x7f08000c;
         public static final int layoutChaqrgeNode=0x7f080000;
         public static final int layoutPrimaryData=0x7f08000a;
         public static final int layoutSecondaryData=0x7f080015;

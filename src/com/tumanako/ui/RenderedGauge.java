@@ -34,7 +34,9 @@ import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 
 
 /***************************************************
@@ -117,8 +119,6 @@ import android.view.View;
 
 public class RenderedGauge extends View
   {
-
-  private boolean isFirstDraw = true;
   
   protected int drawingWidth = 0;
   protected int drawingHeight = 0;
@@ -180,15 +180,24 @@ public class RenderedGauge extends View
  
   protected static final int DEFAULT_BAR_COLOUR = 0xFF00C000;
   protected static final int DEFAULT_TICK_COLOUR = 0xA0F00000;
+  
+  //protected Context uiContext;
     
+  private final ScaledFont fontScale;
+  
   // ********** Constructor: ***************************
   public RenderedGauge(Context context, AttributeSet atttibutes)
     {
     super(context, atttibutes);
     
+    //uiContext = context;
+       
+    // Get Font Scale: 
+    fontScale = new ScaledFont(context);
+    
     // Load custom attributes from XML: 
     getCustomAttributes(atttibutes);
-    
+   
     // Create the arrays to store pre-calculated scale data:     
     slabelX = new float[numberDivisions];
     slabelY = new float[numberDivisions];
@@ -198,7 +207,7 @@ public class RenderedGauge extends View
     
     // Default paint for scale: 
     scalePaint.setColor(Color.BLACK);
-    scalePaint.setTextSize(12);
+    scalePaint.setTextSize(fontScale.getFontScale() * 12);
     scalePaint.setTextAlign(Paint.Align.CENTER);
     scalePaint.setTypeface(Typeface.DEFAULT_BOLD);
     scalePaint.setAntiAlias(true);
@@ -213,7 +222,7 @@ public class RenderedGauge extends View
     guageLablelPaint.setTextAlign(Paint.Align.CENTER);
     guageLablelPaint.setTypeface(Typeface.DEFAULT_BOLD);
     guageLablelPaint.setAntiAlias(true);
-    
+        
     }
   
   
@@ -240,7 +249,7 @@ public class RenderedGauge extends View
     numberDivisions  = a.getInt(R.styleable.RenderedGauge_number_divisions,5);
     tickStep         = a.getFloat(R.styleable.RenderedGauge_scale_tick_step, 0.5f);
     numberScaleTicks = (int)((scaleStep / tickStep) * (numberDivisions-1)) + 1;
-    tickSize         = a.getInt(R.styleable.RenderedGauge_scale_tick_size,2);
+    tickSize         = (int)(a.getFloat(R.styleable.RenderedGauge_scale_tick_size,2.0f) * fontScale.getFontScale());
     fOriginX         = a.getFloat(R.styleable.RenderedGauge_origin_x , 0.5f);
     fOriginY         = a.getFloat(R.styleable.RenderedGauge_origin_y , 0.5f);
     // Gauge label and position:     
@@ -380,6 +389,9 @@ public class RenderedGauge extends View
     
     setValue(scaleMin);
     
+    // ------- Set a good font size for labels, based on screen resolution. ------------
+    guageLablelPaint.setTextSize(fontScale.getFontScale() * 14.0f );
+       
     invalidate();
     }
 
@@ -448,22 +460,29 @@ public class RenderedGauge extends View
 
   
   
+  @Override
+  protected void onLayout (boolean changed, int left, int top, int right, int bottom)
+    {
+    // Layout Time: We should now have measurements for our view area, so we can calculate positions 
+    // and sizes for gauge elements: 
+    // **** Get actual layout parameters: ****
+    if (changed)
+      {
+      // --DEBUG!-- 
+      Log.i( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
+      drawingWidth = this.getWidth();
+      drawingHeight = this.getHeight();
+      calcGauge();                      // Calculate various generic values applying to all gauge types.
+      }
+    }
+  
+  
   
   @Override 
   protected void onDraw(Canvas canvas)
     {
     super.onDraw(canvas);
     
-    //if (drawingWidth == 0)
-    if (isFirstDraw)
-      {
-      isFirstDraw = false;
-      // **** Get actual layout parameters: ****
-      drawingWidth = this.getWidth();
-      drawingHeight = this.getHeight();
-      calcGauge();                      // Calculate various generic values applying to all gauge types. 
-      }
-
     // Draw the gauge label (if required): 
     if (showGaugeLabel) canvas.drawText( gaugeLabel, labelX, labelY, guageLablelPaint);
       //  --DEBUG!-- canvas.drawText( String.format("%.1f", gaugeValue), labelX, labelY, guageLablelPaint);  

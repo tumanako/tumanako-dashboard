@@ -8,16 +8,20 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <FrameLayout
+    <!-- Dials: ====================================== -->
+
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="2dp" >
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:orientation="horizontal" 
+        android:gravity="bottom">
 
         <com.tumanako.ui.Dial
             android:id="@+id/dialMotorRPM"
-            android:layout_width="200dp"
-            android:layout_height="120dp"
-            android:layout_gravity="bottom|left"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
             android:background="@drawable/dial_bg"
             app:colours="FF404040,FFA0A0A0,FF404040,FFA0A0A0,FF404040,FFDBB893,FFDF7401,FFFFA58C,FFFF3700,FFFF0000"
             app:gauge_label="x1000/min"
@@ -35,11 +39,21 @@
             app:scale_tick_size="3"
             app:scale_tick_step="0.5" />
 
+        <com.tumanako.ui.StatusLamp
+            android:id="@+id/lampReverse"
+            android:layout_width="20dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="100dp"
+            android:padding="2dp"
+            app:initial_status="off"
+            app:off_bitmap="@drawable/reverse_off"
+            app:on_bitmap="@drawable/reverse_on" />
+
         <com.tumanako.ui.Dial
             android:id="@+id/dialMainBatteryKWh"
-            android:layout_width="200dp"
-            android:layout_height="120dp"
-            android:layout_gravity="bottom|right"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
             android:background="@drawable/dial_bg"
             app:colours="FFFF0000,FFFF0000,FFDF7401,FFDF7401,FF00D0+00,FF00D000,FF00D000,FF00D000,FF00D000,FF00D000"
             app:gauge_label="kWh"
@@ -56,48 +70,19 @@
             app:scale_step="10"
             app:scale_tick_size="3"
             app:scale_tick_step="5" />
-
-        <com.tumanako.ui.StatusLamp
-            android:id="@+id/lampContactor"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="top|center"
-            app:initial_status="off"
-            app:off_bitmap="@drawable/contactor_off"
-            app:on_bitmap="@drawable/contactor_on" />
-
-        <com.tumanako.ui.StatusLamp
-            android:id="@+id/lampFault"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|center"
-            app:initial_status="on"
-            app:off_bitmap="@drawable/fault_off"
-            app:on_bitmap="@drawable/fault_on" />
-        
-        <com.tumanako.ui.StatusLamp
-            android:id="@+id/lampReverse"
-            android:layout_width="20dp"
-            android:layout_height="24dp"
-            android:layout_gravity="bottom|left"
-            android:layout_marginBottom="30dp"
-            android:layout_marginLeft="170dp"
-            android:padding="2dp"
-            app:initial_status="off"
-            app:off_bitmap="@drawable/reverse_off"
-            app:on_bitmap="@drawable/reverse_on" />        
-        
-    </FrameLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="120dp"
+        android:padding="3dp"
         android:orientation="horizontal" >
+
+        <!-- Lamps: ====================================== -->
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical" >
 
@@ -105,32 +90,63 @@
                 android:id="@+id/lampData"
                 android:layout_width="60dp"
                 android:layout_height="30dp"
+                android:padding="3dp"
                 app:initial_status="off"
                 app:off_bitmap="@drawable/data_off"
                 app:on_bitmap="@drawable/data_on" />
 
             <com.tumanako.ui.StatusLamp
-                android:id="@+id/lampGPS"
+                android:id="@+id/lampContactor"
                 android:layout_width="60dp"
-                android:layout_height="30dp"
+                android:layout_height="60dp"
+                android:padding="3dp"
                 app:initial_status="off"
-                app:off_bitmap="@drawable/gps_off"
-                app:on_bitmap="@drawable/gps_on" />
+                app:off_bitmap="@drawable/contactor_off"
+                app:on_bitmap="@drawable/contactor_on" />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <com.tumanako.ui.StatusLamp
+                android:id="@+id/lampGPS"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:padding="3dp"
+                app:initial_status="off"
+                app:off_bitmap="@drawable/gps_off"
+                app:on_bitmap="@drawable/gps_on" />
+
+            <com.tumanako.ui.StatusLamp
+                android:id="@+id/lampFault"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="3dp"
+                app:initial_status="on"
+                app:off_bitmap="@drawable/fault_off"
+                app:on_bitmap="@drawable/fault_on" />
+        </LinearLayout>
+
+        <!-- Temp Gauges: ====================================== -->
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="fill_parent"
+            android:layout_weight="0.9"
             android:gravity="center"
             android:orientation="vertical" >
 
             <com.tumanako.ui.BarGauge
                 android:id="@+id/barTMotor"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
+                android:layout_height="0dp"
                 android:layout_margin="3dp"
+                android:layout_weight="0.33"
                 android:background="@drawable/bezel"
-                app:bar_across="0.4"
+                app:bar_across="0.8"
                 app:bar_long="0.70"
                 app:colours="FF3ADF00,FF3ADF00,FF74DF00,FF74DF00,FFA5DF00,FFA5DF00,FFD7DF01,FFD7DF01,FFDBA901,FFDBA901,FFDF7401,FFDF7401,FFDF3A01,FFDF3A01,FFFF4000,FFFF4000,FFFF0000,FFFF0000,FFFF0000,FFFF0000"
                 app:gauge_label="Mtr °C"
@@ -146,13 +162,14 @@
                 app:scale_step="10"
                 app:scale_tick_step="5"
                 app:segment_gap="2"
-                app:show_scale="true" />
+                app:show_scale="false" />
 
             <com.tumanako.ui.BarGauge
                 android:id="@+id/barTController"
                 android:layout_width="fill_parent"
-                android:layout_height="20dp"
+                android:layout_height="0dp"
                 android:layout_margin="3dp"
+                android:layout_weight="0.33"
                 android:background="@drawable/bezel"
                 app:bar_across="0.8"
                 app:bar_long="0.70"
@@ -175,8 +192,9 @@
             <com.tumanako.ui.BarGauge
                 android:id="@+id/barTBattery"
                 android:layout_width="fill_parent"
-                android:layout_height="20dp"
+                android:layout_height="0dp"
                 android:layout_margin="3dp"
+                android:layout_weight="0.33"
                 android:background="@drawable/bezel"
                 app:bar_across="0.8"
                 app:bar_long="0.70"

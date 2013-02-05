@@ -9,6 +9,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 import android.util.FloatMath;
+import android.util.Log;
 
 /************************************************************************************
 Tumanako - Electric Vehicle and Motor control software
@@ -45,7 +46,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 public class BarGauge extends RenderedGauge
   {
 
-  private boolean isFirstDraw = true; 
+  private boolean measurementsValid = false;   // Set to true once we have measurments (after onLayout)
   
   // Calculated internal values (based on actual size of dial, and generated at runtime): 
   private int barLong = 0;
@@ -181,9 +182,8 @@ public class BarGauge extends RenderedGauge
     // Figure out how many 'blocks' to draw on the bar. 
     // We'll draw all the complete blocks, then add another 
     // reduced-size block for the last part of the scale:
-    // Note... we can't do this until after the first draw event, because that
-    // triggers 'calcBar()' which sets up many parameters. 
-    if (!isFirstDraw)
+    // Note... we can't do this until after 'calcBar()' has been called, which sets up many parameters. 
+    if (measurementsValid)
       {
       lastDrawnBlock = ( (int) ((gaugeValue - scaleMin) / blockValue) ) - 1;
       if (lastDrawnBlock < -1) lastDrawnBlock = -1;  //  ?? Shouldn't happen. 
@@ -226,20 +226,30 @@ public class BarGauge extends RenderedGauge
   
   
   
+
+  @Override
+  protected void onLayout (boolean changed, int left, int top, int right, int bottom)
+    {
+    super.onLayout(changed, left, top, right, bottom);
+    // Layout Time: We should now have measurements for our view area, so we can calculate positions 
+    // and sizes for dial elements: 
+    // **** Get actual layout parameters: ****
+    if (changed)
+      {
+      // -- DEBUG!! -- Log.i( UIActivity.APP_TAG, "  BarGauge -> onLayout Changed!! ");      
+      calcBar();
+      measurementsValid = true;    
+      }
+    }
+
+  
   
   
 
   @Override 
   protected void onDraw(Canvas canvas)
     {
-     
-    // Determine the chart dimensions, if we haven't already done so: 
-    if (isFirstDraw)
-      {
-      super.onDraw(canvas);
-      isFirstDraw = false;
-      calcBar();
-      }
+    super.onDraw(canvas);
 
     for (int n = 0; n <= lastDrawnBlock; n++)
       {
