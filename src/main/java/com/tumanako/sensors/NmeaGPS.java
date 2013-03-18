@@ -27,49 +27,47 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-
 import com.tumanako.dash.IDashMessages;
 
-
 /*********************************************************************************************
- * NMEA NMEAData Receiver: 
- * 
- * This class provides access to location services so we can use the GPS. 
- * 
+ * NMEA NMEAData Receiver:
+ *
+ * This class provides access to location services so we can use the GPS.
+ *
  * Note that this class uses the NmeaProcessor class to actually listen for GPS messages and
- * do the processing work. See NmeaProcessor.java 
- * 
+ * do the processing work. See NmeaProcessor.java
+ *
  * @author Jeremy Cole-Baker / Riverhead Technology
  *
  *********************************************************************************************/
 
-public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages 
+public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
   {
 
   private LocationManager mLocationManager;
-  private boolean isAvailable = false;             // Is a NMEAData position available? 
+  private boolean isAvailable = false;             // Is a NMEAData position available?
 
   public NmeaProcessor NMEAData;                   // A reference to a NMEA processing object (used to decode NMEA Data strings from GPS)
-  
-  
+
+
   // ***** Constructor: *******
   public NmeaGPS(Context context)
     {
-    // Create a LocationManager object to get location data from NMEAData: 
+    // Create a LocationManager object to get location data from NMEAData:
     mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-    // Create an NMEA Processor to receive and process NMEA sentences: 
+    // Create an NMEA Processor to receive and process NMEA sentences:
     NMEAData = new NmeaProcessor(context);
     }
 
-  
-  
-  
+
+
+
   /***********************************************************************************
-  *     Public Methods 
+  *     Public Methods
   ***********************************************************************************/
-  
+
   // ******* Is the NMEAData OK / available? *******************
-  // Note - NMEAData status found to be slow in changing. It's better to look at   
+  // Note - NMEAData status found to be slow in changing. It's better to look at
   // isFixGood() method of NMEAData object to see if a fix is available.
   public boolean isOK()
     {  return isAvailable;  }
@@ -78,19 +76,19 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
   public boolean isRunning()
     {  return isAvailable;  }
 
-  
-  
+
+
   /********** toString Method: *************************************
    * Returns a string with a data summary (useful for debugging):
-   * @return String representing class data 
+   * @return String representing class data
    ******************************************************************/
   public String toString()
     {  return NMEAData.toString();  }
 
 
-  
-  
-  
+
+
+
   // Start getting NMEAData updates:
   public void resume()
     {
@@ -98,10 +96,10 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     // Add a listener to receive NMEA sentences:
     // Tihs causes our NmeaProcessor class to get NMEA messages from the GPS:
-    mLocationManager.addNmeaListener(NMEAData); 
+    mLocationManager.addNmeaListener(NMEAData);
     }
 
-  
+
   // Stop the NMEAData listener (saves batteries):
   public void suspend()
     {
@@ -109,18 +107,18 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
     mLocationManager.removeUpdates(this);
     }
 
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
 
   /***********************************************************************************
-  *  LocationListener Interface Methods 
+  *  LocationListener Interface Methods
   ***********************************************************************************/
-  
+
   public void onLocationChanged(Location arg0)
     {  }
 
@@ -130,16 +128,16 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
   public void onProviderEnabled(String provider)
     {  }
 
-  
+
   // ******* NMEAData Status Change: *******
   public void onStatusChanged(String provider, int status, Bundle extras)
     {
     // *** NMEAData Status: *****
     //  0 = OUT_OF_SERVICE
     //  1 = TEMPORARILY_UNAVAILABLE
-    //  2 = AVAILABLE 
+    //  2 = AVAILABLE
     //
-    // Note - NMEAData status found to be slow in changing. Just look at 
+    // Note - NMEAData status found to be slow in changing. Just look at
     // isFixGood() method of NMEAData object to see if a fix is available.
     if (status == 2)
       {  isAvailable = true;  }
@@ -153,8 +151,8 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
     {  }
 
- 
-  
 
-  
+
+
+
   }  // Class

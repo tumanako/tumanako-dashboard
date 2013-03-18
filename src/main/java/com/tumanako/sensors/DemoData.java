@@ -22,61 +22,59 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
-import com.tumanako.dash.DashMessages;
-import com.tumanako.dash.IDashMessages;
-import com.tumanako.ui.UIActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-
+import com.tumanako.dash.DashMessages;
+import com.tumanako.dash.IDashMessages;
+import com.tumanako.ui.UIActivity;
 
 /****************************************************************
  *  Tumanako Demo Data Input:
  *  -------------------------------
  *
  *  This class is designed to generate demo data to show the UI
- *  (if a connection to a Tumanako vehicle controller is not 
+ *  (if a connection to a Tumanako vehicle controller is not
  *  a vailable!)
- *   
+ *
  * @author Jeremy Cole-Baker / Riverhead Technology
  *
  ***************************************************************/
 
-
-public class DemoData implements IDashMessages  
+public class DemoData implements IDashMessages
   {
 
   private final int UPDATE_INTERVAL = 200;                  // Data send interval (ms)
   private Handler updateTimer = new Handler();
 
-  
-  /****** Demo Data Message Intent Filter: *********/
-  public static final String DEMO_DATA = "com.tumanako.sensors.demodata";  
-       // We will catch any intents with this identifier.  
-    
-  
-  private boolean isRunning = false;  // Demo mode is running flag!
-  private float kWh = 0f; 
-  
-  private float avgEnergyPerHour = 0f;   // Calculated Values relating to estimated range. 
-  private float avgEnergyPerKm = 0f;     //  
-  
-  private DashMessages dashMessages;
-  
-  
 
-  
+  /****** Demo Data Message Intent Filter: *********/
+  public static final String DEMO_DATA = "com.tumanako.sensors.demodata";
+       // We will catch any intents with this identifier.
+
+
+  private boolean isRunning = false;  // Demo mode is running flag!
+  private float kWh = 0f;
+
+  private float avgEnergyPerHour = 0f;   // Calculated Values relating to estimated range.
+  private float avgEnergyPerKm = 0f;     //
+
+  private DashMessages dashMessages;
+
+
+
+
   // ************** Constructor: *****************************************
   public DemoData(Context context)
     {
-    dashMessages = new DashMessages(context, this, DEMO_DATA);    // We are extending the 'DashMessages' class, and we need to call its Constructor here. 
+    dashMessages = new DashMessages(context, this, DEMO_DATA);    // We are extending the 'DashMessages' class, and we need to call its Constructor here.
     dashMessages.resume();
     }
 
-  
-  
-  
- /********** Other classes call this to start or stop the demo: *******************/ 
+
+
+
+ /********** Other classes call this to start or stop the demo: *******************/
  public void setDemo(boolean thisIsDemo)
    {
    // Set the 'Demo' mode flag:
@@ -85,49 +83,49 @@ public class DemoData implements IDashMessages
    }
 
 
- 
- 
- 
+
+
+
 
  /********** Dash Message Received: *************************************
   * Called when we receive an intent message via our Dashmessage object.
-  * Don't actually do anything!    
+  * Don't actually do anything!
   ***********************************************************************/
  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
    {   }
-  
- 
- 
- 
- 
- 
+
+
+
+
+
+
  private void startDemo()
    {
    isRunning = true;
-   avgEnergyPerHour = 10f;   
-   avgEnergyPerKm = 0.1f;   
+   avgEnergyPerHour = 10f;
+   avgEnergyPerKm = 0.1f;
    updateTimer.removeCallbacks(updateTimerTask);                 // Stop existing timer.
-   updateTimer.postDelayed(updateTimerTask, UPDATE_INTERVAL);    // Restart timer.   
+   updateTimer.postDelayed(updateTimerTask, UPDATE_INTERVAL);    // Restart timer.
    }
- 
- 
+
+
  private void stopDemo()
    {
    isRunning = false;
-   updateTimer.removeCallbacks(updateTimerTask);   // Stop existing timer. 
+   updateTimer.removeCallbacks(updateTimerTask);   // Stop existing timer.
    }
- 
- 
- 
-  
-  
-  
+
+
+
+
+
+
   /********************* Update Timer: **********************************************
-   * Runs on a timer, and sends fake data to the UI as long as demo mode is active.  
+   * Runs on a timer, and sends fake data to the UI as long as demo mode is active.
    **********************************************************************************/
-  private Runnable updateTimerTask = new Runnable() 
+  private Runnable updateTimerTask = new Runnable()
    {
-   public void run()  
+   public void run()
      {
      updateTimer.removeCallbacks(updateTimerTask);                    // ...Make sure there is no active callback already....
 
@@ -135,10 +133,10 @@ public class DemoData implements IDashMessages
      kWh = kWh + 1f;  if (kWh > 30f) kWh = 10f;
      float thisRPM = ((android.util.FloatMath.sin((float)(System.currentTimeMillis() % 12000) / 1909f  ) + 0.3f) * 3000f);
      float demoFault   = (thisRPM < -1500)                              ? 1f : 0f;
-     float demoReverse = (thisRPM < 0)                                  ? 1f : 0f;  
+     float demoReverse = (thisRPM < 0)                                  ? 1f : 0f;
      float contactorOn = (thisRPM > 1)                                  ? 1f : 0f;
      float preCharge = ((System.currentTimeMillis() % 300) > 100)  ? 1f : 0f;
-     float driveTime  = (avgEnergyPerHour > 0f)  ?  (kWh / avgEnergyPerHour) : 99.99f; 
+     float driveTime  = (avgEnergyPerHour > 0f)  ?  (kWh / avgEnergyPerHour) : 99.99f;
      float driveRange = (avgEnergyPerKm   > 0f)  ?  (kWh / avgEnergyPerKm)   : 9999f;
      Bundle vehicleData = new Bundle();
      vehicleData.putFloat("DATA_CONTACTOR_ON",      contactorOn       );
@@ -161,10 +159,10 @@ public class DemoData implements IDashMessages
      /**********************************************************************/
 
      if (isRunning) updateTimer.postDelayed(updateTimerTask, UPDATE_INTERVAL);    // Restart timer.
-     } 
+     }
    };
 
-  
-   
-   
+
+
+
   }  // [class DemoData]
