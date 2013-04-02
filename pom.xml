@@ -22,7 +22,65 @@
 	<version>0.77-SNAPSHOT</version>
 	<packaging>apk</packaging>
 	<name>Tumanako Dashboard</name>
+	<description>
+		Android platform based GUI,
+		that gives the driver of a vehicle what they need
+		to drive the vehicle safely and to alert them to any issues
+		that may need addressing.
+	</description>
+	<url>http://sourceforge.net/apps/mediawiki/tumanako/index.php?title=Dashboard</url>
+	<organization>
+		<name>Greenstage</name>
+		<url>http://www.greenstage.co.nz/</url>
+	</organization>
+	<inceptionYear>2012</inceptionYear>
 
+	<licenses>
+		<license>
+			<name>GNU General Public License, Version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Jeremy Cole-Baker</name>
+			<email>jeremy@rhtech.co.nz</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>hoijui</name>
+			<email>hoijui.quaero@gmail.com</email>
+			<roles>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<mailingLists>
+		<mailingList>
+			<name>Tumanako Develop</name>
+			<subscribe>tumanako-devel-subscribe@lists.sourceforge.net</subscribe>
+			<unsubscribe>tumanako-devel-unsubscribe@lists.sourceforge.net</unsubscribe>
+			<post>tumanako-devel@lists.sourceforge.net</post>
+			<archive>http://sourceforge.net/mailarchive/forum.php?forum_name=tumanako-devel</archive>
+		</mailingList>
+	</mailingLists>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/tumanako/tumanako-dashboard/issues/</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:git://github.com/tumanako/tumanako-dashboard</connection>
+		<developerConnection>scm:git:git@github.com:tumanako/tumanako-dashboard.git</developerConnection>
+		<url>http://github.com/tumanako/tumanako-dashboard</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<reporting>
 		<plugins>
