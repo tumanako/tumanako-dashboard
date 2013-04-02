@@ -1,21 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<properties>
+		<android.platform.version>2.3.3</android.platform.version>
+		<android.sdk.version>10</android.sdk.version>
+	</properties>
+
 	<groupId>com.tumanako</groupId>
 	<artifactId>tumanako-dashboard</artifactId>
 	<version>0.77-SNAPSHOT</version>
 	<packaging>apk</packaging>
 	<name>Tumanako Dashboard</name>
 
-	<properties>
-		<platform.version>2.3.3</platform.version>
-	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
-			<version>${platform.version}</version>
+			<version>${android.platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -42,7 +44,7 @@
 					<resourceDirectory>${project.basedir}/res</resourceDirectory>
 					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
 					<sdk>
-						<platform>10</platform>
+						<platform>${android.sdk.version}</platform>
 					</sdk>
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
 				</configuration>
