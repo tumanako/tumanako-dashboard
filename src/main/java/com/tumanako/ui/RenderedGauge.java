@@ -32,8 +32,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-/***************************************************
- * Rendered Guage - Base Class:
+/**
+ * Rendered Gauge - Base Class:
  * This is the basis for the rendered dial and rendered bar controls,
  * which have a lot in common!
  *
@@ -47,17 +47,17 @@ import android.view.View;
  *  label_format     - string: Format string for numeric scale labels. (See String.format function) e.g. "%.1f"
  *  colours          - string: Comma-seperated list of colour values to apply to the scale / bar. See Note.
  *  gauge_label      - string: Specify a static label to show on the control.
- *  label_x          - float: x position of guage label (as a fraction of view width)
- *  label_y          - float: y position of guage label (as a fraction of view height)
+ *  label_x          - float: x position of gauge label (as a fraction of view width)
+ *  label_y          - float: y position of gauge label (as a fraction of view height)
  *
- * These attributes apply only to 'Dial' guages derived from this class:
+ * These attributes apply only to 'Dial' gauges derived from this class:
  *  minimum_angle    - integer: Needle angle for lowest scale value, in DEGREES; 0 = vertical up; -90 = horizontal to left, etc.
  *  maximum_angle    - integer: Needle angle for highest scale value, as above.
  *  origin_x         - float: x position of needle origin (as a fraction of view width)
  *  origin_y         - float: y position of needle origin (as a fraction of view height)
  *  needle_length    - float: Length of needle, as a fraction of VIEW WIDTH.
 
- * These attributes apply only to 'Bar' guages derived from this class:
+ * These attributes apply only to 'Bar' gauges derived from this class:
  *  orientation      - string: "vertical" or "horizontal"
  *  scale_position   - string: "left" or "right". Specifies the position of the scale relative to the bar for a bar plot. Use "left" for top if the bar is horizontal.
  *
@@ -67,7 +67,7 @@ import android.view.View;
  *  E.g.: minimum_scale = 10;  scale_step = 5; number_divisions = 4;
  *        Scale will be 10 - 15 - 20 - 25. (4 steps, 10 - 25 range.)
  *
- * Scale Colours (Also set the bar segment colours for bar guages):
+ * Scale Colours (Also set the bar segment colours for bar gauges):
  *  The 'colours' attribute specifies a list of colours, as follows:
  *    "0xFFFFC0FF,0xC0FFC0FF,0xA0FFC0FF"
  *
@@ -77,7 +77,7 @@ import android.view.View;
  *
  * Note that there must also be a values\attrs.xml file which defines the custom
  * attributes.  It should look like this:
- *
+ * {@code
  <?xml version="1.0" encoding="utf-8"?>
   <resources>
    <!-- These attributes are used by the Dial and Bar controls: -->
@@ -103,15 +103,12 @@ import android.view.View;
       <attr name="scale_position"    format="string" />
     </declare-styleable>
   </resources>
-
-
+}
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
  */
-
 public class RenderedGauge extends View
-  {
+{
 
   protected int drawingWidth = 0;
   protected int drawingHeight = 0;
@@ -178,9 +175,8 @@ public class RenderedGauge extends View
 
   private final ScaledFont fontScale;
 
-  // ********** Constructor: ***************************
   public RenderedGauge(Context context, AttributeSet atttibutes)
-    {
+  {
     super(context, atttibutes);
 
     //uiContext = context;
@@ -215,25 +211,20 @@ public class RenderedGauge extends View
     guageLablelPaint.setTextAlign(Paint.Align.CENTER);
     guageLablelPaint.setTypeface(Typeface.DEFAULT_BOLD);
     guageLablelPaint.setAntiAlias(true);
-
-    }
-
+  }
 
 
-
-
-
-  /*********** Extract custom attributes: **************************
+  /**
+   * Extracts custom attributes.
    * Given a set of attributes from the XML layout file, extract
    * the custom attributes specific to this control.
    * Also calculates some derived values based on teh specified
    * attributes.
    *
    * @param attrs - Attributes passed in from the XML parser
-   *
-   *****************************************************************/
+   */
   private void getCustomAttributes(AttributeSet attrs)
-    {
+  {
     TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.RenderedGauge );
 
     // ---- Attributes common to all derived controls: -------------------------
@@ -283,15 +274,14 @@ public class RenderedGauge extends View
 
     // Recycle the TypedArray:
     a.recycle();
-
-    }
-
+  }
 
 
-  /**************************************************************************
+
+  /**
    * Extract Colours from attribute value:
    *
-   * The 'colour' atrtibute specifies a list of colours to use for the scale
+   * The 'colour' attribute specifies a list of colours to use for the scale
    * divisions. The attribute is a string, and should be in the following format:
    *
    *  "colour0,colour1,colour2..."
@@ -312,7 +302,7 @@ public class RenderedGauge extends View
    *  *String is null, empty or can't be interpreted as a number:
    *    -Returns an array with a single entry containing a default colour
    *
-   *  *One or more string elements are found (i.e. data seperated by commas):
+   *  *One or more string elements are found (i.e. data separated by commas):
    *    -Returns an array of integers with matching number of entries
    *
    *  *One or more of the elements in the input string can't be converted to an integer:
@@ -321,42 +311,37 @@ public class RenderedGauge extends View
    *
    * @param colourData - String containing colour data (e.g. "FFC0D0F0,FFCFDFFF,FFFF0000")
    * @return integer array containing the colour values.
-   *
-   **************************************************************************/
+   */
   private int[] extractColours(String colourData)
-    {
+  {
     // Create a default colour array: This is an array with only one entry (the default colour):
     int[] defaultColours = { DEFAULT_BAR_COLOUR };
     // Use String.split to split the string at each "," character. Makes an array of sub-strings.
     String[] splitColours = colourData.split(",");
-    if (splitColours.length > 0)
-      {
+    if (splitColours.length > 0) {
       // Length of split array greater than 0, so we found at least one comma seperated string element:
       // Create an array to return integer colour values.
       int[] theseColours = new int[splitColours.length];  // Same number of integer entries as there are string elements.
       // Loop through the array of string elements we found, and try to extract the colour value from each:
-      for (int n=0; n<splitColours.length; n++)
-        {
+      for (int n=0; n<splitColours.length; n++) {
         // Use a Try / Catch block, and try to interpret the colour value with "Integer.parseInt".
         // If this fails, it should throw an exception. In that case, we'll just use the default colour
         // for the corresponding colour entry:
-        try
-          {  theseColours[n] = (int)Long.parseLong(splitColours[n],16);  }
-        catch (NumberFormatException e)
-          {  theseColours[n] = DEFAULT_BAR_COLOUR;  }
+        try {
+          theseColours[n] = (int)Long.parseLong(splitColours[n],16);
+        } catch (NumberFormatException e) {
+          theseColours[n] = DEFAULT_BAR_COLOUR;
         }
-      return theseColours;
       }
-    else
+      return theseColours;
+    } else {
       return defaultColours;     // No strings found... return default (one-entry array).
     }
+  }
 
-
-
-
-  /******* Calculate run-time parameters for drawing scale, etc: ***************/
+  /** Calculate run-time parameters for drawing scale, etc. */
   protected void calcGauge()
-    {
+  {
 
     // Calculate the gauge origin in screen coordinates:
     // For dials, this is the rotation point of the needle.
@@ -371,11 +356,10 @@ public class RenderedGauge extends View
 
     // Loop through the requested number of scale steps and calculate stuff...
     float scaleValue = scaleMin;     // Value of initial point on scale.
-    for (int n=0; n<numberDivisions; n++)
-      {
+    for (int n=0; n<numberDivisions; n++) {
       scaleLabels[n] = String.format(labelFormat,scaleValue);
       scaleValue = scaleValue + scaleStep;
-      }
+    }
     scaleMax = scaleValue - scaleStep;              // Max scale value, used later.
     deltaScale = (float)scaleMax - (float)scaleMin; // Scale range.
     if (deltaScale == 0f) deltaScale = 1f;          // Oops. ??
@@ -386,16 +370,14 @@ public class RenderedGauge extends View
     guageLablelPaint.setTextSize(fontScale.getFontScale() * 14.0f );
 
     invalidate();
-    }
+  }
 
-
-
-
-  /***** Set the value displayed on the guage: *******************
+  /**
+   * Sets the value displayed on the gauge.
    * @param value Value to set the needle to
    */
   public void setValue(float value)
-    {
+  {
     // Set the new value:
     gaugeValue = value;
     // Clamp the new value to make sure it's within the scale range:
@@ -403,77 +385,67 @@ public class RenderedGauge extends View
     if (gaugeValue < scaleMin) gaugeValue = scaleMin;
     // Invalidate the view so that it will be redrawn:
     invalidate();
-    }
+  }
 
-
-  /***** Get the current needle value: ******
+  /**
+   * Returns the current needle value.
    * @return Needle value
    */
   public float getValue()
-    {  return gaugeValue;  }
+  {
+    return gaugeValue;
+  }
 
-
-
-
-
-  // **** Check a supplied width or height spec, and decide whether to override it: ***
+  /**
+   * Checks a supplied width or height spec, and decide whether to override it.
+   */
   private int measureThis(int measureSpec)
-    {
+  {
     int result;
     int specMode = MeasureSpec.getMode(measureSpec);
     int specSize = MeasureSpec.getSize(measureSpec);
-    if (specMode == MeasureSpec.EXACTLY)
-      {
+    if (specMode == MeasureSpec.EXACTLY) {
       // We were told how big to be, so we'll go with that!
       result = specSize;
-      }
-    else
-      {
+    } else {
       // We might have been given an indication of maximum size:
       result = 320;   // We'll try 320 pixels.
       if (specMode == MeasureSpec.AT_MOST) result = specSize;
          // Respect AT_MOST value if that was what is called for by measureSpec
-      }
-    return result;
     }
+    return result;
+  }
 
-
-
-
-
-  // ********************** onMeasure: ************************************
-  // We're being told how big we should be. Compute our dimensions:
+  /**
+   * We're being told how big we should be.
+   * Compute our dimensions.
+   */
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+  {
     // The widthMeasureSpec and heightMeasureSpec contain width and height specifications packed into an integer.
     // We need to carefully check and decode these. We'll use a couple of helper functions to do this:
     setMeasuredDimension(measureThis(widthMeasureSpec),  measureThis(heightMeasureSpec));
-    }
-
-
+  }
 
   @Override
   protected void onLayout (boolean changed, int left, int top, int right, int bottom)
-    {
+  {
     // Layout Time: We should now have measurements for our view area, so we can calculate positions
     // and sizes for gauge elements:
     // **** Get actual layout parameters: ****
-    if (changed)
-      {
+    if (changed) {
       // --DEBUG!--
       Log.i( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
       drawingWidth = this.getWidth();
       drawingHeight = this.getHeight();
       calcGauge();                      // Calculate various generic values applying to all gauge types.
-      }
     }
-
-
+  }
 
   @Override
   protected void onDraw(Canvas canvas)
-    {
+  {
     super.onDraw(canvas);
 
     // Draw the gauge label (if required):
@@ -481,22 +453,16 @@ public class RenderedGauge extends View
       //  --DEBUG!-- canvas.drawText( String.format("%.1f", gaugeValue), labelX, labelY, guageLablelPaint);
 
     // Draw the scale text (if required):
-    if (showScale)
-      {  for (int n=0; n<numberDivisions; n++)  canvas.drawText(scaleLabels[n], slabelX[n], slabelY[n], scalePaint);  }
+    if (showScale) {
+      for (int n=0; n<numberDivisions; n++) {
+        canvas.drawText(scaleLabels[n], slabelX[n], slabelY[n], scalePaint);
+      }
+    }
 
     // Override this in derived classes to draw more widgets...
     //
     // Note: Derived classes must also call this method with 'super.onDraw()' to make sure
     // the View onDraw is called and that drawing width and height are calculated
     // during the first draw (see above).
-
-    }
-
-
-
-  }  // [Class]
-
-
-
-
-
+  }
+}

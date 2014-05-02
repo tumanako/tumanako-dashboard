@@ -26,21 +26,19 @@ import android.content.Context;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 
-/********************************************************************
+/**
  * Swipe Gesture Detector:
  * -----------------------
  *
  * Detect swipe left and right gestures. This is done as an extension
  * of the SimpleOnGestureListener class. We'll override the 'onFling'
  * call, which should get called when the OS detects a 'fling'
- * movement on the touchscreen.
+ * movement on the touch-screen.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- *******************************************************************/
-
+ */
 public class SimpleSwiper extends SimpleOnGestureListener
-  {
+{
 
   private static final int SWIPE_MIN_DISTANCE = 120;
   private static final int SWIPE_MAX_OFF_PATH = 250;
@@ -49,21 +47,20 @@ public class SimpleSwiper extends SimpleOnGestureListener
   private final Context uiContext;
 
   public SimpleSwiper(Context context)
-    {  uiContext = context;  }
-
-
+  {
+    uiContext = context;
+  }
 
   @Override
   public boolean onDown(MotionEvent e)
-    {  return true;  }
-
+  {
+    return true;
+  }
 
   @Override
   public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
-    {
-    try
-      {
-
+  {
+    try {
       // Check for 'off path' swipe: the fling wasn't close enough to horizontal.
       if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
               return false;
@@ -71,18 +68,15 @@ public class SimpleSwiper extends SimpleOnGestureListener
       // *** Swipe Filtering: ***
       // Detects a Left or Right swipe if the 'fling' was long enough and
       // the velocity high enough.
-
-      if      (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)  ((UIActivity)uiContext).nextScreen();
-
-      else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)  ((UIActivity)uiContext).prevScreen();
-
+      if      (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+        ((UIActivity)uiContext).nextScreen();
+      } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+        ((UIActivity)uiContext).prevScreen();
       }
-    catch (Exception e)
-      { } // Don't worry about excxeptions.
-
-    return false;
-
+    } catch (Exception e) {
+      // Don't worry about exceptions.
     }
 
-
-  }  // [Class]
+    return false;
+  }
+}

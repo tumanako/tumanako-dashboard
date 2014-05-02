@@ -39,7 +39,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-/****************************************************************
+/**
  *  Tumanako Vehicle Data Input:
  *  -------------------------------
  *
@@ -51,7 +51,7 @@ import java.util.UUID;
  *
  *  Connection uses Bluetooth. The class extends Thread and
  *  launches the bluetooth connection in a new thread so that
- *  it can listen for incomming data without stalling the UI.
+ *  it can listen for incoming data without stalling the UI.
  *
  *  A 'Watchdog' mechanism is used to keep the connection alive.
  *  This class implements IDashMessages and registers to listen
@@ -72,19 +72,18 @@ import java.util.UUID;
  *  Note that the above applies when the parent of this class
  *  is a persistent service (e.g. DataService) which stays
  *  alive when the UI is closed / suspended. The bluetooth
- *  keepalive timer should be set up to be shorter than the
- *  DataService keepalive timer so that bluetooth connection
+ *  keep-alive timer should be set up to be shorter than the
+ *  DataService keep-alive timer so that bluetooth connection
  *  can close and exit cleanly before the service which created
  *  it is stopped.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- ***************************************************************/
-
+ */
 public class VehicleData extends Thread implements IDashMessages
-  {
+{
 
-  private final Handler watchdogTimer = new Handler();      // Watchdog timer: checks bluetooth status.
+  /** Checks bluetooth status. */
+  private final Handler watchdogTimer = new Handler();
 
   /***** Bluetooth constants and objects: **************************/
   private static final int BT_WATCHDOG_TIME     = 1000;      // Check bluetooth connection every n mSec
@@ -131,35 +130,34 @@ public class VehicleData extends Thread implements IDashMessages
   private Handler uiTimer = new Handler();
   private static final int UI_UPDATE_EVERY = 500;   // Update the UI every n mSeconds.
   private Runnable uiTimerTask = new Runnable()
-    {
+  {
+    @Override
     public void run()
-      {
+    {
       uiTimer.removeCallbacks(uiTimerTask);
       isPing = true;
-    //  uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
-      }
-    };
-  /*******************************************************/
+      //uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
+    }
+  };
+  // *******************************************************
 
-
-  // ************** Constructor: *****************************************
   public VehicleData(Context context)
-    {
+  {
 
     // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
 
     vehicledataContext = context;
 
-    /*********** Bluetooth Init: *******************/
-    myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");    // Build a UUID for a RfComm connection (used when connecting)
-    bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();                   // Create a Bluetooth adaptor object
+    // Bluetooth Init
+    myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // Build a UUID for a RfComm connection (used when connecting)
+    bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();          // Create a Bluetooth adaptor object
     isBTConnected = false;
 
-    dashMessages = new DashMessages(context, this, VEHICLE_DATA);    // We are extending the 'DashMessages' class, and we need to call its Constructor here.
+    dashMessages = new DashMessages(context, this, VEHICLE_DATA);     // We are extending the 'DashMessages' class, and we need to call its Constructor here.
     dashMessages.resume();
 
-    /****** Setup Bluetooth Watchdog Timer: ********/
-    watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);      // ...Callback in n milliseconds!
+    // Setup Bluetooth Watchdog Timer
+    watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);   // ...Callback in n milliseconds!
 
 
     /********* TEMP DEBUG **************************/
@@ -168,50 +166,47 @@ public class VehicleData extends Thread implements IDashMessages
     /********* TEMP DEBUG **************************/
 
     this.start();     // Launch a new thread to connect to the vehicle with Bluetooth!
+  }
 
-    }  // Constructor
+  /**
+   * Dash Message Received.
+   * Called when we receive an intent message via our Dashmessage object.
+   */
+  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
+  {
+    // Message Intent Received: Check type of message.
+    // We respond to 'keep alive' messages and bluetooth address changes.
+    watchdogCounter = 0;     // Whatever the type of message, treat it as a 'keep alive' event and reset watchdog counter.
 
+    if (message == VEHICLE_DATA_BTADDRESS_CHANGE) {
+      // Bluetooth device address has changed! Note: We'll only do this if we've been sent a string (should be new address).
+      isAddressChanged = true;    // This flag tells the connection thread to reconnect with the new address.
+    }
+  }
 
+  // ******** Methods to return status ***************************
+  /** Is the bluetooth socket connected? */
+  public boolean isConnected()
+  {
+    return isBTConnected;
+  }
 
+  /**
+   * Has the bluetooth thread finished and terminated?
+   * (Usually caused by loss of connection or watchdog timeout).
+   */
+  public boolean isFinished()
+  {
+    return isFinished;
+  }
 
-
-
- /********** Dash Message Received: *************************************
-  * Called when we receive an intent message via our Dashmessage object.
-  ***********************************************************************/
- public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
-   {
-   // Message Intent Received: Check type of message.
-   // We respond to 'keep alive' messages and bluetooth address changes.
-   watchdogCounter = 0;     // Whatever the type of message, treat it as a 'keep alive' event and reset watchdog counter.
-
-   if (message == VEHICLE_DATA_BTADDRESS_CHANGE)
-     {
-     // Bluetooth device address has changed! Note: We'll only do this if we've been sent a string (should be new address).
-     isAddressChanged = true;    // This flag tells the connection thread to reconnect with the new address.
-     }
-   }
-
-
-
-  /******** Methods to return status: ***************************/
-
- public boolean isConnected()    // Is the bluetooth socket connected?
-    {  return isBTConnected;  }
-
-  public boolean isFinished()    // Has the bluetooth thread finished and terminated? (Usually caused by loss of connection or watchdog timeout).
-    {  return isFinished;  }
-
-
-
-
-
-  /******** Cleanup: ****************************************
+  /**
+   * Cleanup.
    * This is Called when the thread is to be terminated.
-   * Stops all BT activity and closes the socket:
-   **********************************************************/
+   * Stops all BT activity and closes the socket
+   */
   private void stopVehicleData()
-    {
+  {
     // *** Stop the vehicle sensor... ***
     // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
     btClose();   // Close the BT connection
@@ -219,47 +214,29 @@ public class VehicleData extends Thread implements IDashMessages
     watchdogTimer.removeCallbacks(watchdogTimerTask);       // Stop timer.
     dashMessages.suspend();                                 // Stop the DashMessages object (unregisters intent listener)
     isBTConnected = false;                                  // This will tell the BT connection thread to exit.
-    }
+  }
 
-
-
-
-
-
-
-
-
-
-  /******* Watchdog Timer: **********************************************/
+  /**
+   * Watchdog Timer
+   */
   private Runnable watchdogTimerTask = new Runnable()
-   {
-   public void run()
+  {
+    public void run()
      {
-     watchdogTimer.removeCallbacks(watchdogTimerTask);                    // ...Make sure there is no active callback already....
-     watchdogCounter++;
+      watchdogTimer.removeCallbacks(watchdogTimerTask); // ...Make sure there is no active callback already....
+      watchdogCounter++;
 
-     if (watchdogCounter > BT_WATCHDOG_MAXCOUNT) stopVehicleData();                                                   // Watchdog Counter Overflow! We haven't been told to keep going, so stop the BT thread:
-     else                                        watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);      // ...Callback in n milliseconds!
-
-     }
-   };
-
-
-
-
+      if (watchdogCounter > BT_WATCHDOG_MAXCOUNT) {
+        stopVehicleData();
+      } else {
+        watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME); // ...Callback in n milliseconds!
+      }
+    }
+  };
 
 
-
-
-
-
-
-
-
-
-
-  /************* Data Decode / Send: *****************************
-   * This method decodes a string of data received from the input stream
+  /**
+   * Decodes a string of data received from the input stream
    * and fills in the various data fields in vehicleData.
    * @param thisData - A string containing encoded vehicle data.
    *
@@ -278,13 +255,15 @@ public class VehicleData extends Thread implements IDashMessages
    *    Fault = OFF (i.e. no fault)
    *
    *    Note that acc volt and kWhr are multiplied by 10.
-   *
-   ***************************************************************/
-
+   */
   private void decodeAndSend(String thisData)
-    {
+  {
     if ((!thisData.startsWith("TDV1:")) ||
-        (thisData.length() < 20)) return;  // Line doesn't start with the 'TDV1' tag, or it's too short. Give up.
+        (thisData.length() < 20))
+    {
+      // Line doesn't start with the 'TDV1' tag, or it's too short. Give up.
+      return;
+    }
 
     String dataPart = thisData.substring(5);   // Get the part AFTER the tag.
     String[] splitData = dataPart.split(",");  // Split the data at the comma characters.
@@ -305,8 +284,7 @@ public class VehicleData extends Thread implements IDashMessages
     // We'll wrap this in a tyy / catch block, so that corrupt data
     // won't crash the app (Float.parseFloat will fail if the string
     // it's given isn't a valid number).
-    try
-      {
+    try {
       motorRPM    = Float.parseFloat(splitData[0]);
       tMotor      = Float.parseFloat(splitData[1]);
       tController = Float.parseFloat(splitData[2]);
@@ -316,9 +294,8 @@ public class VehicleData extends Thread implements IDashMessages
       kWh         = Float.parseFloat(splitData[6]) / 10;
       contactorOn = Float.parseFloat(splitData[7]);
       faultOn     = Float.parseFloat(splitData[8]);
-      }
-    catch (NumberFormatException e)
-      { }
+    } catch (NumberFormatException e) {
+    }
 
     motorReverse = (motorRPM < 0) ? 1f : 0f;  // This turns on the reverse indicator lamp if the RPM is negative.
     motorRPM = Math.abs(motorRPM);            // Convert negative RPM into positive for display.
@@ -345,171 +322,119 @@ public class VehicleData extends Thread implements IDashMessages
 
     // Now transmit the data to the UI by sending a message!
     dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData );
+  }
 
+  /**
+   * Tries to establish a bluetooth connection.
+   * @return true on success, false if an error occurs.
+   */
+  private boolean btOpen()
+  {
+
+    // ***** Make sure the bluetooth adaptor is on *******
+    if ((bluetoothAdapter == null) || (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON)) {
+      //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
+      return false;
+    }
+    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Adaptor is ON! ");
+
+    // ****** Get a bluetooth device for the vehicle sensor ***************
+    // We need to retrieve the device address of the selected bluetooth device from the stored app preferences:
+    SharedPreferences settings = vehicledataContext.getSharedPreferences(UIActivity.PREFS_NAME, 0);
+    String btDeviceAddress = settings.getString("btDeviceAddress", "");
+    // Check the address:
+    if (!BluetoothAdapter.checkBluetoothAddress(btDeviceAddress)) return false;   // Invalid address. Give up.
+    btVehicleSensor = bluetoothAdapter.getRemoteDevice(btDeviceAddress);          // "00:12:05:17:91:65" = MDFlyBTSerial bluetooth serial device (for testing).
+    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Got remote device OK! " );
+
+    // ************* Try to establish a BT Connection ***********************************
+    try {
+      if (btSocket != null) btSocket.close();                                 // If there's already a BT Socket open, close it.
+      btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);   // Create a new BT Socket for RF Comm connection.
+      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Socket Created. " );
+      bluetoothAdapter.cancelDiscovery();                                     // Cancel any bluetooth discovery that's running (in case another app started it...) According to the docs, we should do this...
+      btSocket.connect();                                                     // Attempt to connect!!!
+    } catch (IOException ioe) {
+      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
+      // Our attempt to open a BT connection caused an IO exception. This could be due to a bug in
+      // the bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
+      // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android )
+      Method m;
+      try {
+        m = btVehicleSensor.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
+        if (btSocket != null) btSocket.close();    // If there's already a BT Socket open, close it.
+        btSocket = (BluetoothSocket)m.invoke(btVehicleSensor, 1);
+        btSocket.connect();
+      } catch (Exception e) {
+        // Still having errors connecting! Give up.
+        Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");
+        Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
+        return false;  // Give up.
+      }
     }
 
+    // Connected! Try to open streams...
+    try {
+      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> CONNECTED. " );
+      btStreamIn  = btSocket.getInputStream();                 // Get input and output streams
+      btStreamOut = btSocket.getOutputStream();                //  for communication through the socket.
+      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> IO Streams Open! " );
+      return true;                                  // SUCCESS!!
+    } catch (IOException e) {
+      // An error occurred during BT comms setup:
+      Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
+      Log.i(com.tumanako.ui.UIActivity.APP_TAG, e.getMessage());
+      return false;  // Give up.
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-   /********** Open Bluetooth connection! ****************************************
-    * This mmethod tries to establish a bluetooth connection.
-    * @return true on success, false if an error occurs.
-    ******************************************************************************/
-   private boolean btOpen()
-     {
-
-     /***** Make sure the bluetooth adaptor is on: *******/
-     if ((bluetoothAdapter == null) || (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON))
-       {
-       //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
-       return false;
-       }
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Adaptor is ON! ");
-
-     /****** Get a bluetooth device for the vehicle sensor: ***************/
-     //  We need to retrieve the device address of the selected bluetooth device from the stored app preferences:
-     SharedPreferences settings = vehicledataContext.getSharedPreferences(UIActivity.PREFS_NAME, 0);
-     String btDeviceAddress = settings.getString("btDeviceAddress", "");
-     // Check the address:
-     if (!BluetoothAdapter.checkBluetoothAddress(btDeviceAddress)) return false;   // Invalid address. Give up.
-     btVehicleSensor = bluetoothAdapter.getRemoteDevice(btDeviceAddress);          // "00:12:05:17:91:65" = MDFlyBTSerial bluetooth serial device (for testing).
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Got remote device OK! " );
-
-     /************* Try to establish a BT Connection: ***********************************/
-     try
-       {
-       if (btSocket != null) btSocket.close();                                 // If there's already a BT Socket open, close it.
-       btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);   // Create a new BT Socket for RF Comm connection.
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Socket Created. " );
-       bluetoothAdapter.cancelDiscovery();                                     // Cancel any bluetooth discovery that's running (in case another app started it...) According to the docs, we should do this...
-       btSocket.connect();                                                     // Attempt to connect!!!
-       }
-
-     catch (IOException ioe)
-       {
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
-       // Our attempt to open a BT connection caused an IO exception. This could be due to a bug in
-       // the bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
-       // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android )
-       Method m;
-       try
-         {
-         m = btVehicleSensor.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
-         if (btSocket != null) btSocket.close();    // If there's already a BT Socket open, close it.
-         btSocket = (BluetoothSocket)m.invoke(btVehicleSensor, 1);
-         btSocket.connect();
-         }
-       catch (Exception e)
-         {
-         // Still having errors connecting! Give up.
-         Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");
-         Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
-         return false;  // Give up.
-         }
-       }
-
-     // Connected! Try to open streams...
-     try
-       {
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> CONNECTED. " );
-       btStreamIn  = btSocket.getInputStream();                 // Get input and output streams
-       btStreamOut = btSocket.getOutputStream();                //  for communication through the socket.
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> IO Streams Open! " );
-       return true;                                  // SUCCESS!!
-       }
-
-     catch (IOException e)
-       {
-       // An error occurred during BT comms setup:
-       Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
-       Log.i(com.tumanako.ui.UIActivity.APP_TAG, e.getMessage());
-       return false;  // Give up.
-       }
-
-     }
-
-
-
-
-
-
-
-
-   /************** Bluetooth socket close / cleanup: ******************************************************/
-   private void btClose()
-     {
-     // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> btClose(); ");
-     try
-       {
+  /************** Bluetooth socket close / cleanup: ******************************************************/
+  private void btClose()
+  {
+    // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> btClose(); ");
+    try {
        if (btStreamIn != null)  btStreamIn.close();
        if (btStreamOut != null) btStreamOut.close();
        if (btSocket != null)    btSocket.close();
-       }
-     catch (IOException e)
-       {  Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);  }  // If an error occurs here, print a stack trace (debug only) but otherwise quietly ignore.
-     }
+    } catch (IOException e) {
+      // If an error occurs here, print a stack trace (debug only) but otherwise quietly ignore.
+      Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /**********************************************************************************************************************
-   *************** Bluetooth Communications Thread: *********************************************************************
-   **********************************************************************************************************************/
-
+  /**
+   * Bluetooth Communications Thread.
+   */
   @Override
   public void run()
-      {
-      byte[] byteBuffer = new byte[BT_READ_SIZE];
-      StringBuffer btRawData = new StringBuffer();
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");
-      // Try to open a BT connection:
-      if (!btOpen())
-        {
-        // Connection failed! Close any open objects and exit.
-        stopVehicleData();
-        isFinished = true;
-        return;
-        }
-      isBTConnected = true;
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected. ");
-
-
+  {
+    byte[] byteBuffer = new byte[BT_READ_SIZE];
+    StringBuffer btRawData = new StringBuffer();
+    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");
+    // Try to open a BT connection:
+    if (!btOpen()) {
+      // Connection failed! Close any open objects and exit.
+      stopVehicleData();
+      isFinished = true;
+      return;
+    }
+    isBTConnected = true;
+    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected. ");
 
       // ******* BT Connection should now be open! Keep listening to the InputStream while connected: *********************************
-      int bytesRead;
-      while (isBTConnected)
-          {
-
-          // Check to see if the bluetooth address has changed:
-          if (isAddressChanged)
-            {
-            // To change BT address, we shut down the existing connection and reopen with new address:
+    int bytesRead;
+    while (isBTConnected) {
+      // Check to see if the bluetooth address has changed:
+      if (isAddressChanged) {
+        // To change BT address, we shut down the existing connection and reopen with new address:
 //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Address Change! ");
-            isBTConnected = false;
-            isAddressChanged = false;
-            btClose();     // Close existing connection.
-            if (!btOpen()) break;   // If we failed to open a connection, exit BT loop.
-            isBTConnected = true;
+        isBTConnected = false;
+        isAddressChanged = false;
+        btClose();     // Close existing connection.
+        if (!btOpen()) break;   // If we failed to open a connection, exit BT loop.
+        isBTConnected = true;
 //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Reconnected OK. ");
-            }
+      }
 /****** TEMP DEBUG ************************************/
 //if (isPing)
 //  {
@@ -517,67 +442,49 @@ public class VehicleData extends Thread implements IDashMessages
 //isPing = false;
 //  }
 /****** TEMP DEBUG ************************************/
-          try
-            {
-            // Read bytes from the InputStream:
-            bytesRead = btStreamIn.read(byteBuffer,0,100);  // Reads up to 100 bytes.
-            /*********** Buffer Overflow Check: *******************************************
-             * It is very important that the UI remain up-to-date (this is more important than
-             * trying to process ALL data).
-             * Therefore, if the input stream is filling with data faster than we are processing
-             * it, we have to dump data.
-             * Note that this relies on the behaviour of the StreamIn.available() method
-             * to report the number of bytes available. The documentation indicates that
-             * available() may not be reliablie, and in particular, "may be significantly
-             * smaller than the actual number of bytes available." However, testing shows
-             * that it works well. The following code will work fine so long as available()
-             * doesn't return /more/ than the number of bytes available, which it shouldn't!
-             ******************************************************************************/
-            int bytesInStream = btStreamIn.available();
-            if (bytesInStream > BT_STREAM_OVERFLOW) btStreamIn.skip(bytesInStream - BT_STREAM_OVERFLOW);
-            /******************************************************************************/
-            if (bytesRead > 0)  // ACTUAL number of bytes read.
-              {
-              for (int n = 0; n < bytesRead; n++)
-                {
-                // Process the incomming aray of bytes:
-                if (byteBuffer[n] == 0x0D)
-                  {
-                  // End of line! Send record:
-                  decodeAndSend(btRawData.toString());
-                  btRawData = new StringBuffer();        // Reset the line buffer.
-                  }
-                else
-                  {
-                  if (byteBuffer[n] != 0x0A) btRawData.append((char)byteBuffer[n]);  // If this is not a LF character, add it to the line buffer.
-                  }
-                }  // [for (int n = 0; n < bytesRead; n++)]
-              }  // [if (bytesRead > 0)]
-
-            Thread.sleep(1);  // Give up CPU time (waiting for bluetooth characters is so tedious...)
-            }  // try...
-
-          catch (Exception e)
-            {
-            // An error occurred during BT comms operation:
-            Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
-            isBTConnected = false;
-            break;
+      try {
+        // Read bytes from the InputStream:
+        bytesRead = btStreamIn.read(byteBuffer,0,100);  // Reads up to 100 bytes.
+        /*********** Buffer Overflow Check: *******************************************
+         * It is very important that the UI remain up-to-date (this is more important than
+         * trying to process ALL data).
+         * Therefore, if the input stream is filling with data faster than we are processing
+         * it, we have to dump data.
+         * Note that this relies on the behaviour of the StreamIn.available() method
+         * to report the number of bytes available. The documentation indicates that
+         * available() may not be reliablie, and in particular, "may be significantly
+         * smaller than the actual number of bytes available." However, testing shows
+         * that it works well. The following code will work fine so long as available()
+         * doesn't return /more/ than the number of bytes available, which it shouldn't!
+         ******************************************************************************/
+        int bytesInStream = btStreamIn.available();
+        if (bytesInStream > BT_STREAM_OVERFLOW) btStreamIn.skip(bytesInStream - BT_STREAM_OVERFLOW);
+        /******************************************************************************/
+        if (bytesRead > 0) { // ACTUAL number of bytes read.
+          for (int n = 0; n < bytesRead; n++) {
+            // Process the incomming aray of bytes:
+            if (byteBuffer[n] == 0x0D) {
+              // End of line! Send record:
+              decodeAndSend(btRawData.toString());
+              btRawData = new StringBuffer();        // Reset the line buffer.
+            } else {
+              if (byteBuffer[n] != 0x0A) btRawData.append((char)byteBuffer[n]);  // If this is not a LF character, add it to the line buffer.
             }
+          }
+        }
 
-          }  // [while (true)]
+        Thread.sleep(1);  // Give up CPU time (waiting for bluetooth characters is so tedious...)
+      } catch (Exception e) {
+        // An error occurred during BT comms operation:
+        Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
+        isBTConnected = false;
+        break;
+      }
+    }
 
-       // Close down the input and ouptut streams and the bluetooth socket:
-       stopVehicleData();
-       isFinished = true;
-       Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit! ");
-
-      }  // [run()]
-
-
-
-
-
-
-
-  }  // [class VehicleData]
+    // Close down the input and ouptut streams and the bluetooth socket
+    stopVehicleData();
+    isFinished = true;
+    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit! ");
+  }
+}

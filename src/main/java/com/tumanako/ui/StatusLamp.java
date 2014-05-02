@@ -29,9 +29,8 @@ import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-/*************************************************************************************
- *
- * Status Lamp:
+/**
+ * Status Lamp.
  *
  *  This class provides a simple 'Lamp' UI element. The lamp has two states
  *  defined as 'On' and 'Off', each of which is displayed with a bitmap image in the
@@ -41,7 +40,7 @@ import android.widget.ImageView;
  *  e.g. 'Connected' / 'Disconnected', 'On Fire' / 'Not On Fire', etc.
  *
  * To use, suitable XML should be added to the layout file, e.g.:
- *
+ * {@code
       <com.tumanako.ui.StatusLamp
                android:id="@+id/demoStatusLamp"
                android:layout_width="32dp"
@@ -49,7 +48,7 @@ import android.widget.ImageView;
                app:on_bitmap="@drawable/lamp_on"
                app:off_bitmap="@drawable/lamp_off"
                app:initial_status="true"         />
-
+}
  * In the above example, the lamp is a 32x32 bitmap. Bitmaps called
  * 'lamp_on.png' and 'lamp_off.png' should be located in the appropriate res\drawable
  * folder.
@@ -61,7 +60,7 @@ import android.widget.ImageView;
  *   initial_status - Should the lamp be on or off initially? ("on" or "off").
  *
  *   It should look like this:
- *
+ * {@code
     <?xml version="1.0" encoding="utf-8"?>
      <resources>
        <declare-styleable name="StatusLamp">
@@ -70,7 +69,7 @@ import android.widget.ImageView;
           <attr name="initial_status" format="string" />
       </declare-styleable>
     </resources>
-
+}
  *
  * To access the lamp from code and turn it on or off, use something like this:
  *
@@ -85,11 +84,9 @@ import android.widget.ImageView;
  *   getStatus()
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- ************************************************************************************/
-
+ */
 public class StatusLamp extends ImageView
-  {
+{
 
   private boolean lampState = false;  // true = Lamp On; false = Lamp Off.
 
@@ -97,9 +94,7 @@ public class StatusLamp extends ImageView
   private Bitmap bitmapLampOn;
   private Bitmap bitmapLampOff;
 
-
-
-  /**** Constructor: ***************************************
+  /**
    * Called when this view is created, probably from inflating
    * an XML layout file.  Context and attributes are passed on
    * to super class constructor for basic creation of the view,
@@ -107,10 +102,9 @@ public class StatusLamp extends ImageView
    *
    * @param context
    * @param attrs
-   *
-   *********************************************************/
+   */
   public StatusLamp(Context context, AttributeSet attrs)
-    {
+  {
     // Call the super class constructor to create a basic ImageView:
     super(context, attrs);
 
@@ -121,18 +115,16 @@ public class StatusLamp extends ImageView
     // Set Lamp State:
     if (lampState) turnOn();
     else           turnOff();
+  }
 
-    }
-
-
-
-  /*********** Extract custom attributes: **************************
+  /**
+   * Extracts custom attributes.
    * Given a set of attributes from the XML layout file, extract
    * the custom attributes specific to the StatusLamp:
    * @param attrs - Attributes passed in from the XML parser
-   *****************************************************************/
+   */
   private void getCustomAttributes(AttributeSet attrs)
-    {
+  {
     TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.StatusLamp );
 
     // Look up the resource ID of the bitmaps named for 'off' and 'on' in the XML.
@@ -149,41 +141,32 @@ public class StatusLamp extends ImageView
     bitmapLampOff  = BitmapFactory.decodeResource( getResources(), idBitmapLampOff );
 
     // Set initial status: (note that default is Off):
-    if (initialStatus != null)
-      if (initialStatus.equals("on")) lampState = true;  // Turn on the lamp if initial_status is "on"!
-
+    if (initialStatus != null) {
+      if (initialStatus.equals("on")) {
+        // Turn on the lamp if initial_status is "on"!
+        lampState = true;
+      }
     }
+  }
 
-
-
-
-  /****** Turn lamp ON: ***********/
   public void turnOn()
-    {
+  {
     setImageBitmap(bitmapLampOn);
     lampState = true;
-    }
+  }
 
-
-
-  /****** Turn lamp OFF: ***********/
   public void turnOff()
-    {
+  {
     setImageBitmap(bitmapLampOff);
     lampState = false;
-    }
-
-
-
-
-
-  /****** Return current lamp state: ***********
-   * @return true = Lamp is on; false = lamp is off.
-   *********************************************/
-  public boolean getState()
-    {  return lampState;  }
-
-
-
-
   }
+
+  /**
+   * Returns the current lamp state.
+   * @return true = Lamp is on; false = lamp is off.
+   */
+  public boolean getState()
+  {
+    return lampState;
+  }
+}

@@ -22,9 +22,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
-
-/************************************************************
- *
+/**
  * Float Ring Buffer Class:
  *
  * Create a ring buffer to store some numeric values of type 'float':
@@ -40,15 +38,13 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
  * The buffer size and number of fields is set by the constructor.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- ************************************************************/
-
+ */
 public class RingBuffer
-  {
+{
 
-  private final int bufferSize;              // Number of data points in buffer.
-  private final int bufferFieldCount;        // Number of values to store.
-  private final boolean useAverage;          // Should we keep an average as data points are added?
+  private final int bufferSize;        // Number of data points in buffer.
+  private final int bufferFieldCount;  // Number of values to store.
+  private final boolean useAverage;    // Should we keep an average as data points are added?
 
   private final float[][] dataBuffer;  // Data buffer
   private float[] dataAverage;         // Average of the records in the data buffer
@@ -70,98 +66,99 @@ public class RingBuffer
   **************************************************************************************/
 
 
-
-
-  /*********** Class Constructor: **********************************************************
-   *
+  /**
    * @param thisBufferSize - Buffer size. After this many entries have been added, oldest entries are overwritten.
    * @param thisFieldCount - Number of fields to store for each entry. Each entry will be an array of type float of this size.
-   * @param thisUseAverage - Should a running averave of the buffer contents be maintained?
+   * @param thisUseAverage - Should a running average of the buffer contents be maintained?
    *
    *  This constructor sets up the buffer by creating an array of the appropriate size.
    *
    ****************************************************************************************/
   public RingBuffer(int thisBufferSize, int thisFieldCount, boolean thisUseAverage)
-    {
+  {
     bufferSize       = thisBufferSize;
     bufferFieldCount = thisFieldCount;
     useAverage       = thisUseAverage;
     dataBuffer  = new float[bufferSize][bufferFieldCount];   // Creata a new data buffer.
     dataAverage = new float[bufferFieldCount];               // Create an array to track the average of field values.
     Clear();
-    }
+  }
 
-
-
-  /********** Get Buffer Size: **********
+  /**
+   * Returns the buffer size
    * @return Buffer Size
-   *************************************/
+   */
   public int GetSize()
-    {  return bufferSize;  }
+  {
+    return bufferSize;
+  }
 
-
-  /***** Get Actual number of entries used: **********
+  /**
+   * Returns the actual number of entries used
    * @return Number of buffer entries used
-   **************************************************/
+   */
   public int GetLength()
-    {  return dataLength;  }
+  {
+    return dataLength;
+  }
 
-
-  /***** Get number fields: *************************
+  /**
+   * Returns the number of fields
    * @return Number of fields in each buffer entry
-   **************************************************/
+   */
   public int GetFieldCount()
-    {  return bufferFieldCount;  }
+  {
+    return bufferFieldCount;
+  }
 
-
-  /********** Reset the buffer: ********************
+  /**
+   * Resets the buffer.
    * This method replaces the buffer content with 0s.
-   ************************************************/
+   */
   public void Clear()
-    {
+  {
     // Resets data buffer pointers back to start of buffer.
     dataPointer = 0;
     dataLength  = 0;
     // Reset averages array:
     int n;
-    for (n=0; n<bufferFieldCount; n++) dataAverage[n] = 0f;
+    for (n = 0; n < bufferFieldCount; n++) {
+      dataAverage[n] = 0f;
     }
+  }
 
-
-
-  /******** Pre Fill the buffer: **************************
+  /**
+   * Pre-Fill the buffer.
    * Pre-fill the buffer with the specified array of values, as if
-   * AddPoint had been called repetedly with those values until
+   * AddPoint had been called repeatedly with those values until
    * the buffer was full.
    *
    * @param theseValues - Values to use when filling the buffer.
-   *
    */
-  public void PreFill( float[] theseValues )
-    {
+  public void PreFill(float[] theseValues)
+  {
     int n;
-    for (n=0; n<bufferSize; n++) dataBuffer[n] = theseValues;
+    for (n=0; n<bufferSize; n++) {
+      dataBuffer[n] = theseValues;
+    }
     dataAverage = theseValues;
     dataPointer = 0;
     dataLength  = bufferSize;
-    }
+  }
 
-
-
-  /******* Add a datum: ***************************************
+  /**
+   * Adds a datum.
    *  This adds a datum to the buffer, which causes several things to happen:
    *   * Oldest datum is overwritten with the new values
    *   * Buffer pointer is advanced
    *   * Rolling average is updated (if used).
    *
    * @param theseValues - The array of fields (float values) to be added
-   *
-   ***********************************************************/
-  public void AddPoint( float[] theseValues )
-    {
+   */
+  public void AddPoint(float[] theseValues)
+  {
     // Add a point to the buffer:
-    if (useAverage)
-      {
+    if (useAverage) {
       // We are maintaining an average, so we'd better update it:
       // The average is updated by deleting a portion of the oldest value, and
       // adding a portion of the new value.
@@ -169,43 +166,36 @@ public class RingBuffer
       // Note that there is a special case if we haven't filled the buffer yet.
       // In this case, it's a cumulative average of all values received so far.
       int n;
-      for (n=0; n<bufferFieldCount; n++)
-        {
-        if (dataLength == bufferSize)
-          {
+      for (n = 0; n < bufferFieldCount; n++) {
+        if (dataLength == bufferSize) {
           // The buffer is full, so update the rolling average:
           // Note that dataPointer is currently pointintg to the OLDEST value
           // in the buffer, i.e. the one we are about to overwrite.
           dataAverage[n] = dataAverage[n]
                            - (dataBuffer[dataPointer][n] / dataLength)
                            + (theseValues[n] / dataLength);
-          }
-        else
-          {
+        } else {
           // Special case: Buffer not yet full. Use cumulative average instead:
           dataAverage[n] = dataAverage[n] + ( (theseValues[n]-dataAverage[n]) / (dataLength+1) );
-          }
         }
-      }  // [if (useAverage)]
+      }
+    }
     // Insert an array of values at the buffer data pointer:
     dataBuffer[dataPointer] = theseValues.clone();
     dataPointer = dataPointer + 1;
     if (dataPointer >= bufferSize) dataPointer = 0;            // Max number of points reached; Wrap.
     if (dataLength < bufferSize) dataLength = dataLength + 1;  // Increment the number of records.
-    }  // method
+  }
 
-
-
-
-  /****** Get back a datum: ******************************************************
+  /**
+   * Returns a datum.
    * Gets back an arbitrary entry from the buffer. See notes below.
    *
    * @param pointIndex - Index of point to retrieve. 0 = most recent; 1 = next most recent, etc.
    * @return Array of float values representing the fields from the requested buffer entry.
-   *
-   ******************************************************************************/
+   */
   public float[] GetPoint(int pointIndex)
-    {
+  {
     // Retrieves a specific point. pointIndex is a number indicating
     // the point to get, such that:
     //
@@ -229,12 +219,11 @@ public class RingBuffer
     int thisPointer = dataPointer - (pointIndex + 1);             // Temporary data pointer.
     if (thisPointer < 0) thisPointer = thisPointer + bufferSize;  // Buffer loops around. Add bufferSize to get to correct position.
     return dataBuffer[thisPointer].clone();                       // Return a copy of the requested data point.
-    }
+  }
 
-
-
-  /**** Get Buffer Average Method: ******************************************
-   * This method returns an array of numbers which is the average of the current buffer contents.
+  /**
+   * Returns the buffer average.
+   * Returns an array of numbers which is the average of the current buffer contents.
    * Note that the average is actually updated in AddPoint whenever a point is added to the buffer.
    *
    * The average is only available if thisUseAverage was set to True in the constructor call.
@@ -242,10 +231,9 @@ public class RingBuffer
    * Note that the average is always a Float even if the buffer is storing Integers.
    *
    * @return Array containing average of each field across current buffer contents.
-   *
-   **************************************************************************/
+   */
   public float[] GetAverage()
-    {  return dataAverage.clone();  }
-
-
-  }  // Class
+  {
+    return dataAverage.clone();
+  }
+}

@@ -28,8 +28,7 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/*************************************************************************************
- *
+/**
  * Text and Label:
  *
  * Creates a simple compound control with a text box and a smaller label.
@@ -37,6 +36,7 @@ import android.widget.TextView;
  * To Use: Place something like this in the XML layout file, preferably inside a
  * horizontal LinearLayout:
  *
+ * {@code
     <com.tumanako.ui.TextWithLabel
                  android:id="@+id/demoTextWithLabel"
                  android:layout_width="fill_parent"
@@ -46,8 +46,7 @@ import android.widget.TextView;
                  app:main_text="0.0"
                  app:label_text="kph"
                  app:label_size="10" />
-
-
+}
  * The above example creates a text box with 18pt text reading "0.0" and the label "kph".
  * The label font size is set to 10 pt.
  *
@@ -58,7 +57,7 @@ import android.widget.TextView;
  *   label_size - Label font size
  *
  *   It should look like this:
- *
+ * {@code
     <?xml version="1.0" encoding="utf-8"?>
      <resources>
        <declare-styleable name="TextWithLabel">
@@ -67,8 +66,7 @@ import android.widget.TextView;
           <attr name="label_size" format="integer" />
       </declare-styleable>
     </resources>
-
-
+}
  * To access from code, use something like this:
  *
  *    private TextWithLabel  demoTextWithLabel;
@@ -82,17 +80,15 @@ import android.widget.TextView;
  *   String getLabel()
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- ************************************************************************************/
-
+ */
 public class TextWithLabel extends LinearLayout
-  {
+{
 
   private final TextView itemView;
   private final TextView labelView;
   private int labelSize = 10;
 
-  /**** Constructor: ***************************************
+  /**
    * Called when this view is created, probably from inflating
    * an XML layout file.  Context and attributes are passed on
    * to super class constructor for basic creation of the view,
@@ -100,12 +96,11 @@ public class TextWithLabel extends LinearLayout
    *
    * @param context
    * @param attrs
-   *
-   *********************************************************/
+   */
   public TextWithLabel(Context context, AttributeSet attrs)
-    {
+  {
 
-    // Call the super class constructor to create a basic layout:
+    // Call the super class constructor to create a basic layout
     super(context, attrs);
 
     // Generate new TextViews for the the text and label:
@@ -115,31 +110,24 @@ public class TextWithLabel extends LinearLayout
     // Get custom attributes from XML file:
     getCustomAttributes(attrs);
 
-
-    /**** Set some attributes: **********************
-     * Could add more attributes?
-     ************************************************/
+    // Set some attributes
+    // XXX Could add more attributes?
     labelView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PT, labelSize);
     labelView.setGravity( android.view.Gravity.RIGHT );
 
-
-    // Add the new text boxes to this layout:
+    // Add the new text boxes to this layout
     addView(itemView);
     addView(labelView);
+  }
 
-    }
-
-
-
-
-
-  /*********** Extract custom attributes: **************************
+  /**
+   * Extracts custom attributes.
    * Given a set of attributes from the XML layout file, extract
    * the custom attributes specific to this control:
-   * @param attrs - Attributes passed in from the XML parser
-   *****************************************************************/
+   * @param attrs Attributes passed in from the XML parser
+   */
   private void getCustomAttributes(AttributeSet attrs)
-    {
+  {
     TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.TextWithLabel );
 
     String mainText = a.getString(R.styleable.TextWithLabel_main_text);
@@ -154,46 +142,41 @@ public class TextWithLabel extends LinearLayout
 
     if (labelText != null) setLabel(labelText);
     else                   setLabel("");
+  }
 
-    }
-
-
-
-
-
-
-
-  /********* Set Text: *****************
+  /**
    * Sets the main text of the control.
    * @param text - Text to display.
-   *************************************/
+   */
   public void setText(String text)
-    {  itemView.setText(text);  }
+  {
+    itemView.setText(text);
+  }
 
-
-  /********* Set Label: *****************
+  /**
    * Sets the label of the control.
    * @param label - Label to display
-   *************************************/
+   */
   public void setLabel(String label)
-    {  labelView.setText(label);  }
+  {
+    labelView.setText(label);
+  }
 
-
-  /********* Get Text: *****************
+  /**
    * Returns the current text in the control.
    * @return Current text
-   *************************************/
+   */
   public String getText()
-    {  return String.valueOf(itemView.getText());  }
+  {
+    return String.valueOf(itemView.getText());
+  }
 
-
-  /********* Get Label: *****************
+  /**
    * Returns the current label in the control.
    * @return Current label
-   **************************************/
+   */
   public String getLabel()
-    {  return String.valueOf(labelView.getText());  }
-
-
-
-  }  // Class
+  {
+    return String.valueOf(labelView.getText());
+  }
+}

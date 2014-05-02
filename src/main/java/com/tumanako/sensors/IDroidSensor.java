@@ -24,8 +24,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************************/
 
 
-/**************************************************************
- *
+/**
  * Tumanako Sensor Class Interface:
  *
  * Provides a basic sensor definition for several kinds of
@@ -49,7 +48,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
  * toString()  - Return useful sensor info as a string. Used for debugging.
  *
  *
- * The general lifecycle of a sensor is:
+ * The general life-cycle of a sensor is:
  *
  * Create - The constructor is called when a new instance is created. This should
  *          set up the sensor but NOT start it (i.e. it shouldn't start
@@ -63,28 +62,37 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
  *             or is closed.
  *
  *             After suspend(), resume() may be called later when the UI is re-displayed,
- *             or the OS may trash the app in which case resume() will never be called.
+ *             or the OS may trash the application in which case resume() will never be called.
  *             Thus, suspend() should unregister any sensors or system services and
  *             leave things in a state where they don't waste power or CPU time.
  *
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- **************************************************************/
-
+ */
 public interface IDroidSensor
-  {
+{
 
-  /****** Generic sensor methods, common to all sensors: *******************************************************************/
-  public boolean isOK();           // Signals whether the Sensor was successfully found, initialised and set up.
-  public boolean isRunning();      // Signals whether the Sensor is currently producing data.
+  // Generic sensor methods, common to all sensors
+  /** Signals whether the Sensor was successfully found, initialized and set up. */
+  boolean isOK();
+  /** Signals whether the Sensor is currently producing data. */
+  boolean isRunning();
 
-  public void suspend();           // Stop the sensor from taking readings*.
-  public void resume();            // Start taking readings with the sensor.
-      //   *Suspend: This is typically used when the application is paused, and should leave the sensors in a state
-      //   where they don't consume batteries.
+  /**
+   * Stop the sensor from taking readings.
+   * This is typically used when the application is paused, and should leave the sensors in a state
+   * where they don't consume batteries.
+   */
+  void suspend();
+  /**
+   * Start taking readings with the sensor.
+   */
+  void resume();
 
+  /**
+   * Returns interesting sensor data as a string.
+   * Generally only used for debugging.
+   */
   @Override
-  public String toString();        // Returns interesting sensor data as a string. Generally only used for debugging.
-
-  }
+  String toString();
+}

@@ -26,34 +26,30 @@ import android.content.Context;
 import android.view.Display;
 import android.view.WindowManager;
 
-/***************************************************
- * UI Font Scaler Class:
- *  This class looks up the display window size, and generates a font size
- *  multiplier appropriate for the display.
+/**
+ * UI Font Scaler Class.
+ * This class looks up the display window size, and generates a font size
+ * multiplier appropriate for the display.
  *
- *  Sizing is based on fonts which look good on an HVGA phone, e.g.
- *  small 480x320 display. This will give a multiplier of 1.0.
- *  higher resolution displays needing larger fonts (e.g. for gauge
- *  labels) will return a number > 1.0
+ * Sizing is based on fonts which look good on an HVGA phone, e.g.
+ * small 480x320 display. This will give a multiplier of 1.0.
+ * higher resolution displays needing larger fonts (e.g. for gauge
+ * labels) will return a number > 1.0
  *
- *  Calculations are carried out in the constructor. The multiplier can then be
- *  reqested using "getFontScale()"
+ * Calculations are carried out in the constructor. The multiplier can then be
+ * requested using "getFontScale()"
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
  */
-
 public class ScaledFont
-  {
+{
 
   private static final int REF_SIZE = 480;
 
   private final float myMultiplier;
 
-
-  // ********** Constructor: ***************************
   public ScaledFont(Context context)
-    {
+  {
 
     // ------- Calculate a good font size multiplier for labels, based on screen resolution. ------------
 
@@ -70,16 +66,10 @@ public class ScaledFont
 
     if (windowWidth > windowHeight)  myMultiplier = windowWidth / (float)REF_SIZE;
     else                             myMultiplier = windowHeight / (float)REF_SIZE;
-
-    }
-
+  }
 
   public float getFontScale()
-    {
+  {
     return myMultiplier;
-    }
-
-
-
-
   }
+}

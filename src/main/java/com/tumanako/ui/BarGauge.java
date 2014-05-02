@@ -28,18 +28,13 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
-
-
-/*************************************************************************************
- *
+/**
  * Bar Gauge: Experimental! Derived from RenderedGauge. See RenderedGauge.java for attribute definitions.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- ************************************************************************************/
-
+ */
 public class BarGauge extends RenderedGauge
-  {
+{
 
   private boolean measurementsValid = false;   // Set to true once we have measurments (after onLayout)
 
@@ -57,10 +52,8 @@ public class BarGauge extends RenderedGauge
   private final Paint barPaint;
   private final Rect[] barRects;
 
-
-  // ********** Constructor: ***************************
   public BarGauge(Context context, AttributeSet atttibutes)
-    {
+  {
     super(context, atttibutes);
 
     // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  Dial -> Constructor ");
@@ -75,15 +68,11 @@ public class BarGauge extends RenderedGauge
     barPaint.setStyle(Paint.Style.FILL);
     barPaint.setStrokeWidth(0);
     barPaint.setColor(DEFAULT_BAR_COLOUR);  // Default colour.
+  }
 
-    }
-
-
-
-
-  /******* Calculate run-time parameters for drawing scale, etc: ***************/
+  /** Calculates run-time parameters for drawing scale, etc. */
   private void calcBar()
-    {
+  {
 
     // NOTE:
     // drawingWidth and drawingHeight are absolute, irrespective of the bar orientation.
@@ -100,8 +89,7 @@ public class BarGauge extends RenderedGauge
     int blockY = (int) originY;  // representing blocks on the bar. Start at Origin x/Origin y.
     float scaleLong;
 
-    if (isVertical)
-      {
+    if (isVertical) {
       // Set up a VERTICAL bar gauge:
       scalePaint.setTextAlign(Paint.Align.RIGHT);
       guageLablelPaint.setTextAlign(Paint.Align.CENTER);
@@ -111,27 +99,21 @@ public class BarGauge extends RenderedGauge
       blockLong = (int) (barLong / (numberScaleTicks-1));
 
       // Loop through the requested number of tick steps and calculate bar blocks...
-      for (int n=0; n<numberScaleTicks; n++)
-        {
+      for (int n=0; n<numberScaleTicks; n++) {
         barRects[n] = new Rect(blockX,(blockY-blockLong)+barSegmentGap,(blockX+barAcross),blockY);
         blockY -= blockLong;
-        }  // [for ...]
+      }
 
       // Loop through the requested number of scale steps and calculate scale label positions...
       blockX = (int) originX;
       blockY = (int) originY;
       scaleLong = (int) (barLong / (numberDivisions-1));
-      for (int n=0; n<numberDivisions; n++)
-        {
+      for (int n=0; n<numberDivisions; n++) {
         slabelX[n] = blockX - 3;
         slabelY[n] = blockY + 5;
         blockY -= scaleLong;
-        }  // [for ...]
-
       }
-
-    else  // [if (isVertical)]
-      {
+    } else {
       // Set up a HORIZONTAL bar gauge:
       scalePaint.setTextAlign(Paint.Align.CENTER);
       guageLablelPaint.setTextAlign(Paint.Align.RIGHT);
@@ -141,36 +123,31 @@ public class BarGauge extends RenderedGauge
       blockLong = (int) (barLong / (numberScaleTicks-1));
 
       // Loop through the requested number of tick steps and calculate bar blocks...
-      for (int n=0; n<numberScaleTicks; n++)
-        {
+      for (int n=0; n<numberScaleTicks; n++) {
         barRects[n] = new Rect(blockX,(blockY-barAcross),(blockX+blockLong)-barSegmentGap,blockY);
         blockX += blockLong;
-        }  // [for ...]
+      }
 
       // Loop through the requested number of scale steps and calculate scale label positions...
       blockX = (int) originX;
       blockY = (int) originY;
       scaleLong = (int) (barLong / (numberDivisions-1));
-      for (int n=0; n<numberDivisions; n++)
-        {
+      for (int n=0; n<numberDivisions; n++) {
         slabelX[n] = blockX;
         slabelY[n] = (blockY-barAcross-3);
         blockX += scaleLong;
-        }  // [for ...]
-
-      }  // [if (isVertical)]
+      }
+    }  // [if (isVertical)]
     invalidate();
-    }
+  }
 
-
-
-
-  /***** Set the value displayed on the bar: *******************
+  /**
+   * Sets the value displayed on the bar.
    * @param value Value to set
-   *************************************************************/
+   */
   @Override
   public void setValue(float value)
-    {
+  {
     // First, call the 'RenderedGauge' version (sets value and clamps to scale).
     super.setValue(value);
 
@@ -178,97 +155,70 @@ public class BarGauge extends RenderedGauge
     // We'll draw all the complete blocks, then add another
     // reduced-size block for the last part of the scale:
     // Note... we can't do this until after 'calcBar()' has been called, which sets up many parameters.
-    if (measurementsValid)
-      {
+    if (measurementsValid) {
       lastDrawnBlock = ( (int) ((gaugeValue - scaleMin) / blockValue) ) - 1;
       if (lastDrawnBlock < -1) lastDrawnBlock = -1;  //  ?? Shouldn't happen.
 
-      if (lastDrawnBlock < (numberBlocks-1))
-        {
+      if (lastDrawnBlock < (numberBlocks-1)) {
         // Haven't filled the last block... add a smaller one to finish off bar:
         int n = lastDrawnBlock + 1;
         float lastBlockLong = ( (  (gaugeValue - scaleMin - ((float)(lastDrawnBlock + 1) * blockValue))  ) / blockValue )  * blockLong;
-        if (isVertical)
-          {
+        if (isVertical) {
           // VERTICAL bar:
           lastBlockRect = new Rect( barRects[n].left,
                                     barRects[n].bottom - (int)lastBlockLong,
                                     barRects[n].right,
                                     barRects[n].bottom);
-          }  // [if (isVertical)]
-        else
-          {
+        } else {
           // HORIZONTAL bar:
           lastBlockRect = new Rect( barRects[n].left,
                                     barRects[n].top,
                                     barRects[n].left + (int)lastBlockLong,
                                     barRects[n].bottom);
-          }  // [if (isVertical)]
-        }  // [if (lastDrawnBlock < (numberBlocks-1))]
-      else
-        {
+        }
+      } else {
         if ( lastDrawnBlock > (numberBlocks-1) ) lastDrawnBlock = (numberBlocks-1);  // ??  Shouldn't happen.
         lastBlockRect = null;  // No last block required.
-        }  // [if (lastDrawnBlock < (numberBlocks-1))]
       }
-    else  // [if (!isFirstDraw)]
-      {
+    } else {
       // Not set up yet. Set defaults.
       lastDrawnBlock = -1;
       lastBlockRect = new Rect(0,0,0,0);
-      }  // [if (!isFirstDraw)]
-    }  // [function]
-
-
-
+    }
+  }
 
   @Override
   protected void onLayout (boolean changed, int left, int top, int right, int bottom)
-    {
+  {
     super.onLayout(changed, left, top, right, bottom);
     // Layout Time: We should now have measurements for our view area, so we can calculate positions
     // and sizes for dial elements:
     // **** Get actual layout parameters: ****
-    if (changed)
-      {
+    if (changed) {
       // -- DEBUG!! -- Log.i( UIActivity.APP_TAG, "  BarGauge -> onLayout Changed!! ");
       calcBar();
       measurementsValid = true;
-      }
     }
-
-
-
-
+  }
 
   @Override
   protected void onDraw(Canvas canvas)
-    {
+  {
     super.onDraw(canvas);
 
-    for (int n = 0; n <= lastDrawnBlock; n++)
-      {
+    for (int n = 0; n <= lastDrawnBlock; n++) {
       if (n < numberColours) barPaint.setColor(scaleColours[n]);
       else                   barPaint.setColor(DEFAULT_BAR_COLOUR);
       canvas.drawRect( barRects[n], barPaint);
-      }
+    }
 
-
-    if (lastBlockRect != null)
-      {
+    if (lastBlockRect != null) {
       int lastBlockColourIndex = lastDrawnBlock + 1;
       if (lastBlockColourIndex < numberColours) barPaint.setColor(scaleColours[lastBlockColourIndex]);
       else                                      barPaint.setColor(DEFAULT_BAR_COLOUR);
       canvas.drawRect( lastBlockRect, barPaint);
-      }
-
-    super.onDraw(canvas);
-
     }
 
-
-
-
-
-
-  }  // [Class]
+    super.onDraw(canvas);
+  }
+}

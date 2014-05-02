@@ -24,12 +24,15 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
+/**
+ * Classes which wish to use the DashMessages class should implement this.
+ */
 public interface IDashMessages
-  {
+{
 
-  /**** Message ID Constants: ***********************************************
+  /* Message ID Constants: **************************************************
    * These integer IDs are used as the 'value' of the DASHMESSAGE_MESSAGE
-   * field in an intent. They idenitify the source of the message.
+   * field in an intent. They identify the source of the message.
    * We define a global list here, and other classes may add their own by
    * using one of these as a base and adding an integer value.
    **************************************************************************/
@@ -41,8 +44,8 @@ public interface IDashMessages
   public static final int CHARGE_HTTPCON_ID        = 1100;
 
 
-  public abstract void messageReceived(String action, int message, Float floatData, String stringData, Bundle data );
-    // Classes which wish to use the DashMessages class should impliment the above
-    // method, which will receive filtered intents.
-
-  }
+  /**
+   * Receives filtered intents.
+   */
+  void messageReceived(String action, int message, Float floatData, String stringData, Bundle data);
+}

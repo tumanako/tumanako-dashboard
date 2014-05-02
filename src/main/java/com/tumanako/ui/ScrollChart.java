@@ -33,9 +33,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import com.tumanako.dash.RingBuffer;
 
-/*************************************************************************************
- *
- * Scrolling Chart:
+/**
+ * Scrolling Chart.
  *
  * Creates a chart which scrolls horizontally as new data are added!
  *
@@ -57,11 +56,9 @@ import com.tumanako.dash.RingBuffer;
  *    demoChart.AddPoint( 10.5, 12.5 );
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
- *
- ************************************************************************************/
-
+ */
 public class ScrollChart extends View
-  {
+{
 
   private ShapeDrawable chartBorder;
   private ShapeDrawable chartLine;
@@ -84,19 +81,16 @@ public class ScrollChart extends View
   private final float[] xCoord = new float[NUMBER_POINTS];
   private final float[] yCoord = new float[NUMBER_POINTS];
 
-  // ********** Constructor: ***************************
   public ScrollChart(Context context, AttributeSet atttibutes)
-    {
+  {
     super(context, atttibutes);
     // Set up the data buffer (initially filled with 1):
     dataBuffer.PreFill(new float[] {10f});
-    }
+  }
 
-
-
-  // ***** Add a new point to the chart. This causes the chart to scroll along. *****
+  /** Adds a new point to the chart. This causes the chart to scroll along. */
   public void AddPoint(float thisValue, float thisAverage)
-    {
+  {
     // Note: The value we will store in the internal buffer is converted here to a
     // fraction of the distance down from the top of the chart.
     // This makes it much faster later when we have to compute the coordinates
@@ -105,18 +99,16 @@ public class ScrollChart extends View
     dataAverage = 1f - (thisAverage/MAX_SCALE);
     dataBuffer.AddPoint(new float[] {  (1f - (thisValue/MAX_SCALE))  } );
     invalidate();  // Signal the OS that we need to be redrawn!
-    }
-
-
-
+  }
 
   private Path MakeChartFill()
-    {
+  {
     // Convert the data in the data buffer to coordinates for the chart:
     int n;
     int lastPointIndex = NUMBER_POINTS - 1;
-    for (n=0; n<NUMBER_POINTS; n++)
+    for (n=0; n<NUMBER_POINTS; n++) {
          yCoord[n] = (float)drawingTop + ( (Float)dataBuffer.GetPoint(lastPointIndex-n)[0] * (float)drawingHeight );
+    }
     // Generate a filled path object to represent the path:
     Path thisPath = new Path();  // Create a blank path.
     thisPath.setFillType(Path.FillType.EVEN_ODD);
@@ -126,25 +118,25 @@ public class ScrollChart extends View
     thisPath.lineTo(0, (float)drawingHeight);                         //  ]  Finish the filled shape.
     thisPath.lineTo(xCoord[0], yCoord[0]);                            //  ]
     return thisPath;
-    }
-
+  }
 
   private Path MakeChartLine()
-    {
+  {
     // NOTE: Must call MakeChartFill (Above) FIRST to set up yCoord array!!
     int n;
     // Generate a path object to represent the line for the chart:
     Path thisPath = new Path();  // Create a blank path.
     thisPath.setFillType(Path.FillType.EVEN_ODD);
     thisPath.moveTo(xCoord[0], yCoord[0]);                                       // ...First point!
-    for (n=1; n<NUMBER_POINTS; n++)  thisPath.lineTo(xCoord[n], yCoord[n]);      //    Loop through points and add each.
-    return thisPath;
+    // Loop through points and add each.
+    for (n = 1; n < NUMBER_POINTS; n++) {
+      thisPath.lineTo(xCoord[n], yCoord[n]);
     }
-
-
+    return thisPath;
+  }
 
   private Path MakeAvgLine()
-    {
+  {
     // Draws an 'Average' line across the chart:
     float xStart = (float)drawingLeft;
     float xEnd = xStart + (float)drawingWidth;
@@ -154,59 +146,45 @@ public class ScrollChart extends View
     thisPath.moveTo(xStart, y);             // ...First point!
     thisPath.lineTo(xEnd,   y);             // ...Second point!
     return thisPath;
-    }
+  }
 
-
-
-
-
-  // ********************** onMeasure: ************************************
-  // We're being told how big we should be. Compute our dimensions:
+  /**
+   * We're being told how big we should be. Compute our dimensions.
+   */
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+  {
     // The widthMeasureSpec and heightMeasureSpec contain width and height specifications packed into an integer.
     // We need to carefully check and decode these. We'll use a couple of helper functions to do this:
     setMeasuredDimension(measureThis(widthMeasureSpec),  measureThis(heightMeasureSpec));
-    }
+  }
 
-
-
-  // **** Check a supplied width or hight spec, and decide whether to override it:
+  /** Check a supplied width or hight spec, and decide whether to override it. */
   private int measureThis(int measureSpec)
-    {
+  {
     int result;
     int specMode = MeasureSpec.getMode(measureSpec);
     int specSize = MeasureSpec.getSize(measureSpec);
-    if (specMode == MeasureSpec.EXACTLY)
-      {
+    if (specMode == MeasureSpec.EXACTLY) {
       // We were told how big to be, so we'll go with that!
       result = specSize;
-      }
-    else
-      {
+    } else {
       // We might have been given an indication of maximum size:
       result = 320;   // We'll try 320 pixels.
       if (specMode == MeasureSpec.AT_MOST) result = specSize;
          // Respect AT_MOST value if that was what is called for by measureSpec
-      }
-    return result;
     }
-
-
-
-
-
+    return result;
+  }
 
   @Override
   protected void onDraw(Canvas canvas)
-    {
+  {
     super.onDraw(canvas);
     Paint paintBorder;
 
     // Determine the chart dimensions, if we haven't already done so:
-    if (drawingWidth == 0)
-      {
+    if (drawingWidth == 0) {
       // **** Get actual layout parameters: ****
       drawingWidth = this.getWidth() - MARGIN - MARGIN;
       drawingHeight = this.getHeight() - MARGIN - MARGIN;
@@ -220,8 +198,10 @@ public class ScrollChart extends View
       paintBorder.setColor(0xFFF0F0F0);
       chartBorder.setBounds(MARGIN,MARGIN,drawingWidth,drawingHeight);
       // *** Compute X coordinates for the chart points (these don't change): ***
-      for (int n=0; n<NUMBER_POINTS; n++)  xCoord[n] = (float)drawingLeft + ( ((float)n/(NUMBER_POINTS-1)) * (float)drawingWidth);
+      for (int n = 0; n < NUMBER_POINTS; n++) {
+        xCoord[n] = (float)drawingLeft + ( ((float)n/(NUMBER_POINTS-1)) * (float)drawingWidth);
       }
+    }
 
     // *** Set up the chart: ****
     Path chartFillPath = MakeChartFill();
@@ -258,9 +238,6 @@ public class ScrollChart extends View
     chartAvgLine.draw(canvas);
     chartBorder.draw(canvas);
 
-    //     invalidate();
-    }
-
-  }  // [Class]
-
-
+    //invalidate();
+  }
+}
