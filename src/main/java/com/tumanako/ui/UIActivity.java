@@ -74,7 +74,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
 
     // HashMap for list of UI Widgets:
-    private HashMap<String,View> uiWidgets = new HashMap<String,View>();
+    private final HashMap<String, View> uiWidgets;
 
     // Intent - used to start Data Service:
     private Intent  dataIntent;
@@ -107,6 +107,10 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     // ---------------DEMO MODE CODE -------------------------------
     private boolean isDemo = false;  // Demo mode flag!
     // ---------------DEMO MODE CODE -------------------------------
+
+    public UIActivity() {
+      this.uiWidgets = new HashMap<String, View>();
+    }
 
 
 
@@ -563,6 +567,7 @@ Log.i(APP_TAG,"UIActivity -> onPause()");
 
     // ******** Save State Event: **********************************
     // Save state info before the application is hidden / rotated / etc (or otherwise trashed by the OS):
+    @Override
     public void onSaveInstanceState(Bundle outState)
       {
 Log.i(APP_TAG,"UIActivity -> onSaveInstanceState()");

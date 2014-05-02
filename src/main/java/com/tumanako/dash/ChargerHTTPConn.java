@@ -28,6 +28,7 @@ import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -62,7 +63,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
   private final Bundle cookieDataToSend;
 
   private final String responseIntent;
-  private DashMessages comthreadMessages;  // We'll need to generate intents so we can interract with the rest of the app.
+  private final DashMessages comthreadMessages;  // We'll need to generate intents so we can interract with the rest of the app.
 
   private final boolean followRedirects;  // If we get a 'Redirect' header back from the server, should we follow it?
   private int responseCode = 0;
@@ -151,14 +152,19 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
        Iterator<String> myIterator = keys.iterator();    // This is an iterator to iterate over the list.
        String key;
        String value;
-       StringBuffer cookieStrings = new StringBuffer("");
+       StringBuilder cookieStrings = new StringBuilder("");
        while (myIterator.hasNext())
          {
          key = myIterator.next();
          value = data.get(key).toString();
          cookieStrings.append(key);
          cookieStrings.append("=");
-         cookieStrings.append(URLEncoder.encode(value));
+         try {
+           cookieStrings.append(URLEncoder.encode(value, "UTF-8"));
+         } catch (UnsupportedEncodingException ex) {
+           // we will never get here, because every JDK has to support UTF-8
+           Log.w(com.tumanako.ui.UIActivity.APP_TAG, ex);
+         }
          if (myIterator.hasNext()) cookieStrings.append("; ");
          }
        // --DEBUG!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " CommThread -> Cookies: " +  cookieStrings.toString());
@@ -174,20 +180,25 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
   * Turn a bundle of key/value pairs into a string of POST data suitable for
   * use in the HTTP POST request:
   *********************************************************************************/
-  private String encodePostData(Bundle data)
+  private static String encodePostData(Bundle data)
     {
     Set<String> keys = data.keySet();                 // Get a list of data keys in the bundle of submitted data.
     Iterator<String> myIterator = keys.iterator();    // This is an iterator to iterate over the list.
     String key;
     String value;
-    StringBuffer postData = new StringBuffer("");
+    StringBuilder postData = new StringBuilder("");
     while (myIterator.hasNext())
       {
       key = myIterator.next();
       value = data.get(key).toString();
       postData.append(key);
       postData.append("=");
-      postData.append(URLEncoder.encode(value));
+      try {
+        postData.append(URLEncoder.encode(value, "UTF-8"));
+      } catch (UnsupportedEncodingException ex) {
+        // we will never get here, because every JDK has to support UTF-8
+        Log.w(com.tumanako.ui.UIActivity.APP_TAG, ex);
+      }
       if (myIterator.hasNext()) postData.append("&");
       }
     return postData.toString();
@@ -208,6 +219,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
   /*************************************************************************************
    ******** RUN THREAD: ****************************************************************
    *************************************************************************************/
+  @Override
   public void run()
     {
     isRun = true;               // Signal that we have started work!
@@ -255,7 +267,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
 
 
       /********* Create input stream and read the response sent by the server: ***********************************/
-      StringBuffer httpReceivedData = new StringBuffer("");       // Empty string buffer. We'll add data we receive by HTTP to this.
+      StringBuilder httpReceivedData = new StringBuilder("");       // Empty string buffer. We'll add data we receive by HTTP to this.
       Bundle dataBundle = new Bundle();                           // Empty data bundle. We'll put any HTML, XML or JSON data in this to return it to the parent.
       InputStream streamIn = new BufferedInputStream(serverConn.getInputStream());
       // ----- Read data that the server sent to us (HTTP Response): ---------
@@ -306,7 +318,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
 
     catch (Exception e)
       {
-      e.printStackTrace();
+      Log.w("HTTPConn", e);
       comthreadMessages.sendData(responseIntent, CONN_ERROR, null, e.getMessage() , null);
       // --DEBUG!!--Log.i("HTTPConn", "HTTP Error!");
       }

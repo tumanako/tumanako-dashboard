@@ -93,7 +93,7 @@ public class VehicleData extends Thread implements IDashMessages
   private static final int BT_READ_SIZE         = 200;         // Max Number of characters we read per stream read. Not too critical.
   private static final int BT_STREAM_OVERFLOW   = 600;         // If there are more than this many bytes left in the BT input stream after processing, we should dump some.
   /*****************************************************************/
-  private BluetoothAdapter bluetoothAdapter;
+  private final BluetoothAdapter bluetoothAdapter;
   private BluetoothDevice  btVehicleSensor;
   private BluetoothSocket  btSocket;
   private InputStream      btStreamIn;
@@ -117,7 +117,7 @@ public class VehicleData extends Thread implements IDashMessages
   public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = IDashMessages.VEHICLE_DATA_ID + 2;   // Bluetooth address change! (I.e. user selected different BT device). New address will be included in stringData field of message.
 
 
-  private DashMessages dashMessages;
+  private final DashMessages dashMessages;
   private int watchdogCounter = 0;
   private final Context vehicledataContext;
 
@@ -317,7 +317,7 @@ public class VehicleData extends Thread implements IDashMessages
       contactorOn = Float.parseFloat(splitData[7]);
       faultOn     = Float.parseFloat(splitData[8]);
       }
-    catch (Exception e)
+    catch (NumberFormatException e)
       { }
 
     motorReverse = (motorRPM < 0) ? 1f : 0f;  // This turns on the reverse indicator lamp if the RPM is negative.
@@ -403,15 +403,14 @@ public class VehicleData extends Thread implements IDashMessages
          {
          m = btVehicleSensor.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
          if (btSocket != null) btSocket.close();    // If there's already a BT Socket open, close it.
-         btSocket = (BluetoothSocket)m.invoke(btVehicleSensor, Integer.valueOf(1));
+         btSocket = (BluetoothSocket)m.invoke(btVehicleSensor, 1);
          btSocket.connect();
          }
        catch (Exception e)
          {
          // Still having errors connecting! Give up.
-         e.printStackTrace();
          Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");
-         Log.i(com.tumanako.ui.UIActivity.APP_TAG, e.getMessage());
+         Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
          return false;  // Give up.
          }
        }
@@ -426,7 +425,7 @@ public class VehicleData extends Thread implements IDashMessages
        return true;                                  // SUCCESS!!
        }
 
-     catch (Exception e)
+     catch (IOException e)
        {
        // An error occurred during BT comms setup:
        Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
@@ -453,8 +452,8 @@ public class VehicleData extends Thread implements IDashMessages
        if (btStreamOut != null) btStreamOut.close();
        if (btSocket != null)    btSocket.close();
        }
-     catch (Exception e)
-       {  e.printStackTrace();  }  // If an error occurs here, print a stack trace (debug only) but otherwise quietly ignore.
+     catch (IOException e)
+       {  Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);  }  // If an error occurs here, print a stack trace (debug only) but otherwise quietly ignore.
      }
 
 
@@ -475,6 +474,7 @@ public class VehicleData extends Thread implements IDashMessages
    *************** Bluetooth Communications Thread: *********************************************************************
    **********************************************************************************************************************/
 
+  @Override
   public void run()
       {
       byte[] byteBuffer = new byte[BT_READ_SIZE];

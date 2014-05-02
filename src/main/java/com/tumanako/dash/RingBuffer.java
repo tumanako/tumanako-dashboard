@@ -50,7 +50,7 @@ public class RingBuffer
   private final int bufferFieldCount;        // Number of values to store.
   private final boolean useAverage;          // Should we keep an average as data points are added?
   
-  private float[][] dataBuffer;        // Data buffer
+  private final float[][] dataBuffer;  // Data buffer
   private float[] dataAverage;         // Average of the records in the data buffer
 
   private int dataPointer = 0;         // Index of current write point in buffer (increments AFTER data write).
@@ -237,11 +237,11 @@ public class RingBuffer
    * This method returns an array of numbers which is the average of the current buffer contents.
    * Note that the average is actually updated in AddPoint whenever a point is added to the buffer.
    * 
-   * The average is only available if thisUseAverage was set to True in the contructor call.
+   * The average is only available if thisUseAverage was set to True in the constructor call.
    * If thisUseAverage was false, this method will always return an array of 0 values.
    * Note that the average is always a Float even if the buffer is storing Integers. 
    *  
-   * @return Array containing average of each field accross current buffer contents.  
+   * @return Array containing average of each field across current buffer contents.
    * 
    **************************************************************************/
   public float[] GetAverage()

@@ -47,9 +47,9 @@ public class Dial extends RenderedGauge
   // Runtime Data Values:
   private float needleAngle = 0f;   // The angle of the needle used to represent the above value
 
-  private Path needlePath;
+  private final Path needlePath;
 
-  private Paint needlePaint;
+  private final Paint needlePaint;
 
 
   // ********** Constructor: ***************************

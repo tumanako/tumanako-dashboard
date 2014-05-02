@@ -342,7 +342,7 @@ public class RenderedGauge extends View
         // for the corresponding colour entry:
         try
           {  theseColours[n] = (int)Long.parseLong(splitColours[n],16);  }
-        catch (Exception e)
+        catch (NumberFormatException e)
           {  theseColours[n] = DEFAULT_BAR_COLOUR;  }
         }
       return theseColours;
@@ -419,7 +419,7 @@ public class RenderedGauge extends View
   // **** Check a supplied width or height spec, and decide whether to override it: ***
   private int measureThis(int measureSpec)
     {
-    int result = 0;
+    int result;
     int specMode = MeasureSpec.getMode(measureSpec);
     int specSize = MeasureSpec.getSize(measureSpec);
     if (specMode == MeasureSpec.EXACTLY)

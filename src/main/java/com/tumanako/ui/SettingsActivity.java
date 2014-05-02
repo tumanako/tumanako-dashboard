@@ -61,7 +61,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, I
         {
         String deviceBTName = device.getName();
         listAdapter.add(deviceBTName);
-        addressList[i] = new String(device.getAddress());
+        addressList[i] = device.getAddress();
         i++;
         }
       }

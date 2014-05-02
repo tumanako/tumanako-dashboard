@@ -54,8 +54,8 @@ public class BarGauge extends RenderedGauge
   private int lastDrawnBlock = -1;  // Index of last complete block on the scale.
   private Rect lastBlockRect;       // Will be a Rect used to draw the last bare block (smaller than a full block).
 
-  private Paint barPaint;
-  private Rect[] barRects;
+  private final Paint barPaint;
+  private final Rect[] barRects;
 
 
   // ********** Constructor: ***************************

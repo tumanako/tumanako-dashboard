@@ -79,10 +79,10 @@ public class ScrollChart extends View
   private static final int NUMBER_POINTS = 60;
   private static final float MAX_SCALE = 20;
 
-  private RingBuffer dataBuffer = new RingBuffer(NUMBER_POINTS+1, 1, false);
+  private final RingBuffer dataBuffer = new RingBuffer(NUMBER_POINTS+1, 1, false);
 
-  private float[] xCoord = new float[NUMBER_POINTS];
-  private float[] yCoord = new float[NUMBER_POINTS];
+  private final float[] xCoord = new float[NUMBER_POINTS];
+  private final float[] yCoord = new float[NUMBER_POINTS];
 
   // ********** Constructor: ***************************
   public ScrollChart(Context context, AttributeSet atttibutes)
@@ -175,7 +175,7 @@ public class ScrollChart extends View
   // **** Check a supplied width or hight spec, and decide whether to override it:
   private int measureThis(int measureSpec)
     {
-    int result = 0;
+    int result;
     int specMode = MeasureSpec.getMode(measureSpec);
     int specSize = MeasureSpec.getSize(measureSpec);
     if (specMode == MeasureSpec.EXACTLY)

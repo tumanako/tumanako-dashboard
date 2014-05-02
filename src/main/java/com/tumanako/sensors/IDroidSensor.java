@@ -84,6 +84,7 @@ public interface IDroidSensor
       //   *Suspend: This is typically used when the application is paused, and should leave the sensors in a state
       //   where they don't consume batteries.
 
+  @Override
   public String toString();        // Returns interesting sensor data as a string. Generally only used for debugging.
 
   }

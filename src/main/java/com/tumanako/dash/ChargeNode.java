@@ -31,6 +31,7 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.Queue;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /***********************************************************************
@@ -284,9 +285,9 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Re
               //--DEBUG!!--Log.i("HTTPConn", "  sourceId: " + jsonDataItem.getString("sourceId") + "\n  integerValue: " + String.format("%d", jsonDataItem.getInt("integerValue") )  );
               }  // [for...]
             }  // [try]
-          catch (Exception e)
+          catch (JSONException e)
             {
-            e.printStackTrace();
+            Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
             //chargeStatus = STATUS_NOT_CHARGING;
             //connectionStatus = STATUS_OFFLINE;
             //dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
@@ -348,9 +349,10 @@ Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> XML Data Message." );
     {  updateTimer.postDelayed(updateTimerTask, UPDATE_TIME);  }
                       // ...Restarts the update timer.
 
-  private Runnable updateTimerTask = new Runnable()
+  private final Runnable updateTimerTask = new Runnable()
    {
    // Creates a Runnable which will be called after a delay, to carry out a read of vehicle data.
+   @Override
    public void run()
      {
      timerStop();  // Clears existing timers.

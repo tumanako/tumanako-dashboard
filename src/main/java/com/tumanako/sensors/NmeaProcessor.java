@@ -147,12 +147,8 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     // Overrides normal operation in demo mode:
     if (isDemo) return true;
     // ---------------DEMO MODE CODE -------------------------------
-
     //  If isFixGood and it's been less than NMEA_WAIT_TIMEOUT mS since the last good NMEA data, this is a good fix!
-    if (isFixGood && (timeLastPosition > NMEA_WAIT_TIMEOUT) && (timeLastPosition + NMEA_WAIT_TIMEOUT) > (SystemClock.elapsedRealtime()) )
-      {  return true;  }
-    else
-      {  return false;  }
+    return isFixGood && (timeLastPosition > NMEA_WAIT_TIMEOUT) && (timeLastPosition + NMEA_WAIT_TIMEOUT) > (SystemClock.elapsedRealtime());
     }
 
 
@@ -183,10 +179,11 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
    * Returns a string with a data summary (useful for debugging):
    * @return String representing class data
    ******************************************************************/
+  @Override
   public String toString()
     {
     // Return a summary of NMEAData data as a string (for debugging).
-    StringBuffer thisDump = new StringBuffer();
+    StringBuilder thisDump = new StringBuilder();
 
     thisDump.append(  String.format( " Time:      %.1f\n" +
                                      " Qual:      %d\n" +
@@ -288,10 +285,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
           // Correct sign (South of equator and East of Grenwitch should be negative):
           if (nmeaParts[3].equals("S")) gpsLat = gpsLat * -1;   // South of equator!
           if (nmeaParts[5].equals("W")) gpsLon = gpsLon * -1;   // West of Grenwitch!
-          if (gpsQual > 0)
-            {  isFixGood = true;  }                          //
-          else
-            {  isFixGood = false;  }                         //
+          isFixGood = (gpsQual > 0);
           timeLastPosition = SystemClock.elapsedRealtime();  //  We have a position fix!
           }
         catch (NumberFormatException e)
@@ -357,7 +351,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
       Double minutes = Double.valueOf(thisLatLon.substring(dotAt-2));
       return degrees + (minutes /60.0);
       }
-    catch (Exception e)
+    catch (NumberFormatException e)
       {
       return 0.0;  // On error, give up and return 0.0
       }

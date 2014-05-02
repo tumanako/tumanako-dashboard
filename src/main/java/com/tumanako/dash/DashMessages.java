@@ -52,7 +52,7 @@ public class DashMessages extends BroadcastReceiver
   {
 
 
-  private LocalBroadcastManager messageBroadcaster;
+  private final LocalBroadcastManager messageBroadcaster;
     // Will be used to send and receive intents from other parts of the app (E.g. UI)
 
 
@@ -70,7 +70,7 @@ public class DashMessages extends BroadcastReceiver
 
   private String actionFilter = null;
 
-  private IDashMessages parent;
+  private final IDashMessages parent;
 
 
 

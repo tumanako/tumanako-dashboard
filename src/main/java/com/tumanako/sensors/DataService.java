@@ -181,8 +181,9 @@ public class DataService extends Service implements IDashMessages
   /**********************************************************************************************
    * Update Timer Runnable:
    **********************************************************************************************/
-  private Runnable updateTimerTask = new Runnable()
+  private final Runnable updateTimerTask = new Runnable()
       {
+      @Override
       public void run()
         {
         // Update Watchdog counter and check for overflow:

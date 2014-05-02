@@ -44,7 +44,7 @@ import com.tumanako.dash.IDashMessages;
 public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
   {
 
-  private LocationManager mLocationManager;
+  private final LocationManager mLocationManager;
   private boolean isAvailable = false;             // Is a NMEAData position available?
 
   public NmeaProcessor NMEAData;                   // A reference to a NMEA processing object (used to decode NMEA Data strings from GPS)
@@ -82,6 +82,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
    * Returns a string with a data summary (useful for debugging):
    * @return String representing class data
    ******************************************************************/
+  @Override
   public String toString()
     {  return NMEAData.toString();  }
 
@@ -139,10 +140,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
     //
     // Note - NMEAData status found to be slow in changing. Just look at
     // isFixGood() method of NMEAData object to see if a fix is available.
-    if (status == 2)
-      {  isAvailable = true;  }
-    else
-      {  isAvailable = false;  }
+      isAvailable = (status == 2);
     }
 
 
