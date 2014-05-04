@@ -103,6 +103,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, I
     Toast.makeText(getApplicationContext(), ThisMessage, Toast.LENGTH_SHORT).show();
   }
 
+  @Override
   public void onItemClick(AdapterView<?> parent, View view, int position, long id)
   {
     switch (parent.getId()) {

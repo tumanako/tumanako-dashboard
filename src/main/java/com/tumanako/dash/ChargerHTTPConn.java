@@ -299,6 +299,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
     }
   }
 
+  @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
     // We don't respond to any incomming messages.

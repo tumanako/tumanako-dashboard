@@ -188,6 +188,7 @@ public class ChargeNode implements IDashMessages
   /**
    * Intent Processor.
    */
+  @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
     // --DEBUG!--Log.i(UIActivity.APP_TAG, String.format( " ChargeNode -> Msg Rec: %d", message) );
