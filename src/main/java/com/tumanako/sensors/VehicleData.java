@@ -39,58 +39,63 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 /**
- *  Tumanako Vehicle Data Input.
+ * Tumanako Vehicle Data Input.
  *
- *  This class is designed to connect to get a stream of data from
- *  the vehicle electronics.
+ * This class is designed to connect to get a stream of data from
+ * the vehicle electronics.
  *
- *  The stream is decoded as necessary and sent to the UI as
- *  an Intent with a bundle of data (see DashMessages).
+ * The stream is decoded as necessary and sent to the UI as
+ * an Intent with a bundle of data (see {@link IDashMessages}).
  *
- *  Connection uses Bluetooth. The class extends Thread and
- *  launches the bluetooth connection in a new thread so that
- *  it can listen for incoming data without stalling the UI.
+ * Connection uses Bluetooth. The class extends Thread and
+ * launches the Bluetooth connection in a new thread so that
+ * it can listen for incoming data without stalling the UI.
  *
- *  A 'Watchdog' mechanism is used to keep the connection alive.
- *  This class implements IDashMessages and registers to listen
- *  for intents directed to "VEHICLE_DATA".
+ * A 'Watchdog' mechanism is used to keep the connection alive.
+ * This class implements {@link IDashMessages} and registers to
+ * listen for intents directed to "VEHICLE_DATA".
  *
- *  During normal operation, a timer (watchdogTimer) is triggered
- *  on an interval (1s) and increments a watchdog counter.
- *  If this counter passes a maximum value, we assume that the
- *  BT connection is no longer required (i.e. UI has closed),
- *  and the thread stops itself and carries out cleanup (closes
- *  bluetooth connections, etc).
+ * During normal operation, a timer (watchdogTimer) is triggered
+ * on an interval (1s) and increments a watchdog counter.
+ * If this counter passes a maximum value, we assume that the
+ * BT connection is no longer required (i.e. UI has closed),
+ * and the thread stops itself and carries out cleanup (closes
+ * Bluetooth connections, etc).
  *
- *  While the UI is active, it should send intent messages to
- *  the vehicle data class. When this class receives an
- *  intent message through its DashMessages object, it resets
- *  the watchdog counter, thereby keeping itself alive.
+ * While the UI is active, it should send intent messages to
+ * the vehicle data class. When this class receives an
+ * intent message through its DashMessages object, it resets
+ * the watchdog counter, thereby keeping itself alive.
  *
- *  Note that the above applies when the parent of this class
- *  is a persistent service (e.g. DataService) which stays
- *  alive when the UI is closed / suspended. The bluetooth
- *  keep-alive timer should be set up to be shorter than the
- *  DataService keep-alive timer so that bluetooth connection
- *  can close and exit cleanly before the service which created
- *  it is stopped.
+ * Note that the above applies when the parent of this class
+ * is a persistent service (e.g. ) which
+ * stays alive when the UI is closed / suspended. The Bluetooth
+ * keep-alive timer should be set up to be shorter than the
+ * {@link DataService} keep-alive timer so that Bluetooth
+ * connection can close and exit cleanly before the service
+ * which created it is stopped.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
 public class VehicleData extends Thread implements IDashMessages
 {
 
-  /** Checks bluetooth status. */
+  /** Checks the Bluetooth status. */
   private final Handler watchdogTimer = new Handler();
 
-  // ***** Bluetooth constants and objects: **************************
-  /** Check bluetooth connection every n mSec */
+  /** Check Bluetooth connection every n mSec */
   private static final int BT_WATCHDOG_TIME     = 1000;
-  /** Close down bluetooth after BT_WATCHDOG_TIME x n without a 'KeepAlive' message from UI. */
+  /** Close down Bluetooth after BT_WATCHDOG_TIME x n without a 'KeepAlive' message from UI. */
   private static final int BT_WATCHDOG_MAXCOUNT = 2;
-  /** Max Number of characters we read per stream read. Not too critical. */
+  /**
+   * Max Number of characters we read per stream read.
+   * Not too critical.
+   */
   private static final int BT_READ_SIZE         = 200;
-  /** If there are more than this many bytes left in the BT input stream after processing, we should dump some. */
+  /**
+   * If there are more than this many bytes left in the BT input stream after processing,
+   * we should dump some.
+   */
   private static final int BT_STREAM_OVERFLOW   = 600;
 
   private final BluetoothAdapter bluetoothAdapter;
@@ -102,9 +107,15 @@ public class VehicleData extends Thread implements IDashMessages
 
   /** Internal flag which indicates when the BT connection is established. */
   private volatile boolean isBTConnected = false;
-  /** Internal flag which signals when the comms loop has ended and the BT connection has been closed. */
+  /**
+   * Internal flag which signals when the comms loop has ended
+   * and the BT connection has been closed.
+   */
   private volatile boolean isFinished = false;
-  /** Internal flag which signals when the BT device address has been changed by another part of the app. */
+  /**
+   * Internal flag which signals when the BT device address has been changed
+   * by another part of the application.
+   */
   private volatile boolean isAddressChanged = false;
 
 
@@ -118,9 +129,15 @@ public class VehicleData extends Thread implements IDashMessages
    * Message types we recognize.
    * Used in the 'message' field of intents sent to us.
    */
-  /** A 'KeepAlive' message, telling us that the UI is still active and the connection is still required. */
+  /**
+   * A 'KeepAlive' message, telling us that the UI is still active
+   * and the connection is still required.
+   */
   public static final int VEHICLE_DATA_KEEPALIVE         = IDashMessages.VEHICLE_DATA_ID + 1;
-  /** Bluetooth address change! (I.e. user selected different BT device). New address will be included in stringData field of message. */
+  /**
+   * Bluetooth address change! (I.e. user selected different BT device).
+   * New address will be included in stringData field of message.
+   */
   public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = IDashMessages.VEHICLE_DATA_ID + 2;
 
   private final DashMessages dashMessages;
@@ -136,7 +153,7 @@ public class VehicleData extends Thread implements IDashMessages
    */
   private volatile boolean isPing = false;
   private Handler uiTimer = new Handler();
-  private static final int UI_UPDATE_EVERY = 500;   // Update the UI every n mSeconds.
+  private static final int UI_UPDATE_EVERY = 500; // Update the UI every n mSeconds.
   private Runnable uiTimerTask = new Runnable()
   {
     @Override
@@ -164,7 +181,7 @@ public class VehicleData extends Thread implements IDashMessages
     dashMessages = new DashMessages(context, this, VEHICLE_DATA);     // We are extending the 'DashMessages' class, and we need to call its Constructor here.
     dashMessages.resume();
 
-    // Setup Bluetooth Watchdog Timer
+    // Setup the Bluetooth Watchdog Timer
     watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);   // ...Callback in n milliseconds!
 
     // ********* TEMP DEBUG **************************
@@ -177,29 +194,34 @@ public class VehicleData extends Thread implements IDashMessages
 
   /**
    * Dash Message Received.
-   * Called when we receive an intent message via our Dashmessage object.
+   * Called when we receive an intent message via our IDashMessages object.
    */
-  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
+  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
     // Message Intent Received: Check type of message.
-    // We respond to 'keep alive' messages and bluetooth address changes.
-    watchdogCounter = 0;     // Whatever the type of message, treat it as a 'keep alive' event and reset watchdog counter.
+    // We respond to 'keep alive' messages and Bluetooth address changes.
+
+    // Whatever the type of message, treat it as a 'keep alive' event
+    // and reset the watchdog counter.
+    watchdogCounter = 0;
 
     if (message == VEHICLE_DATA_BTADDRESS_CHANGE) {
-      // Bluetooth device address has changed! Note: We'll only do this if we've been sent a string (should be new address).
-      isAddressChanged = true;    // This flag tells the connection thread to reconnect with the new address.
+      // The Bluetooth device address has changed!
+      // NOTE We will only do this if we have been sent a string (should be the new address).
+
+      // This flag tells the connection thread to reconnect with the new address.
+      isAddressChanged = true;
     }
   }
 
-  // ******** Methods to return status ***************************
-  /** Is the bluetooth socket connected? */
+  /** Is the Bluetooth socket connected? */
   public boolean isConnected()
   {
     return isBTConnected;
   }
 
   /**
-   * Has the bluetooth thread finished and terminated?
+   * Has the Bluetooth thread finished and terminated?
    * (Usually caused by loss of connection or watchdog timeout).
    */
   public boolean isFinished()
@@ -214,13 +236,14 @@ public class VehicleData extends Thread implements IDashMessages
    */
   private void stopVehicleData()
   {
-    // *** Stop the vehicle sensor... ***
+    // Stop the vehicle sensor
     // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
     btClose();   // Close the BT connection
-    // Stop the update timer if it's running:
-    watchdogTimer.removeCallbacks(watchdogTimerTask);       // Stop timer.
-    dashMessages.suspend();                                 // Stop the DashMessages object (unregisters intent listener)
-    isBTConnected = false;                                  // This will tell the BT connection thread to exit.
+
+    // Stop the update timer if it is running
+    watchdogTimer.removeCallbacks(watchdogTimerTask); // Stop the timer.
+    dashMessages.suspend();                           // Stop the IDashMessages object (unregisters the intent listener)
+    isBTConnected = false;                            // Tell the BT connection thread to exit.
   }
 
   /**
@@ -229,18 +252,19 @@ public class VehicleData extends Thread implements IDashMessages
   private Runnable watchdogTimerTask = new Runnable()
   {
     public void run()
-     {
-      watchdogTimer.removeCallbacks(watchdogTimerTask); // ...Make sure there is no active callback already....
+    {
+      // Make sure there is no active callback already
+      watchdogTimer.removeCallbacks(watchdogTimerTask);
       watchdogCounter++;
 
       if (watchdogCounter > BT_WATCHDOG_MAXCOUNT) {
         stopVehicleData();
       } else {
-        watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME); // ...Callback in n milliseconds!
+        // Callback in n milliseconds!
+        watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);
       }
     }
   };
-
 
   /**
    * Decodes a string of data received from the input stream
@@ -302,8 +326,10 @@ public class VehicleData extends Thread implements IDashMessages
     } catch (NumberFormatException e) {
     }
 
-    motorReverse = (motorRPM < 0) ? 1f : 0f;  // This turns on the reverse indicator lamp if the RPM is negative.
-    motorRPM = Math.abs(motorRPM);            // Convert negative RPM into positive for display.
+    // This turns on the reverse indicator lamp if the RPM is negative.
+    motorReverse = (motorRPM < 0) ? 1f : 0f;
+    // Convert negative RPM into positive for display.
+    motorRPM = Math.abs(motorRPM);
 
     // Make the data up into a 'Bundle', using the data type indicators
     // defined above as 'keys':
@@ -325,31 +351,31 @@ public class VehicleData extends Thread implements IDashMessages
     vehicleData.putFloat("DATA_DRIVE_TIME",        0f                );
     vehicleData.putFloat("DATA_DRIVE_RANGE",       0f                );
 
-    // Now transmit the data to the UI by sending a message!
-    dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData );
+    // Now transmit the data to the UI by sending a message
+    dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData);
   }
 
   /**
-   * Tries to establish a bluetooth connection.
+   * Tries to establish a Bluetooth connection.
    * @return true on success, false if an error occurs.
    */
   private boolean btOpen()
   {
 
-    // ***** Make sure the bluetooth adaptor is on *******
+    // ***** Make sure the Bluetooth adaptor is on *******
     if ((bluetoothAdapter == null) || (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON)) {
       //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
       return false;
     }
     //Log.i(UIActivity.APP_TAG, "             -> Adaptor is ON! ");
 
-    // ****** Get a bluetooth device for the vehicle sensor ***************
-    // We need to retrieve the device address of the selected bluetooth device from the stored app preferences:
+    // ****** Get a Bluetooth device for the vehicle sensor ***************
+    // We need to retrieve the device address of the selected Bluetooth device from the stored app preferences:
     SharedPreferences settings = vehicledataContext.getSharedPreferences(UIActivity.PREFS_NAME, 0);
     String btDeviceAddress = settings.getString("btDeviceAddress", "");
     // Check the address:
     if (!BluetoothAdapter.checkBluetoothAddress(btDeviceAddress)) return false;   // Invalid address. Give up.
-    btVehicleSensor = bluetoothAdapter.getRemoteDevice(btDeviceAddress);          // "00:12:05:17:91:65" = MDFlyBTSerial bluetooth serial device (for testing).
+    btVehicleSensor = bluetoothAdapter.getRemoteDevice(btDeviceAddress);          // "00:12:05:17:91:65" = MDFlyBTSerial Bluetooth serial device (for testing).
     //Log.i(UIActivity.APP_TAG, "             -> Got remote device OK! " );
 
     // ************* Try to establish a BT Connection ***********************************
@@ -357,17 +383,17 @@ public class VehicleData extends Thread implements IDashMessages
       if (btSocket != null) btSocket.close();                                 // If there's already a BT Socket open, close it.
       btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);   // Create a new BT Socket for RF Comm connection.
       //Log.i(UIActivity.APP_TAG, "             -> Socket Created. " );
-      bluetoothAdapter.cancelDiscovery();                                     // Cancel any bluetooth discovery that's running (in case another app started it...) According to the docs, we should do this...
+      bluetoothAdapter.cancelDiscovery();                                     // Cancel any Bluetooth discovery that's running (in case another app started it...) According to the docs, we should do this...
       btSocket.connect();                                                     // Attempt to connect!!!
     } catch (IOException ioe) {
       //Log.i(UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
       // Our attempt to open a BT connection caused an IO exception. This could be due to a bug in
-      // the bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
+      // the Bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
       // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android )
       Method m;
       try {
-        m = btVehicleSensor.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
-        if (btSocket != null) btSocket.close();    // If there's already a BT Socket open, close it.
+        m = btVehicleSensor.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+        if (btSocket != null) btSocket.close(); // If there's already a BT Socket open, close it.
         btSocket = (BluetoothSocket)m.invoke(btVehicleSensor, 1);
         btSocket.connect();
       } catch (Exception e) {
@@ -382,7 +408,7 @@ public class VehicleData extends Thread implements IDashMessages
     try {
       //Log.i(UIActivity.APP_TAG, "             -> CONNECTED. " );
       btStreamIn  = btSocket.getInputStream();                 // Get input and output streams
-      btStreamOut = btSocket.getOutputStream();                //  for communication through the socket.
+      btStreamOut = btSocket.getOutputStream();                // for communication through the socket.
       //Log.i(UIActivity.APP_TAG, "             -> IO Streams Open! " );
       return true;                                  // SUCCESS!!
     } catch (IOException e) {
@@ -393,7 +419,7 @@ public class VehicleData extends Thread implements IDashMessages
     }
   }
 
-  /************** Bluetooth socket close / cleanup: ******************************************************/
+  /** Bluetooth socket close / cleanup */
   private void btClose()
   {
     // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> btClose(); ");
@@ -416,7 +442,7 @@ public class VehicleData extends Thread implements IDashMessages
     byte[] byteBuffer = new byte[BT_READ_SIZE];
     StringBuffer btRawData = new StringBuffer();
     //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");
-    // Try to open a BT connection:
+    // Try to open a BT connection
     if (!btOpen()) {
       // Connection failed! Close any open objects and exit.
       stopVehicleData();
@@ -426,12 +452,12 @@ public class VehicleData extends Thread implements IDashMessages
     isBTConnected = true;
     //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected. ");
 
-      // ******* BT Connection should now be open! Keep listening to the InputStream while connected: *********************************
+      // BT Connection should now be open! Keep listening to the InputStream while connected
     int bytesRead;
     while (isBTConnected) {
-      // Check to see if the bluetooth address has changed:
+      // Check to see if the Bluetooth address has changed
       if (isAddressChanged) {
-        // To change BT address, we shut down the existing connection and reopen with new address:
+        // To change BT address, we shut down the existing connection and reopen with new address
 //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Address Change! ");
         isBTConnected = false;
         isAddressChanged = false;
@@ -464,10 +490,10 @@ public class VehicleData extends Thread implements IDashMessages
          ******************************************************************************/
         int bytesInStream = btStreamIn.available();
         if (bytesInStream > BT_STREAM_OVERFLOW) btStreamIn.skip(bytesInStream - BT_STREAM_OVERFLOW);
-        //*****************************************************************************/
+
         if (bytesRead > 0) { // ACTUAL number of bytes read.
           for (int n = 0; n < bytesRead; n++) {
-            // Process the incomming aray of bytes:
+            // Process the incomming aray of bytes
             if (byteBuffer[n] == 0x0D) {
               // End of line! Send record:
               decodeAndSend(btRawData.toString());
@@ -479,16 +505,16 @@ public class VehicleData extends Thread implements IDashMessages
           }
         }
 
-        Thread.sleep(1);  // Give up CPU time (waiting for bluetooth characters is so tedious...)
+        Thread.sleep(1); // Give up CPU time (waiting for Bluetooth characters is so tedious...)
       } catch (Exception e) {
-        // An error occurred during BT comms operation:
+        // An error occurred during BT comms operation
         Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
         isBTConnected = false;
         break;
       }
     }
 
-    // Close down the input and ouptut streams and the bluetooth socket
+    // Close down the input and ouptut streams and the Bluetooth socket
     stopVehicleData();
     isFinished = true;
     Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit! ");
