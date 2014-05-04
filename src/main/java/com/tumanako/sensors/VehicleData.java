@@ -40,8 +40,7 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 /**
- *  Tumanako Vehicle Data Input:
- *  -------------------------------
+ *  Tumanako Vehicle Data Input.
  *
  *  This class is designed to connect to get a stream of data from
  *  the vehicle electronics.
@@ -85,47 +84,57 @@ public class VehicleData extends Thread implements IDashMessages
   /** Checks bluetooth status. */
   private final Handler watchdogTimer = new Handler();
 
-  /***** Bluetooth constants and objects: **************************/
-  private static final int BT_WATCHDOG_TIME     = 1000;      // Check bluetooth connection every n mSec
-  private static final int BT_WATCHDOG_MAXCOUNT = 2;         // Close down bluetooth after BT_WATCHDOG_TIME x n without a 'KeepAlive' message from UI.
-  /*****************************************************************/
-  private static final int BT_READ_SIZE         = 200;         // Max Number of characters we read per stream read. Not too critical.
-  private static final int BT_STREAM_OVERFLOW   = 600;         // If there are more than this many bytes left in the BT input stream after processing, we should dump some.
-  /*****************************************************************/
+  // ***** Bluetooth constants and objects: **************************
+  /** Check bluetooth connection every n mSec */
+  private static final int BT_WATCHDOG_TIME     = 1000;
+  /** Close down bluetooth after BT_WATCHDOG_TIME x n without a 'KeepAlive' message from UI. */
+  private static final int BT_WATCHDOG_MAXCOUNT = 2;
+  /** Max Number of characters we read per stream read. Not too critical. */
+  private static final int BT_READ_SIZE         = 200;
+  /** If there are more than this many bytes left in the BT input stream after processing, we should dump some. */
+  private static final int BT_STREAM_OVERFLOW   = 600;
+
   private final BluetoothAdapter bluetoothAdapter;
   private BluetoothDevice  btVehicleSensor;
   private BluetoothSocket  btSocket;
   private InputStream      btStreamIn;
   private OutputStream     btStreamOut;
   private final UUID       myUUID;
-  /*****************************************************************/
-  private volatile boolean isBTConnected = false;       // Internal flag which indicates when the BT connection is established.
-  private volatile boolean isFinished = false;          // Internal flag which signals when the comms loop has ended and the BT connection has been closed.
-  private volatile boolean isAddressChanged = false;    // Internal flag which signals when the BT device address has been changed by another part of the app.
-  /*****************************************************************/
+
+  /** Internal flag which indicates when the BT connection is established. */
+  private volatile boolean isBTConnected = false;
+  /** Internal flag which signals when the comms loop has ended and the BT connection has been closed. */
+  private volatile boolean isFinished = false;
+  /** Internal flag which signals when the BT device address has been changed by another part of the app. */
+  private volatile boolean isAddressChanged = false;
 
 
-  /****** Vehicle Data Message Intent Filter: *********/
+  /**
+   * Vehicle Data Message Intent Filter.
+   * We will catch any intents with this identifier
+   */
   public static final String VEHICLE_DATA = "com.tumanako.sensors.vehicledata";
-       // We will catch any intents with this identifier.
 
-  /****** Message types we recognise: ******************
-   * Used in the 'message' field of intents sent to us:
-   * ***************************************************/
-  public static final int VEHICLE_DATA_KEEPALIVE         = IDashMessages.VEHICLE_DATA_ID + 1;   // A 'KeepAlive' message, telling us that the UI is still active and the connection is still required.
-  public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = IDashMessages.VEHICLE_DATA_ID + 2;   // Bluetooth address change! (I.e. user selected different BT device). New address will be included in stringData field of message.
-
+  /*
+   * Message types we recognize.
+   * Used in the 'message' field of intents sent to us.
+   */
+  /** A 'KeepAlive' message, telling us that the UI is still active and the connection is still required. */
+  public static final int VEHICLE_DATA_KEEPALIVE         = IDashMessages.VEHICLE_DATA_ID + 1;
+  /** Bluetooth address change! (I.e. user selected different BT device). New address will be included in stringData field of message. */
+  public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = IDashMessages.VEHICLE_DATA_ID + 2;
 
   private final DashMessages dashMessages;
   private int watchdogCounter = 0;
   private final Context vehicledataContext;
 
 
-  /*********** TEMP DEBUG ********************************
+  // ********* TEMP DEBUG **************************
+  /**
    * This update timer can be used to trigger output of
    * debug info during BT operations.
-   * Warning! May not stop timer on thread completion!!
-   ******************************************************/
+   * FIXME Warning! May not stop timer on thread completion!!
+   */
   private volatile boolean isPing = false;
   private Handler uiTimer = new Handler();
   private static final int UI_UPDATE_EVERY = 500;   // Update the UI every n mSeconds.
@@ -139,7 +148,7 @@ public class VehicleData extends Thread implements IDashMessages
       //uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
     }
   };
-  // *******************************************************
+  // ********* TEMP DEBUG **************************
 
   public VehicleData(Context context)
   {
@@ -159,11 +168,10 @@ public class VehicleData extends Thread implements IDashMessages
     // Setup Bluetooth Watchdog Timer
     watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);   // ...Callback in n milliseconds!
 
-
-    /********* TEMP DEBUG **************************/
+    // ********* TEMP DEBUG **************************
     //uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
     //uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
-    /********* TEMP DEBUG **************************/
+    // ********* TEMP DEBUG **************************
 
     this.start();     // Launch a new thread to connect to the vehicle with Bluetooth!
   }

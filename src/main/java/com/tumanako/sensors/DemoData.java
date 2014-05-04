@@ -35,7 +35,7 @@ import com.tumanako.ui.UIActivity;
  *
  *  This class is designed to generate demo data to show the UI
  *  (if a connection to a Tumanako vehicle controller is not
- *  a vailable!)
+ *  available!)
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */

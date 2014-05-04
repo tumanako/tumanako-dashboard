@@ -29,8 +29,7 @@ import android.os.SystemClock;
 import com.tumanako.dash.IDashMessages;
 
 /**
- *  NMEA NMEAData Listener and Processor
- *  ------------------------------------
+ *  NMEA NMEAData Listener and Processor.
  *
  *  Implements the GpsStatus.NmeaListener interface, which receives NMEA
  *  sentences from the NMEAData.

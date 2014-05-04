@@ -30,7 +30,7 @@ import android.os.Bundle;
 import com.tumanako.dash.IDashMessages;
 
 /**
- * NMEA NMEAData Receiver:
+ * NMEA NMEAData Receiver.
  *
  * This class provides access to location services so we can use the GPS.
  *

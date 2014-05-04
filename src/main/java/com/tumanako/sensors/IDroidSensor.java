@@ -25,7 +25,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- * Tumanako Sensor Class Interface:
+ * Tumanako Sensor Class Interface.
  *
  * Provides a basic sensor definition for several kinds of
  * sensor. Currently:
@@ -65,7 +65,6 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
  *             or the OS may trash the application in which case resume() will never be called.
  *             Thus, suspend() should unregister any sensors or system services and
  *             leave things in a state where they don't waste power or CPU time.
- *
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
