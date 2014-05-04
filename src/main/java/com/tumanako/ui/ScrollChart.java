@@ -94,7 +94,7 @@ public class ScrollChart extends View
     this.xCoord = new float[NUMBER_POINTS];
     this.dataBuffer = new RingBuffer(NUMBER_POINTS + 1, 1, false);
     // Set up the data buffer (initially filled with 1)
-    this.dataBuffer.PreFill(new float[] {10f});
+    this.dataBuffer.fill(new float[] {10f});
   }
 
   /** Adds a new point to the chart. This causes the chart to scroll along. */
@@ -106,7 +106,7 @@ public class ScrollChart extends View
     // of points on the chart.
     // The dataAverage is also converted to a chart fraction, and stored.
     dataAverage = 1f - (thisAverage / MAX_SCALE);
-    dataBuffer.AddPoint(new float[] {1f - (thisValue / MAX_SCALE)});
+    dataBuffer.add(new float[] {1f - (thisValue / MAX_SCALE)});
     invalidate(); // Signal the OS that we need to be redrawn!
   }
 
@@ -115,7 +115,7 @@ public class ScrollChart extends View
     // Convert the data in the data buffer to coordinates for the chart
     int lastPointIndex = NUMBER_POINTS - 1;
     for (int n = 0; n < NUMBER_POINTS; n++) {
-         yCoord[n] = drawingTop + (dataBuffer.GetPoint(lastPointIndex-n)[0] * drawingHeight);
+         yCoord[n] = drawingTop + (dataBuffer.get(lastPointIndex-n)[0] * drawingHeight);
     }
 
     // Generate a filled path object to represent the path

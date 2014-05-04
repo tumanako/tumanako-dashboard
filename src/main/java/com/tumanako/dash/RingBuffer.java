@@ -21,6 +21,8 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.tumanako.dash;
 
+import java.util.AbstractList;
+
 /**
  * Float Ring Buffer Class:
  *
@@ -38,7 +40,7 @@ package com.tumanako.dash;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class RingBuffer
+public class RingBuffer extends AbstractList<float[]>
 {
 
   /** Number of data points in buffer. */
@@ -62,7 +64,7 @@ public class RingBuffer
    * {@link #dataLength} starts at 0, and increments whenever a record is added.
    *
    * When the end of the buffer is reached, {@link #dataLength} will equal {@link #bufferSize}.
-   * At this point, the next call to {@link #AddPoint} will overwrite the first element
+   * At this point, the next call to {@link #add} will overwrite the first element
    * in the buffer.
    * {@link #dataLength} will remain equal to {@link #bufferSize}.
    * {@link #bufferSize} and {@link #dataLength} can be checked using 'Get' methods
@@ -86,14 +88,15 @@ public class RingBuffer
     this.useAverage       = thisUseAverage;
     this.dataBuffer  = new float[bufferSize][bufferFieldCount];
     this.dataAverage = new float[bufferFieldCount];
-    Clear();
+    clear();
   }
 
   /**
    * Returns the buffer size
    * @return Buffer Size
    */
-  public int GetSize()
+  @Override
+  public int size()
   {
     return bufferSize;
   }
@@ -102,7 +105,7 @@ public class RingBuffer
    * Returns the actual number of entries used
    * @return Number of buffer entries used
    */
-  public int GetLength()
+  public int length()
   {
     return dataLength;
   }
@@ -111,7 +114,7 @@ public class RingBuffer
    * Returns the number of fields
    * @return Number of fields in each buffer entry
    */
-  public int GetFieldCount()
+  public int getFieldCount()
   {
     return bufferFieldCount;
   }
@@ -120,7 +123,8 @@ public class RingBuffer
    * Resets the buffer.
    * This method replaces the buffer content with 0s.
    */
-  public void Clear()
+  @Override
+  public void clear()
   {
     // Resets data buffer pointers back to start of buffer.
     dataPointer = 0;
@@ -139,7 +143,7 @@ public class RingBuffer
    *
    * @param theseValues - Values to use when filling the buffer.
    */
-  public void PreFill(float[] theseValues)
+  public void fill(float[] theseValues)
   {
     for (int n = 0; n < bufferSize; n++) {
       dataBuffer[n] = theseValues;
@@ -157,8 +161,10 @@ public class RingBuffer
    * - Rolling average is updated (if used).
    *
    * @param theseValues - The array of fields (float values) to be added
+   * @return {@code true} (as specified by {@link Collection#add})
    */
-  public void AddPoint(float[] theseValues)
+  @Override
+  public boolean add(float[] theseValues)
   {
     // Add a point to the buffer:
     if (useAverage) {
@@ -193,6 +199,8 @@ public class RingBuffer
       // Increment the number of records.
       dataLength = dataLength + 1;
     }
+
+    return true;
   }
 
   /**
@@ -202,7 +210,8 @@ public class RingBuffer
    * @param pointIndex - Index of point to retrieve. 0 = most recent; 1 = next most recent, etc.
    * @return Array of float values representing the fields from the requested buffer entry.
    */
-  public float[] GetPoint(int pointIndex)
+  @Override
+  public float[] get(int pointIndex)
   {
     // Retrieves a specific point. pointIndex is a number indicating
     // the point to get, such that:
@@ -239,7 +248,7 @@ public class RingBuffer
    *
    * @return Array containing average of each field across current buffer contents.
    */
-  public float[] GetAverage()
+  public float[] getAverage()
   {
     return dataAverage.clone();
   }
