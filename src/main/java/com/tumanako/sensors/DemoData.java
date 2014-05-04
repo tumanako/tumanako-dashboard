@@ -25,7 +25,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import com.tumanako.dash.DashMessages;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 import com.tumanako.ui.UIActivity;
 
 /**
@@ -37,7 +37,7 @@ import com.tumanako.ui.UIActivity;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class DemoData implements IDashMessages
+public class DemoData implements DashMessageListener
 {
 
   /** Data send interval (ms) */
@@ -140,7 +140,7 @@ public class DemoData implements IDashMessages
       vehicleData.putFloat("DATA_DATA_OK",           1f                );
       vehicleData.putFloat("DATA_DRIVE_TIME",        driveTime         );
       vehicleData.putFloat("DATA_DRIVE_RANGE",       driveRange        );
-      dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData);
+      dashMessages.sendData( UIActivity.UI_INTENT_IN, DashMessageListener.VEHICLE_DATA_ID, null, null, vehicleData);
 
       if (isRunning) updateTimer.postDelayed(updateTimerTask, UPDATE_INTERVAL); // Restart timer
     }

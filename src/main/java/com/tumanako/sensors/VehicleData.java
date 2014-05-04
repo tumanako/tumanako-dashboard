@@ -30,7 +30,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import com.tumanako.dash.DashMessages;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 import com.tumanako.ui.UIActivity;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,14 +45,14 @@ import java.util.UUID;
  * the vehicle electronics.
  *
  * The stream is decoded as necessary and sent to the UI as
- * an Intent with a bundle of data (see {@link IDashMessages}).
+ * an Intent with a bundle of data (see {@link DashMessageListener}).
  *
  * Connection uses Bluetooth. The class extends Thread and
  * launches the Bluetooth connection in a new thread so that
  * it can listen for incoming data without stalling the UI.
  *
  * A 'Watchdog' mechanism is used to keep the connection alive.
- * This class implements {@link IDashMessages} and registers to
+ * This class implements {@link DashMessageListener} and registers to
  * listen for intents directed to "VEHICLE_DATA".
  *
  * During normal operation, a timer (watchdogTimer) is triggered
@@ -77,7 +77,7 @@ import java.util.UUID;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class VehicleData extends Thread implements IDashMessages
+public class VehicleData extends Thread implements DashMessageListener
 {
 
   /** Checks the Bluetooth status. */
@@ -133,12 +133,12 @@ public class VehicleData extends Thread implements IDashMessages
    * A 'KeepAlive' message, telling us that the UI is still active
    * and the connection is still required.
    */
-  public static final int VEHICLE_DATA_KEEPALIVE         = IDashMessages.VEHICLE_DATA_ID + 1;
+  public static final int VEHICLE_DATA_KEEPALIVE         = DashMessageListener.VEHICLE_DATA_ID + 1;
   /**
    * Bluetooth address change! (I.e. user selected different BT device).
    * New address will be included in stringData field of message.
    */
-  public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = IDashMessages.VEHICLE_DATA_ID + 2;
+  public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = DashMessageListener.VEHICLE_DATA_ID + 2;
 
   private final DashMessages dashMessages;
   private int watchdogCounter = 0;
@@ -350,7 +350,7 @@ public class VehicleData extends Thread implements IDashMessages
     vehicleData.putFloat("DATA_DRIVE_RANGE",       0f                );
 
     // Now transmit the data to the UI by sending a message
-    dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData);
+    dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.VEHICLE_DATA_ID, null, null, vehicleData);
   }
 
   /**

@@ -45,7 +45,7 @@ import java.util.Set;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class ChargerHTTPConn extends Thread implements IDashMessages
+public class ChargerHTTPConn extends Thread implements DashMessageListener
 {
 
   /* Intent Filter and Message ID constants: ***********************************/

@@ -26,7 +26,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 
 /**
  * NMEA NMEAData Receiver.
@@ -38,7 +38,7 @@ import com.tumanako.dash.IDashMessages;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
+public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListener
   {
 
   private final LocationManager mLocationManager;

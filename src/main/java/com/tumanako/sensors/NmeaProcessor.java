@@ -25,7 +25,7 @@ import android.content.Context;
 import android.location.GpsStatus;
 import android.os.Bundle;
 import android.os.SystemClock;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 
 /**
  *  NMEA NMEAData Listener and Processor.
@@ -62,7 +62,7 @@ import com.tumanako.dash.IDashMessages;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDashMessages
+public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, DashMessageListener
 {
 
   // ****** Information directly from the NMEAData **********
@@ -109,12 +109,12 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   private static final int NMEA_WAIT_TIMEOUT = 3000;
 
   // *** GPS Processing / Data Message Type Indicators: ***
-  public static final String NMEA_PROCESSOR_DATA_UPDATED  = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 0);
-  public static final String NMEA_PROCESSOR_ERROR         = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 99);
+  public static final String NMEA_PROCESSOR_DATA_UPDATED  = String.format("%d", DashMessageListener.NMEA_PROCESSOR_ID + 0);
+  public static final String NMEA_PROCESSOR_ERROR         = String.format("%d", DashMessageListener.NMEA_PROCESSOR_ID + 99);
 
-  public static final String DATA_GPS_HAS_LOCK            = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 1);
-  public static final String DATA_GPS_TIME                = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 2);
-  public static final String DATA_GPS_SPEED               = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 3);
+  public static final String DATA_GPS_HAS_LOCK            = String.format("%d", DashMessageListener.NMEA_PROCESSOR_ID + 1);
+  public static final String DATA_GPS_TIME                = String.format("%d", DashMessageListener.NMEA_PROCESSOR_ID + 2);
+  public static final String DATA_GPS_SPEED               = String.format("%d", DashMessageListener.NMEA_PROCESSOR_ID + 3);
 
   // ---------------DEMO MODE CODE -------------------------------
   private boolean isDemo = false;  // Demo mode flag!

@@ -22,11 +22,12 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 package com.tumanako.dash;
 
 import android.os.Bundle;
+import java.util.EventListener;
 
 /**
  * Classes which wish to use the DashMessages class should implement this.
  */
-public interface IDashMessages
+public interface DashMessageListener extends EventListener
 {
 
   /* Message ID Constants: **************************************************

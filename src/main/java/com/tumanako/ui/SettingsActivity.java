@@ -34,12 +34,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.tumanako.dash.DashMessages;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 import com.tumanako.sensors.DataService;
 import com.tumanako.sensors.VehicleData;
 import java.util.Set;
 
-public class SettingsActivity extends Activity implements OnItemClickListener, IDashMessages
+public class SettingsActivity extends Activity implements OnItemClickListener, DashMessageListener
 {
 
   /** Message Broadcaster to send Intents to data service */

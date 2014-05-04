@@ -29,7 +29,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 /**
- * Tumanako Dash Message Receiver / Broadcaster:
+ * Tumanako Dash Message Receiver / Broadcaster.
  *
  * This class provides a generic framework for passing messages between
  * parts of the Tumanako application, using Intents.
@@ -66,9 +66,9 @@ public class DashMessages extends BroadcastReceiver
 
   private String actionFilter = null;
 
-  private final IDashMessages parent;
+  private final DashMessageListener parent;
 
-  public DashMessages(Context context, IDashMessages callbackParent, String intentActionFilter)
+  public DashMessages(Context context, DashMessageListener callbackParent, String intentActionFilter)
   {
     parent = callbackParent;
 

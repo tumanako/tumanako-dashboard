@@ -43,7 +43,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 import com.tumanako.dash.ChargeNode;
 import com.tumanako.dash.DashMessages;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 import com.tumanako.sensors.DataService;
 import com.tumanako.sensors.NmeaProcessor;
 import com.tumanako.sensors.VehicleData;
@@ -57,7 +57,7 @@ import java.util.Set;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class UIActivity extends Activity implements OnClickListener, OnLongClickListener, OnTouchListener, IDashMessages //, ServiceConnection
+public class UIActivity extends Activity implements OnClickListener, OnLongClickListener, OnTouchListener, DashMessageListener //, ServiceConnection
 {
 
   public static final String APP_TAG = "TumanakoDash";
@@ -591,7 +591,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       showMessage(stringData);
     }
 
-    if (message == IDashMessages.CHARGE_NODE_ID) {
+    if (message == DashMessageListener.CHARGE_NODE_ID) {
       // Data Message from Charge Node...
       // If string data is included in the Intent, assume it's some HTML for the webview control to display:
       //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadUrl(stringData);
@@ -617,7 +617,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       //((TextWithLabel)uiWidgets.get("textChargeAH"))           .setText   ( String.format("%.1f",chargeAH)      );
     }
 
-    if (message == IDashMessages.VEHICLE_DATA_ID) {
+    if (message == DashMessageListener.VEHICLE_DATA_ID) {
       // ******************** Data from the Vehicle Data senor *************************************
       Set<String> keys = data.keySet();               // Get a list of data keys in the bundle of submitted data.
       Iterator<String> myIterator = keys.iterator();  // This is an iterator to iterate over the list.

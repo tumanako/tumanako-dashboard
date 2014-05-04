@@ -30,7 +30,7 @@ import android.os.IBinder;
 import android.util.Log;
 import com.tumanako.dash.ChargeNode;
 import com.tumanako.dash.DashMessages;
-import com.tumanako.dash.IDashMessages;
+import com.tumanako.dash.DashMessageListener;
 import com.tumanako.ui.UIActivity;
 
 /**
@@ -66,7 +66,7 @@ import com.tumanako.ui.UIActivity;
  *
  * @author Jeremy
  */
-public class DataService extends Service implements IDashMessages
+public class DataService extends Service implements DashMessageListener
 {
 
   // Data Sources we'd like to use

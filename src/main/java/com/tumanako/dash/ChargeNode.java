@@ -54,7 +54,7 @@ import org.json.JSONObject;
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
-public class ChargeNode implements IDashMessages
+public class ChargeNode implements DashMessageListener
 {
 
   // ************** Action strings to identify Intents used by this class **************************
@@ -63,17 +63,17 @@ public class ChargeNode implements IDashMessages
 
   // ************* Message IDs: Used to identify specific intent messages.
   /** Send by the UI: tells us to keep alive. */
-  public static final int CHARGE_NODE_KEEPALIVE    = IDashMessages.CHARGE_NODE_ID +  1;
+  public static final int CHARGE_NODE_KEEPALIVE    = DashMessageListener.CHARGE_NODE_ID +  1;
   /** Send by the UI: tells us to connect to server. */
-  public static final int CHARGE_NODE_CONNECT      = IDashMessages.CHARGE_NODE_ID +  2;
+  public static final int CHARGE_NODE_CONNECT      = DashMessageListener.CHARGE_NODE_ID +  2;
   /** Send by the UI: tells us to start charging. */
-  public static final int CHARGE_NODE_CHARGESTART  = IDashMessages.CHARGE_NODE_ID +  3;
+  public static final int CHARGE_NODE_CHARGESTART  = DashMessageListener.CHARGE_NODE_ID +  3;
   /** Send by the UI: tells us to stop charging. */
-  public static final int CHARGE_NODE_CHARGESTOP   = IDashMessages.CHARGE_NODE_ID +  4;
+  public static final int CHARGE_NODE_CHARGESTOP   = DashMessageListener.CHARGE_NODE_ID +  4;
   /** Passed to, and returned by, the ChargerHTTPConn class. */
-  public static final int CHARGE_NODE_HTML_DATA    = IDashMessages.CHARGE_NODE_ID +  5;
+  public static final int CHARGE_NODE_HTML_DATA    = DashMessageListener.CHARGE_NODE_ID +  5;
   /** Indicate the data type we expect back from the request. */
-  public static final int CHARGE_NODE_JSON_DATA    = IDashMessages.CHARGE_NODE_ID +  6;
+  public static final int CHARGE_NODE_JSON_DATA    = DashMessageListener.CHARGE_NODE_ID +  6;
   // ************* Charger Data Tags: **************************************
   // These are used as keys when sending data to the UI as a bundle.
   public static final String CONNECTION_STATUS = "CONSTAT";
@@ -213,12 +213,12 @@ public class ChargeNode implements IDashMessages
           // Already connected. Need to disconnect:
           doChargeSet(0);  // Turn off the charger if it's on.
           connectionStatus = STATUS_OFFLINE;
-          dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_DEFAULT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING, 0f, 0f)); // Tell the UI we have disconnected.
+          dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_DEFAULT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING, 0f, 0f)); // Tell the UI we have disconnected.
         } else {
           // Need to connect!
           if ((data != null) && data.containsKey("j_username") && data.containsKey("j_password")) {
             // A bundle containing 'USER' and 'PASSWORD' strings must be supplied to connect.
-            dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_CONNECT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING, 0f, 0f)); // Clear old UI data.
+            dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_CONNECT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING, 0f, 0f)); // Clear old UI data.
             doLogin(data);
             connectionStatus = STATUS_CONNECTING;
             timerStart();    // Make sure the update timer is running!
@@ -244,13 +244,13 @@ public class ChargeNode implements IDashMessages
           if (data.getInt("ResponseCode", 999) == 200) {
             // Connected OK!
             connectionStatus = STATUS_CONNECTED;
-            dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_CONNECTED_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
+            dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_CONNECTED_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
             timerStart();   // Make sure timer is running (for PING updates).
           } else {
             // Login error.
             connectionStatus = STATUS_OFFLINE;
             chargeStatus = STATUS_NOT_CHARGING;
-            dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_LOGINERROR_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
+            dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_LOGINERROR_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
             timerStop();
           }
         }
@@ -283,7 +283,7 @@ public class ChargeNode implements IDashMessages
                 } else {
                   chargeStatus = STATUS_NOT_CHARGING;
                 }
-                dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_OK_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
+                dashMessages.sendData( UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_OK_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
               }
               //--DEBUG!!--Log.i("HTTPConn", "  sourceId: " + jsonDataItem.getString("sourceId") + "\n  integerValue: " + String.format("%d", jsonDataItem.getInt("integerValue") )  );
             }
@@ -297,6 +297,23 @@ public class ChargeNode implements IDashMessages
         }
         break;
 /*
+      case ChargerHTTPConn.XML_DATA:
+        Log.d(UIActivity.APP_TAG, " ChargeNode -> XML Data Message." );
+        String chargeStatus = "";
+        String pageHTML = "";
+        float chargeCurrent = 0f;
+        float chargeUnits = 0f;
+        if (data != null) {
+          if (data.containsKey("ChargeStatus")) chargeStatus  = data.getString("ChargeStatus");
+          if (data.containsKey("Current"))      chargeCurrent = data.getFloat("Current", 0.0f);
+          if (data.containsKey("Units"))        chargeUnits   = data.getFloat("Units", 0.0f);
+          if (data.containsKey("PageData"))     pageHTML      = data.getString("PageData");
+        }
+        if (chargeStatus.equals("CHARGING"))  status = STATUS_CHARGING;
+        else                                  status = STATUS_CONNECTED;
+        dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, pageHTML, getChargeData(status,chargeCurrent,chargeUnits) );
+        break;
+*//*
       case ChargerHTTPConn.XML_DATA:
         Log.d(UIActivity.APP_TAG, " ChargeNode -> XML Data Message." );
         String chargeStatus = "";
@@ -390,7 +407,7 @@ public class ChargeNode implements IDashMessages
             if (pingCounter >= SEND_PING_EVERY) {
               pingCounter = 0;
               Log.d(UIActivity.APP_TAG, " ChargeNode -> Ping! ");
-              dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_UPDATING_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
+              dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_UPDATING_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
               requestQueue.add(new ChargerHTTPConn(weakContext,CHARGE_NODE_INTENT,PING_URL,null,cookieData,false,CHARGE_NODE_JSON_DATA));
             }
             break;
