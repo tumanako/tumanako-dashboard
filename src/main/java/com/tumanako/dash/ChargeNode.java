@@ -195,7 +195,7 @@ public class ChargeNode implements IDashMessages
    */
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
-    // --DEBUG!--Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> Msg Rec: %d", message) );
+    // --DEBUG!--Log.i(UIActivity.APP_TAG, String.format( " ChargeNode -> Msg Rec: %d", message) );
 
     // Message received! Reset the watchdog counter.
     watchdogCounter = 0;
@@ -243,7 +243,7 @@ public class ChargeNode implements IDashMessages
         // HTTP response received from server.
         if ((connectionStatus == STATUS_CONNECTING) && (data != null) && (data.containsKey("ResponseCode"))) {
           // --DEBUG!--
-          Log.d(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
+          Log.d(UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
           // Check the r4esponse code. Should be 200 if we logged in OK:
           if (data.getInt("ResponseCode", 999) == 200) {
             // Connected OK!
@@ -264,7 +264,7 @@ public class ChargeNode implements IDashMessages
 
       case CHARGE_NODE_JSON_DATA:
         if (connectionStatus == STATUS_CONNECTED) {
-          Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
+          Log.i(UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
           // The text we received back should be JSON data.
           // Parse: (note Try / Catch block to catch JSON errors, in case data can't be parsed).
           try {
@@ -292,17 +292,17 @@ public class ChargeNode implements IDashMessages
               //--DEBUG!!--Log.i("HTTPConn", "  sourceId: " + jsonDataItem.getString("sourceId") + "\n  integerValue: " + String.format("%d", jsonDataItem.getInt("integerValue") )  );
             }
           } catch (JSONException e) {
-            Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
+            Log.w(UIActivity.APP_TAG, e);
             //chargeStatus = STATUS_NOT_CHARGING;
             //connectionStatus = STATUS_OFFLINE;
             //dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, "", makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
-            Log.e(com.tumanako.ui.UIActivity.APP_TAG, "Error Parsing JSON Data!");
+            Log.e(UIActivity.APP_TAG, "Error Parsing JSON Data!");
           }
         }
         break;
 /*
       case ChargerHTTPConn.XML_DATA:
-        Log.d(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> XML Data Message." );
+        Log.d(UIActivity.APP_TAG, " ChargeNode -> XML Data Message." );
         String chargeStatus = "";
         String pageHTML = "";
         float chargeCurrent = 0f;
@@ -346,13 +346,13 @@ public class ChargeNode implements IDashMessages
     public void run()
     {
       timerStop();  // Clears existing timers.
-      //--DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Timer" );
+      //--DEBUG!!-- Log.i(UIActivity.APP_TAG, " ChargeNode -> Timer" );
       watchdogCounter++;
       if (watchdogCounter >= WATCHDOG_OVERFLOW) {
         // Nothing has happend for a while! Stop the timer and set status to 'Disconnected'.
         chargeStatus = STATUS_NOT_CHARGING;
         connectionStatus = STATUS_OFFLINE;  // Give up.
-        Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Watchdog Overflow. Stopping. ");
+        Log.i(UIActivity.APP_TAG, " ChargeNode -> Watchdog Overflow. Stopping. ");
       } else {
         /***********************************************************************************************
         * HTTP Request Queue Management:
@@ -368,7 +368,7 @@ public class ChargeNode implements IDashMessages
           if (!currentConn.isAlive()) {
             // Current item is not "Alive" (i.e. running). Has it started yet?
             if (currentConn.isRun()) {
-              //--DEBUG!!--- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Thread Finished. Removing From Queue. " );
+              //--DEBUG!!--- Log.i(UIActivity.APP_TAG, " ChargeNode -> Thread Finished. Removing From Queue. " );
               // The thread has run, so it must have finished!
               currentConn = null;
               requestQueue.poll();   // Removes the item from the queue.
@@ -376,7 +376,7 @@ public class ChargeNode implements IDashMessages
             }
             // NOW: If we still have a valid HTTP connection item from the queue, we know it needs to be started.
             if (currentConn != null) {
-              //--DEBUG!!--- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Starting HTTP Conn From Queue. " );
+              //--DEBUG!!--- Log.i(UIActivity.APP_TAG, " ChargeNode -> Starting HTTP Conn From Queue. " );
               currentConn.run();
             }
           }
@@ -393,7 +393,7 @@ public class ChargeNode implements IDashMessages
             pingCounter++;
             if (pingCounter >= SEND_PING_EVERY) {
               pingCounter = 0;
-              Log.d(com.tumanako.ui.UIActivity.APP_TAG, " ChargeNode -> Ping! ");
+              Log.d(UIActivity.APP_TAG, " ChargeNode -> Ping! ");
               dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_UPDATING_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
               requestQueue.add(new ChargerHTTPConn(weakContext,CHARGE_NODE_INTENT,PING_URL,null,cookieData,false,CHARGE_NODE_JSON_DATA));
             }

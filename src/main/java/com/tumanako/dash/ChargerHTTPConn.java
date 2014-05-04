@@ -24,6 +24,7 @@ package com.tumanako.dash;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import com.tumanako.ui.UIActivity;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -122,14 +123,14 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
     Map<String, List<String>> httpHeaders = serverConn.getHeaderFields();
     Set<String> headerKeys = httpHeaders.keySet();
     for (String headerKey : headerKeys) {
-      // --DEBUG!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " CommThread -> Header: " + headerKey + "=" + serverConn.getHeaderField(headerKey) );
+      // --DEBUG!-- Log.i(UIActivity.APP_TAG, " CommThread -> Header: " + headerKey + "=" + serverConn.getHeaderField(headerKey) );
       if (headerKey.equals("Set-Cookie")) {
         String cookie = serverConn.getHeaderField(headerKey);
         cookie = cookie.substring(0, cookie.indexOf(";"));
         String cookieName = cookie.substring(0, cookie.indexOf("="));
         String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
         cookies.putString(cookieName, cookieValue);
-        // --DEBUG!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " CommThread -> Set-Cookie: " + cookieName + "=" + cookieValue );
+        // --DEBUG!-- Log.i(UIActivity.APP_TAG, " CommThread -> Set-Cookie: " + cookieName + "=" + cookieValue );
       }
     }
     return cookies;
@@ -160,11 +161,11 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
           cookieStrings.append(URLEncoder.encode(value, "UTF-8"));
         } catch (UnsupportedEncodingException ex) {
           // we will never get here, because every JDK has to support UTF-8
-          Log.w(com.tumanako.ui.UIActivity.APP_TAG, ex);
+          Log.w(UIActivity.APP_TAG, ex);
         }
         if (myIterator.hasNext()) cookieStrings.append("; ");
       }
-      // --DEBUG!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " CommThread -> Cookies: " +  cookieStrings.toString());
+      // --DEBUG!-- Log.i(UIActivity.APP_TAG, " CommThread -> Cookies: " +  cookieStrings.toString());
       return cookieStrings.toString();
     }
   }
@@ -191,7 +192,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
         postData.append(URLEncoder.encode(value, "UTF-8"));
       } catch (UnsupportedEncodingException ex) {
         // we will never get here, because every JDK has to support UTF-8
-        Log.w(com.tumanako.ui.UIActivity.APP_TAG, ex);
+        Log.w(UIActivity.APP_TAG, ex);
       }
       if (myIterator.hasNext()) postData.append("&");
     }

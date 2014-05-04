@@ -31,6 +31,7 @@ import android.util.Log;
 import com.tumanako.dash.ChargeNode;
 import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.IDashMessages;
+import com.tumanako.ui.UIActivity;
 
 /**
  * Data Input Service:
@@ -105,7 +106,7 @@ public class DataService extends Service implements IDashMessages
 
   public DataService()
   {
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> Constructor; ");
+    Log.i(UIActivity.APP_TAG, " DataService -> Constructor; ");
   }
 
   /**
@@ -167,7 +168,7 @@ public class DataService extends Service implements IDashMessages
       // Update Watchdog counter and check for overflow:
       updateStop();
       watchdogCounter++;
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> Timer. Counter = " + watchdogCounter);
+//Log.i(UIActivity.APP_TAG, " DataService -> Timer. Counter = " + watchdogCounter);
       if (watchdogCounter > WATCHDOG_OVERFLOW) {
         // Watchdog Expired!
         stopSensors();        // Stop the sensors.
@@ -227,7 +228,7 @@ public class DataService extends Service implements IDashMessages
   public void onCreate()
   {
     // Sensor Service CREATED:
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> onCreate(); ");
+    Log.i(UIActivity.APP_TAG, " DataService -> onCreate(); ");
     // Add some sensors:
     deviceGPS    = new NmeaGPS(this);
     dashMessages = new DashMessages(this, this, DATA_SERVICE);
@@ -240,7 +241,7 @@ public class DataService extends Service implements IDashMessages
   {
     // Start Command: Someone requested that the serice be started:
     super.onStartCommand(intent, flags, startId);
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> Received start id " + startId + ": " + intent);
+    Log.i(UIActivity.APP_TAG, " DataService -> Received start id " + startId + ": " + intent);
     dashMessages.resume();
     updateStart();
     startSensors();         // Start the Sensors (if not already started!)
@@ -251,7 +252,7 @@ public class DataService extends Service implements IDashMessages
   @Override
   public IBinder onBind(Intent intent)
   {
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> onBind(); " );
+    Log.i(UIActivity.APP_TAG, " DataService -> onBind(); " );
     dashMessages.resume();
     updateStart();         // Start Update Timer
     startSensors();        // Start the Sensors (if not already started!)
@@ -262,14 +263,14 @@ public class DataService extends Service implements IDashMessages
   public boolean onUnbind (Intent intent)
   {
     // UNBIND: A client has unbound. Don't need to do anything.
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> onUnBind(); " );
+    Log.i(UIActivity.APP_TAG, " DataService -> onUnBind(); " );
     return true;
   }
 
   @Override
   public void onRebind (Intent intent)
   {
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> onReBind(); " );
+    Log.i(UIActivity.APP_TAG, " DataService -> onReBind(); " );
     // REBIND: A client has reconnected to the service after disconnecting.
     dashMessages.resume();
     updateStart();         // Start update timer.
@@ -280,7 +281,7 @@ public class DataService extends Service implements IDashMessages
   public void onDestroy()
   {
     // Service DESTROYED:
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> onDestroy(); " );
+    Log.i(UIActivity.APP_TAG, " DataService -> onDestroy(); " );
     // Unregister the Intent listener since the service is about to be destroyed.
     dashMessages.suspend();
     updateStop();          // Stop update timer.
@@ -293,7 +294,7 @@ public class DataService extends Service implements IDashMessages
   @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
-    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DataService -> KeepAlive!" );
+    //Log.i(UIActivity.APP_TAG, " DataService -> KeepAlive!" );
     keepAlive();
     // ---------------DEMO MODE CODE -------------------------------
     if ((message == DATA_SERVICE_DEMO) && (floatData != null)) {

@@ -99,7 +99,7 @@ public class DashMessages extends BroadcastReceiver
     if (intent.hasExtra(DASHMESSAGE_STRING)) stringData = intent.getStringExtra(DASHMESSAGE_STRING);
     if (intent.hasExtra(DASHMESSAGE_DATA)  ) data       = intent.getBundleExtra(DASHMESSAGE_DATA);
 
-    // --DEBUG!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, String.format( " DashMessages -> Msg Rec: %d", message) );
+    // --DEBUG!-- Log.i(UIActivity.APP_TAG, String.format( " DashMessages -> Msg Rec: %d", message) );
 
     parent.messageReceived(action, message, floatData, stringData, data);
   }

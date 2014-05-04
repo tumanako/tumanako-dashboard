@@ -152,7 +152,7 @@ public class VehicleData extends Thread implements IDashMessages
   public VehicleData(Context context)
   {
 
-    // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Constructor; ");
+    // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> Constructor; ");
 
     vehicledataContext = context;
 
@@ -215,7 +215,7 @@ public class VehicleData extends Thread implements IDashMessages
   private void stopVehicleData()
   {
     // *** Stop the vehicle sensor... ***
-    // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
+    // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
     btClose();   // Close the BT connection
     // Stop the update timer if it's running:
     watchdogTimer.removeCallbacks(watchdogTimerTask);       // Stop timer.
@@ -343,7 +343,7 @@ public class VehicleData extends Thread implements IDashMessages
       //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
       return false;
     }
-    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Adaptor is ON! ");
+    //Log.i(UIActivity.APP_TAG, "             -> Adaptor is ON! ");
 
     // ****** Get a bluetooth device for the vehicle sensor ***************
     // We need to retrieve the device address of the selected bluetooth device from the stored app preferences:
@@ -352,17 +352,17 @@ public class VehicleData extends Thread implements IDashMessages
     // Check the address:
     if (!BluetoothAdapter.checkBluetoothAddress(btDeviceAddress)) return false;   // Invalid address. Give up.
     btVehicleSensor = bluetoothAdapter.getRemoteDevice(btDeviceAddress);          // "00:12:05:17:91:65" = MDFlyBTSerial bluetooth serial device (for testing).
-    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Got remote device OK! " );
+    //Log.i(UIActivity.APP_TAG, "             -> Got remote device OK! " );
 
     // ************* Try to establish a BT Connection ***********************************
     try {
       if (btSocket != null) btSocket.close();                                 // If there's already a BT Socket open, close it.
       btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);   // Create a new BT Socket for RF Comm connection.
-      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Socket Created. " );
+      //Log.i(UIActivity.APP_TAG, "             -> Socket Created. " );
       bluetoothAdapter.cancelDiscovery();                                     // Cancel any bluetooth discovery that's running (in case another app started it...) According to the docs, we should do this...
       btSocket.connect();                                                     // Attempt to connect!!!
     } catch (IOException ioe) {
-      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
+      //Log.i(UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
       // Our attempt to open a BT connection caused an IO exception. This could be due to a bug in
       // the bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
       // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android )
@@ -374,23 +374,23 @@ public class VehicleData extends Thread implements IDashMessages
         btSocket.connect();
       } catch (Exception e) {
         // Still having errors connecting! Give up.
-        Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");
-        Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
+        Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");
+        Log.w(UIActivity.APP_TAG, e);
         return false;  // Give up.
       }
     }
 
     // Connected! Try to open streams...
     try {
-      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> CONNECTED. " );
+      //Log.i(UIActivity.APP_TAG, "             -> CONNECTED. " );
       btStreamIn  = btSocket.getInputStream();                 // Get input and output streams
       btStreamOut = btSocket.getOutputStream();                //  for communication through the socket.
-      //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> IO Streams Open! " );
+      //Log.i(UIActivity.APP_TAG, "             -> IO Streams Open! " );
       return true;                                  // SUCCESS!!
     } catch (IOException e) {
       // An error occurred during BT comms setup:
-      Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
-      Log.i(com.tumanako.ui.UIActivity.APP_TAG, e.getMessage());
+      Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
+      Log.i(UIActivity.APP_TAG, e.getMessage());
       return false;  // Give up.
     }
   }
@@ -398,14 +398,14 @@ public class VehicleData extends Thread implements IDashMessages
   /************** Bluetooth socket close / cleanup: ******************************************************/
   private void btClose()
   {
-    // --DEBUG!!-- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> btClose(); ");
+    // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> btClose(); ");
     try {
        if (btStreamIn != null)  btStreamIn.close();
        if (btStreamOut != null) btStreamOut.close();
        if (btSocket != null)    btSocket.close();
     } catch (IOException e) {
       // If an error occurs here, print a stack trace (debug only) but otherwise quietly ignore.
-      Log.w(com.tumanako.ui.UIActivity.APP_TAG, e);
+      Log.w(UIActivity.APP_TAG, e);
     }
   }
 
@@ -417,7 +417,7 @@ public class VehicleData extends Thread implements IDashMessages
   {
     byte[] byteBuffer = new byte[BT_READ_SIZE];
     StringBuffer btRawData = new StringBuffer();
-    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");
+    //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");
     // Try to open a BT connection:
     if (!btOpen()) {
       // Connection failed! Close any open objects and exit.
@@ -426,7 +426,7 @@ public class VehicleData extends Thread implements IDashMessages
       return;
     }
     isBTConnected = true;
-    //Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected. ");
+    //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected. ");
 
       // ******* BT Connection should now be open! Keep listening to the InputStream while connected: *********************************
     int bytesRead;
@@ -434,13 +434,13 @@ public class VehicleData extends Thread implements IDashMessages
       // Check to see if the bluetooth address has changed:
       if (isAddressChanged) {
         // To change BT address, we shut down the existing connection and reopen with new address:
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Address Change! ");
+//Log.i(UIActivity.APP_TAG, " VehicleData -> BT Address Change! ");
         isBTConnected = false;
         isAddressChanged = false;
         btClose();     // Close existing connection.
         if (!btOpen()) break;   // If we failed to open a connection, exit BT loop.
         isBTConnected = true;
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Reconnected OK. ");
+//Log.i(UIActivity.APP_TAG, " VehicleData -> BT Reconnected OK. ");
       }
 /****** TEMP DEBUG ************************************/
 //if (isPing)
@@ -483,7 +483,7 @@ public class VehicleData extends Thread implements IDashMessages
         Thread.sleep(1);  // Give up CPU time (waiting for bluetooth characters is so tedious...)
       } catch (Exception e) {
         // An error occurred during BT comms operation:
-        Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
+        Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
         isBTConnected = false;
         break;
       }
@@ -492,6 +492,6 @@ public class VehicleData extends Thread implements IDashMessages
     // Close down the input and ouptut streams and the bluetooth socket
     stopVehicleData();
     isFinished = true;
-    Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit! ");
+    Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit! ");
   }
 }
