@@ -98,7 +98,7 @@ public class ScrollChart extends View
   }
 
   /** Adds a new point to the chart. This causes the chart to scroll along. */
-  public void AddPoint(float thisValue, float thisAverage)
+  public void add(float thisValue, float thisAverage)
   {
     // NOTE The value we will store in the internal buffer is converted here to a
     // fraction of the distance down from the top of the chart.
@@ -110,7 +110,7 @@ public class ScrollChart extends View
     invalidate(); // Signal the OS that we need to be redrawn!
   }
 
-  private Path MakeChartFill()
+  private Path makeChartFill()
   {
     // Convert the data in the data buffer to coordinates for the chart
     int lastPointIndex = NUMBER_POINTS - 1;
@@ -136,7 +136,7 @@ public class ScrollChart extends View
     return thisPath;
   }
 
-  private Path MakeChartLine()
+  private Path makeChartLine()
   {
     // NOTE: Must call MakeChartFill (Above) FIRST to set up yCoord array!!
     int n;
@@ -151,7 +151,7 @@ public class ScrollChart extends View
     return thisPath;
   }
 
-  private Path MakeAvgLine()
+  private Path makeAvgLine()
   {
     // Draws an 'Average' line across the chart:
     float xStart = (float)drawingLeft;
@@ -225,9 +225,9 @@ public class ScrollChart extends View
     }
 
     // Set up the chart
-    Path chartFillPath = MakeChartFill();
-    Path chartLinePath = MakeChartLine();
-    Path chartAvgPath = MakeAvgLine();
+    Path chartFillPath = makeChartFill();
+    Path chartLinePath = makeChartLine();
+    Path chartAvgPath = makeAvgLine();
 
     Paint paintChartFill;
     Paint paintChartLine;

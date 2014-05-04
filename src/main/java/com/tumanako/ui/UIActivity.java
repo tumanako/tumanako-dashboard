@@ -235,7 +235,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
 
   /** Save a copy of some data to the Preferences */
-  private void SaveSettings()
+  private void saveSettings()
   {
     /***
     SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -291,7 +291,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
 
   /** Toast Message */
-  private void ShowMessage(String ThisMessage)
+  private void showMessage(String ThisMessage)
   {
     // *** Displays pop-up TOAST message: **
     Toast.makeText(getApplicationContext(), ThisMessage, Toast.LENGTH_SHORT).show();
@@ -414,10 +414,10 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       // ---------------DEMO MODE CODE -------------------------------
       case R.id.menuitemDemoMode:
         if (isDemo) {
-          ShowMessage("Stop Demo.");
+          showMessage("Stop Demo.");
           stopDemo();
         } else {
-          ShowMessage("Start Demo!");
+          showMessage("Start Demo!");
           startDemo();
         }
         return true;
@@ -539,7 +539,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     stopDemo();
     // ---------------DEMO MODE CODE -------------------------------
     super.onStop();
-    SaveSettings();
+    saveSettings();
   }
 
 
@@ -588,7 +588,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     uiResetCounter = 0;   // Reset the UI Reset Counter whenever we get some data from an input source.
 
     if (message == UI_TOAST_MESSAGE) {
-      ShowMessage(stringData);
+      showMessage(stringData);
     }
 
     if (message == IDashMessages.CHARGE_NODE_ID) {
