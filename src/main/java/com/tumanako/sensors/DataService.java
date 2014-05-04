@@ -1,6 +1,4 @@
-package com.tumanako.sensors;
-
-/************************************************************************************
+/*
 Tumanako - Electric Vehicle and Motor control software
 
 Copyright (C) 2012 Jeremy Cole-Baker <jeremy@rhtech.co.nz>
@@ -19,8 +17,9 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-*************************************************************************************/
+package com.tumanako.sensors;
 
 import android.app.Service;
 import android.content.Intent;

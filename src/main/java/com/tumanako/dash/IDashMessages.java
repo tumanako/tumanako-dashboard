@@ -1,8 +1,4 @@
-package com.tumanako.dash;
-
-import android.os.Bundle;
-
-/************************************************************************************
+/*
 Tumanako - Electric Vehicle and Motor control software
 
 Copyright (C) 2012 Jeremy Cole-Baker <jeremy@rhtech.co.nz>
@@ -21,8 +17,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-*************************************************************************************/
+package com.tumanako.dash;
+
+import android.os.Bundle;
 
 /**
  * Classes which wish to use the DashMessages class should implement this.

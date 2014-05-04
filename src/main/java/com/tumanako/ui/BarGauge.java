@@ -1,12 +1,4 @@
-package com.tumanako.ui;
-
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.util.AttributeSet;
-
-/************************************************************************************
+/*
 Tumanako - Electric Vehicle and Motor control software
 
 Copyright (C) 2012 Jeremy Cole-Baker <jeremy@rhtech.co.nz>
@@ -25,8 +17,15 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-*************************************************************************************/
+package com.tumanako.ui;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.util.AttributeSet;
 
 /**
  * Bar Gauge: Experimental! Derived from RenderedGauge. See RenderedGauge.java for attribute definitions.
