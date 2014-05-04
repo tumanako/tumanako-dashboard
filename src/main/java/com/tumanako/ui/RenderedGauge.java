@@ -346,12 +346,12 @@ public class RenderedGauge extends View
     // For dials, this is the rotation point of the needle.
     // For bars, this is the bottom left corner of the bar (vertical orientation)
     // or top left corner (horizontal orientation).
-    originX = (fOriginX * (float)drawingWidth);
-    originY = (fOriginY * (float)drawingHeight);
+    originX = fOriginX * (float) drawingWidth;
+    originY = fOriginY * (float) drawingHeight;
 
     // Calculate the gauge label position in screen coordinates:
-    labelX = (fLabelX * (float)drawingWidth);
-    labelY = (fLabelY * (float)drawingHeight);
+    labelX = fLabelX * (float) drawingWidth;
+    labelY = fLabelY * (float) drawingHeight;
 
     // Loop through the requested number of scale steps and calculate stuff...
     float scaleValue = scaleMin;     // Value of initial point on scale.

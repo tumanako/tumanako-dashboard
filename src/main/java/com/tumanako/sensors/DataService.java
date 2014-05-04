@@ -148,16 +148,17 @@ public class DataService extends Service implements IDashMessages
 
   private void startVehicleData()
   {
-    // Create new Vehicle Data connection:
-    if (vehicleData != null) {
-      // A vehicle data conneciton already exists. Check whether it is active:
-      if (vehicleData.isFinished()) vehicleData = null;
-          // The BT thread has already stopped itself.
-          // Note that it may not be safe to discard the object (i.e. set it to null)
-          // if the thread is still active - hence we need to check isFinished.
+    if ((vehicleData != null) && vehicleData.isFinished()) {
+      // A vehicle data connection already exists and is active
+      vehicleData = null;
+      // The BT thread has already stopped itself.
+      // NOTE It may not be safe to discard the object (i.e. set it to null)
+      //   if the thread is still active - hence we need to check isFinished.
     }
-    // If the vehicle data connection doesn't exist at this point, create a new one:
-    if (vehicleData == null) vehicleData = new VehicleData(this);
+    // If the vehicle data connection doesn't exist at this point, create a new one
+    if (vehicleData == null) {
+      vehicleData = new VehicleData(this);
+    }
   }
 
   private final Runnable updateTimerTask = new Runnable()

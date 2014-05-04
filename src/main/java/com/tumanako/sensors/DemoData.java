@@ -41,7 +41,7 @@ public class DemoData implements IDashMessages
 {
 
   /** Data send interval (ms) */
-  private final int UPDATE_INTERVAL = 200;
+  private static final int UPDATE_INTERVAL = 200;
   private Handler updateTimer = new Handler();
 
 
@@ -103,30 +103,26 @@ public class DemoData implements IDashMessages
     updateTimer.removeCallbacks(updateTimerTask);   // Stop existing timer.
   }
 
-
-
-
-
-
   /**
-   * Update Timer:.
+   * Update Timer.
    * Runs on a timer, and sends fake data to the UI as long as demo mode is active.
    */
   private Runnable updateTimerTask = new Runnable()
   {
+    @Override
     public void run()
     {
       updateTimer.removeCallbacks(updateTimerTask); // ...Make sure there is no active callback already....
 
       // Generate some fake data  and send it to the UI
       kWh = kWh + 1f;  if (kWh > 30f) kWh = 10f;
-      float thisRPM = ((android.util.FloatMath.sin((float)(System.currentTimeMillis() % 12000) / 1909f  ) + 0.3f) * 3000f);
-      float demoFault   = (thisRPM < -1500)                              ? 1f : 0f;
-      float demoReverse = (thisRPM < 0)                                  ? 1f : 0f;
-      float contactorOn = (thisRPM > 1)                                  ? 1f : 0f;
-      float preCharge = ((System.currentTimeMillis() % 300) > 100)  ? 1f : 0f;
-      float driveTime  = (avgEnergyPerHour > 0f)  ?  (kWh / avgEnergyPerHour) : 99.99f;
-      float driveRange = (avgEnergyPerKm   > 0f)  ?  (kWh / avgEnergyPerKm)   : 9999f;
+      final float thisRPM = (android.util.FloatMath.sin((float) (System.currentTimeMillis() % 12000) / 1909f) + 0.3f) * 3000f;
+      final float demoFault   = (thisRPM < -1500) ? 1f : 0f;
+      final float demoReverse = (thisRPM < 0)     ? 1f : 0f;
+      final float contactorOn = (thisRPM > 1)     ? 1f : 0f;
+      final float preCharge = ((System.currentTimeMillis() % 300) > 100)  ? 1f : 0f;
+      final float driveTime  = (avgEnergyPerHour > 0f) ? (kWh / avgEnergyPerHour) : 99.99f;
+      final float driveRange = (avgEnergyPerKm   > 0f) ? (kWh / avgEnergyPerKm)   : 9999f;
       Bundle vehicleData = new Bundle();
       vehicleData.putFloat("DATA_CONTACTOR_ON",      contactorOn       );
       vehicleData.putFloat("DATA_FAULT",             demoFault         );

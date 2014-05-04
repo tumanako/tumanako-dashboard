@@ -175,7 +175,7 @@ public class RingBuffer
                            + (theseValues[n] / dataLength);
         } else {
           // Special case: Buffer not yet full. Use cumulative average instead:
-          dataAverage[n] = dataAverage[n] + ( (theseValues[n]-dataAverage[n]) / (dataLength+1) );
+          dataAverage[n] = dataAverage[n] + ((theseValues[n] - dataAverage[n]) / (dataLength + 1));
         }
       }
     }
@@ -214,7 +214,7 @@ public class RingBuffer
     //
     int tempIndex = pointIndex;         // Local copy of the requested index (so we can check bounds and change if required)
     if (tempIndex < 0) tempIndex = 0;                             // Data index must be 0 or positive.
-    if (tempIndex > (dataLength-1)) tempIndex = (dataLength-1);   // Data index must be less than the available number of records!
+    if (tempIndex > (dataLength - 1)) tempIndex = dataLength - 1;   // Data index must be less than the available number of records!
     int thisPointer = dataPointer - (pointIndex + 1);             // Temporary data pointer.
     if (thisPointer < 0) thisPointer = thisPointer + bufferSize;  // Buffer loops around. Add bufferSize to get to correct position.
     return dataBuffer[thisPointer].clone();                       // Return a copy of the requested data point.

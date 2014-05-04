@@ -35,13 +35,12 @@ public interface IDashMessages
    * We define a global list here, and other classes may add their own by
    * using one of these as a base and adding an integer value.
    **************************************************************************/
-  public static final int DASHMESSAGE_UNSPECIFIED  =    0;
-  public static final int NMEA_GPS_SENSOR_ID       =  300;
-  public static final int NMEA_PROCESSOR_ID        =  400;
-  public static final int VEHICLE_DATA_ID          =  500;
-  public static final int CHARGE_NODE_ID           = 1000;
-  public static final int CHARGE_HTTPCON_ID        = 1100;
-
+  int DASHMESSAGE_UNSPECIFIED  =    0;
+  int NMEA_GPS_SENSOR_ID       =  300;
+  int NMEA_PROCESSOR_ID        =  400;
+  int VEHICLE_DATA_ID          =  500;
+  int CHARGE_NODE_ID           = 1000;
+  int CHARGE_HTTPCON_ID        = 1100;
 
   /**
    * Receives filtered intents.

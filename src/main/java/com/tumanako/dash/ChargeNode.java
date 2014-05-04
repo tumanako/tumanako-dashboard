@@ -139,7 +139,7 @@ public class ChargeNode implements IDashMessages
 
   public ChargeNode(Context context)
   {
-    dashMessages = new DashMessages(context,this,CHARGE_NODE_INTENT);
+    dashMessages = new DashMessages(context, this, CHARGE_NODE_INTENT);
     weakContext = new WeakReference<Context>(context);
     resume();      // Start the update timer!
   }
@@ -197,7 +197,7 @@ public class ChargeNode implements IDashMessages
     watchdogCounter = 0;
 
     // Check to see if any cookie data have been received (e.g. from a web server):
-    if ( (data != null) && (data.containsKey("Cookies")) ) {
+    if ((data != null) && data.containsKey("Cookies")) {
       Bundle tempCookies = data.getBundle("Cookies");
       if (!tempCookies.isEmpty()) {
         cookieData = new Bundle(tempCookies);
@@ -213,12 +213,12 @@ public class ChargeNode implements IDashMessages
           // Already connected. Need to disconnect:
           doChargeSet(0);  // Turn off the charger if it's on.
           connectionStatus = STATUS_OFFLINE;
-          dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null,CHARGE_NODE_DEFAULT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING,0f,0f) );   // Tell the UI we have disconnected.
+          dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_DEFAULT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING, 0f, 0f)); // Tell the UI we have disconnected.
         } else {
           // Need to connect!
-          if ( (data != null) && (data.containsKey("j_username")) && (data.containsKey("j_password")) ) {
+          if ((data != null) && data.containsKey("j_username") && data.containsKey("j_password")) {
             // A bundle containing 'USER' and 'PASSWORD' strings must be supplied to connect.
-            dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null,CHARGE_NODE_CONNECT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING,0f,0f) );   // Clear old UI data.
+            dashMessages.sendData(UIActivity.UI_INTENT_IN, IDashMessages.CHARGE_NODE_ID, null, CHARGE_NODE_CONNECT_HTML,makeChargeData(STATUS_OFFLINE,STATUS_NOT_CHARGING, 0f, 0f)); // Clear old UI data.
             doLogin(data);
             connectionStatus = STATUS_CONNECTING;
             timerStart();    // Make sure the update timer is running!
@@ -237,7 +237,7 @@ public class ChargeNode implements IDashMessages
       // ************** Messages from the Comm thread ****************************
       case CHARGE_NODE_HTML_DATA:
         // HTTP response received from server.
-        if ((connectionStatus == STATUS_CONNECTING) && (data != null) && (data.containsKey("ResponseCode"))) {
+        if ((connectionStatus == STATUS_CONNECTING) && (data != null) && data.containsKey("ResponseCode")) {
           // --DEBUG!--
           Log.d(UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
           // Check the r4esponse code. Should be 200 if we logged in OK:
@@ -275,7 +275,7 @@ public class ChargeNode implements IDashMessages
             // Search the data array for an entry with sourceId = /power/switch/1:
             for (int i=0; i<jsonDataSection.length(); i++) {
               JSONObject jsonDataItem = jsonDataSection.getJSONObject(i);
-              if ((jsonDataItem.has("sourceId")) && (jsonDataItem.getString("sourceId").equals("/power/switch/2"))) {
+              if (jsonDataItem.has("sourceId") && jsonDataItem.getString("sourceId").equals("/power/switch/2")) {
                 Log.i("HTTPConn", "  FOUND!!! Value = " + String.format("%d", jsonDataItem.getInt("integerValue")));
                 if (jsonDataItem.getInt("integerValue") == 1) {
                   // Charging!
@@ -358,7 +358,7 @@ public class ChargeNode implements IDashMessages
         *  - If it's running, do nothing.
         *  - If it's finished, throw it away and start the next one!
         */
-        if ((requestQueue != null) && (!requestQueue.isEmpty())) {
+        if ((requestQueue != null) && !requestQueue.isEmpty()) {
           // There is at least one HTTP request in the queue:
           ChargerHTTPConn currentConn = requestQueue.peek(); // Get reference to current (first) item in the queue.
           if (!currentConn.isAlive()) {

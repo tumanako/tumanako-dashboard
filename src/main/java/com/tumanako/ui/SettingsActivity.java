@@ -118,6 +118,8 @@ public class SettingsActivity extends Activity implements OnItemClickListener, I
         dashMessages.sendData(VehicleData.VEHICLE_DATA, VehicleData.VEHICLE_DATA_BTADDRESS_CHANGE, null, null, null);
         finish();
         break;
+      default:
+        // do nothing
     }
   }
 

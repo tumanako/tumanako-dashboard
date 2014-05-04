@@ -265,10 +265,8 @@ public class VehicleData extends Thread implements IDashMessages
    */
   private void decodeAndSend(String thisData)
   {
-    if ((!thisData.startsWith("TDV1:")) ||
-        (thisData.length() < 20))
-    {
-      // Line doesn't start with the 'TDV1' tag, or it's too short. Give up.
+    if (!thisData.startsWith("TDV1:") || (thisData.length() < 20)) {
+      // Line does not start with the 'TDV1' tag, or it is too short. Give up.
       return;
     }
 
@@ -442,40 +440,41 @@ public class VehicleData extends Thread implements IDashMessages
         isBTConnected = true;
 //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Reconnected OK. ");
       }
-/****** TEMP DEBUG ************************************/
+// ****** TEMP DEBUG ************************************
 //if (isPing)
 //  {
 //try  {  Log.i("BT_STREAM", String.format("%d",btStreamIn.available()));  } catch (IOException e) {  e.printStackTrace();  }
 //isPing = false;
 //  }
-/****** TEMP DEBUG ************************************/
+// ****** TEMP DEBUG ************************************
       try {
         // Read bytes from the InputStream:
         bytesRead = btStreamIn.read(byteBuffer,0,100);  // Reads up to 100 bytes.
-        /*********** Buffer Overflow Check: *******************************************
+        /* ********** Buffer Overflow Check *******************************************
          * It is very important that the UI remain up-to-date (this is more important than
          * trying to process ALL data).
          * Therefore, if the input stream is filling with data faster than we are processing
          * it, we have to dump data.
-         * Note that this relies on the behaviour of the StreamIn.available() method
+         * Note that this relies on the behavior of the StreamIn.available() method
          * to report the number of bytes available. The documentation indicates that
-         * available() may not be reliablie, and in particular, "may be significantly
+         * available() may not be reliable, and in particular, "may be significantly
          * smaller than the actual number of bytes available." However, testing shows
          * that it works well. The following code will work fine so long as available()
          * doesn't return /more/ than the number of bytes available, which it shouldn't!
          ******************************************************************************/
         int bytesInStream = btStreamIn.available();
         if (bytesInStream > BT_STREAM_OVERFLOW) btStreamIn.skip(bytesInStream - BT_STREAM_OVERFLOW);
-        /******************************************************************************/
+        //*****************************************************************************/
         if (bytesRead > 0) { // ACTUAL number of bytes read.
           for (int n = 0; n < bytesRead; n++) {
             // Process the incomming aray of bytes:
             if (byteBuffer[n] == 0x0D) {
               // End of line! Send record:
               decodeAndSend(btRawData.toString());
-              btRawData = new StringBuffer();        // Reset the line buffer.
-            } else {
-              if (byteBuffer[n] != 0x0A) btRawData.append((char)byteBuffer[n]);  // If this is not a LF character, add it to the line buffer.
+              btRawData = new StringBuffer(); // Reset the line buffer.
+            } else if (byteBuffer[n] != 0x0A) {
+              // If this is not a LF character, add it to the line buffer.
+              btRawData.append((char) byteBuffer[n]);
             }
           }
         }

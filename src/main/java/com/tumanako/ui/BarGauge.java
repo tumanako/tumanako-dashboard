@@ -95,7 +95,7 @@ public class BarGauge extends RenderedGauge
       // Calculate the dimensions of the bar:
       barAcross = (int) (fBarAcross * drawingWidth);
       barLong = (int) (fBarLong * drawingHeight);
-      blockLong = (int) (barLong / (numberScaleTicks-1));
+      blockLong = barLong / (numberScaleTicks - 1);
 
       // Loop through the requested number of tick steps and calculate bar blocks...
       for (int n = 0; n < numberScaleTicks; n++) {
@@ -106,7 +106,7 @@ public class BarGauge extends RenderedGauge
       // Loop through the requested number of scale steps and calculate scale label positions...
       blockX = (int) originX;
       blockY = (int) originY;
-      scaleLong = (int) (barLong / (numberDivisions-1));
+      scaleLong = barLong / (numberDivisions - 1);
       for (int n = 0; n < numberDivisions; n++) {
         slabelX[n] = blockX - 3;
         slabelY[n] = blockY + 5;
@@ -119,7 +119,7 @@ public class BarGauge extends RenderedGauge
       // Calculate the dimensions of the bar:
       barAcross = (int) (fBarAcross * drawingHeight);
       barLong = (int) (fBarLong * drawingWidth);
-      blockLong = (int) (barLong / (numberScaleTicks-1));
+      blockLong = barLong / (numberScaleTicks - 1);
 
       // Loop through the requested number of tick steps and calculate bar blocks...
       for (int n = 0; n < numberScaleTicks; n++) {
@@ -130,10 +130,10 @@ public class BarGauge extends RenderedGauge
       // Loop through the requested number of scale steps and calculate scale label positions...
       blockX = (int) originX;
       blockY = (int) originY;
-      scaleLong = (int) (barLong / (numberDivisions-1));
+      scaleLong = barLong / (numberDivisions - 1);
       for (int n = 0; n < numberDivisions; n++) {
         slabelX[n] = blockX;
-        slabelY[n] = (blockY - barAcross - 3);
+        slabelY[n] = blockY - barAcross - 3;
         blockX += scaleLong;
       }
     }
@@ -161,23 +161,23 @@ public class BarGauge extends RenderedGauge
       if (lastDrawnBlock < (numberBlocks-1)) {
         // Haven't filled the last block... add a smaller one to finish off bar:
         int n = lastDrawnBlock + 1;
-        float lastBlockLong = ( (  (gaugeValue - scaleMin - ((float)(lastDrawnBlock + 1) * blockValue))  ) / blockValue )  * blockLong;
+        final float lastBlockLong = ((gaugeValue - scaleMin - ((float) (lastDrawnBlock + 1) * blockValue)) / blockValue)  * blockLong;
         if (isVertical) {
           // VERTICAL bar:
           lastBlockRect = new Rect( barRects[n].left,
-                                    barRects[n].bottom - (int)lastBlockLong,
+                                    barRects[n].bottom - (int) lastBlockLong,
                                     barRects[n].right,
                                     barRects[n].bottom);
         } else {
           // HORIZONTAL bar:
           lastBlockRect = new Rect( barRects[n].left,
                                     barRects[n].top,
-                                    barRects[n].left + (int)lastBlockLong,
+                                    barRects[n].left + (int) lastBlockLong,
                                     barRects[n].bottom);
         }
       } else {
-        if ( lastDrawnBlock > (numberBlocks-1) ) lastDrawnBlock = (numberBlocks-1);  // ??  Shouldn't happen.
-        lastBlockRect = null;  // No last block required.
+        if (lastDrawnBlock > (numberBlocks - 1)) lastDrawnBlock = numberBlocks - 1;  // ??  Shouldn't happen.
+        lastBlockRect = null; // No last block required.
       }
     } else {
       // Not set up yet. Set defaults.

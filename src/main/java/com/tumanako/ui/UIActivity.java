@@ -188,7 +188,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
 
     // ---- Create a Data Service intent: ------
-    dataIntent = new Intent(this, com.tumanako.sensors.DataService.class);
+    dataIntent = new Intent(this, DataService.class);
 
     // Get a Broadcast Manager so we can send out messages to other parts of the app.
     dashMessages = new DashMessages( this, this, UI_INTENT_IN );

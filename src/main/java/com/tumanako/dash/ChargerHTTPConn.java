@@ -278,7 +278,7 @@ public class ChargerHTTPConn extends Thread implements IDashMessages
        *
        ***************************************************************************/
       if (responseCode == 302) responseCode = 200;                                         // For a start, just change redirects to "OK".
-      if ((serverConn.getHeaderField("Location") != null) && (serverConn.getHeaderField("Location").contains("login.do"))) {
+      if ((serverConn.getHeaderField("Location") != null) && serverConn.getHeaderField("Location").contains("login.do")) {
         // Login Failed! Change to our own error.
         responseCode = 999;
       }

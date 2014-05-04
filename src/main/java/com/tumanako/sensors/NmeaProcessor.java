@@ -94,7 +94,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
    */
   private boolean isLastSentence   = false;
   /** System time (mS) for the last position update. */
-  private long    timeLastPosition = 0l;
+  private long    timeLastPosition = 0L;
   /**
    * Do we have a current fix? True when we are receiving good NMEA data;
    * false if NMEA data is empty (i.e. no fix)
@@ -177,7 +177,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     if (isDemo) return true;
     // ---------------DEMO MODE CODE -------------------------------
     //  If isFixGood and it's been less than NMEA_WAIT_TIMEOUT mS since the last good NMEA data, this is a good fix!
-    return isFixGood && (timeLastPosition > NMEA_WAIT_TIMEOUT) && (timeLastPosition + NMEA_WAIT_TIMEOUT) > (SystemClock.elapsedRealtime());
+    return isFixGood && (timeLastPosition > NMEA_WAIT_TIMEOUT) && (timeLastPosition + NMEA_WAIT_TIMEOUT) > SystemClock.elapsedRealtime();
   }
 
   public String getLastGGA()
@@ -212,19 +212,19 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     StringBuilder thisDump = new StringBuilder();
 
     thisDump.append(String.format(
-        " Time:      %.1f\n" +
-        " Qual:      %d\n" +
-        " Sats:      %d\n\n" +
-        " Latitude:  %.6f\n" +
-        " Longitude: %.6f\n" +
-        " Altitude:  %.1f\n" +
-        " Track:     %.1f\n" +
-        " Speed:     %.1f\n\n",
+        " Time:      %.1f%n" +
+        " Qual:      %d%n" +
+        " Sats:      %d%n%n" +
+        " Latitude:  %.6f%n" +
+        " Longitude: %.6f%n" +
+        " Altitude:  %.1f%n" +
+        " Track:     %.1f%n" +
+        " Speed:     %.1f%n%n",
         gpsTime, gpsQual, gpsSats, gpsLat, gpsLon, gpsAlt, gpsTrackT, gpsSpeed));
     if (isFixGood) {
-      thisDump.append( "Fix: GOOD\n\n");
+      thisDump.append( "Fix: GOOD%n%n");
     }  else {
-      thisDump.append( "Fix: NO FIX\n\n");
+      thisDump.append( "Fix: NO FIX%n%n");
     }
     // -- DEBUG: -- thisDump.append( gpsLastGGA.replace(",", ",%n") + "%n%n" + gpsLastVTG.replace(",", ",%n");
     return thisDump.toString();
@@ -243,7 +243,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   /** Send some useful GPS data as Intents: */
   private void sendGPSData()
   {
-    float fixGood = (isFixGood) ? 1f : 0f;
+    float fixGood = isFixGood ? 1f : 0f;
     Bundle gpsData = new Bundle();
     gpsData.putFloat(DATA_GPS_HAS_LOCK, fixGood);
     gpsData.putFloat(DATA_GPS_TIME,     gpsTime);
@@ -356,11 +356,11 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     if (thisLatLon.length() < 7) return 0.0;   // Should have at least 'DDMM.MM'.
     try {
       int dotAt = thisLatLon.indexOf(".");
-      Double degrees = Double.valueOf(thisLatLon.substring(0,dotAt-2));
-      Double minutes = Double.valueOf(thisLatLon.substring(dotAt-2));
-      return degrees + (minutes /60.0);
+      final double degrees = Double.valueOf(thisLatLon.substring(0,dotAt-2));
+      final double minutes = Double.valueOf(thisLatLon.substring(dotAt-2));
+      return degrees + (minutes / 60.0);
     } catch (NumberFormatException e) {
-      return 0.0;  // On error, give up and return 0.0
+      return 0.0; // On error, give up and return 0.0
     }
   }
 

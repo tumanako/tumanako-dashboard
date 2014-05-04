@@ -139,12 +139,10 @@ public class StatusLamp extends ImageView
     bitmapLampOn   = BitmapFactory.decodeResource( getResources(), idBitmapLampOn  );
     bitmapLampOff  = BitmapFactory.decodeResource( getResources(), idBitmapLampOff );
 
-    // Set initial status: (note that default is Off):
-    if (initialStatus != null) {
-      if (initialStatus.equals("on")) {
-        // Turn on the lamp if initial_status is "on"!
-        lampState = true;
-      }
+    // Set initial status (note that default is Off)
+    if ((initialStatus != null) && initialStatus.equals("on")) {
+      // Turn on the lamp if initial_status is "on"!
+      lampState = true;
     }
   }
 
