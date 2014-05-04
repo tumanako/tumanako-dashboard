@@ -22,72 +22,67 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 package com.tumanako.sensors;
 
 /**
- * Tumanako Sensor Class Interface.
+ * Tumanako Sensor.
  *
  * Provides a basic sensor definition for several kinds of
  * sensor. Currently:
  *
- *  Vehicle Data - Some connection to the vehicle (probably Bluetooth or USB)
- *  NMEA GPS     - For position, etc. Uses system location services
+ * - {@link VehicleData} : Some connection to the vehicle (probably Bluetooth or USB)
+ * - {@link NmeaGPS}     : For position, etc. Uses system location services
  *
- * The following methods must be implemented for all tumanako sensors /
- * data sources:
- *
- * isOK()      - Returns a boolean indicating whether the sensor is available
- * isRunning() - Returns a boolean indicating whether the sensor is generating data
- *
- * resume()    - Start taking readings. The sensor will start generating messages.
- *
- * suspend()   - Stop the sensor from taking readings. This should leave the sensor
- *               in a state which does NOT use CPU time or batteries - suitable
- *               for if the application is put into the background indefinitely.
- *
- * toString()  - Return useful sensor info as a string. Used for debugging.
- *
+ * The methods in this interface have to be implemented for all Tumanako sensors /
+ * data sources.
  *
  * The general life-cycle of a sensor is:
  *
- * Create - The constructor is called when a new instance is created. This should
- *          set up the sensor but NOT start it (i.e. it shouldn't start
- *          generating messages or using CPU / Battery time)
- *
- * resume() - Called when the UI or parent is ready to receive messages. turn 'On'
- *            the sensor.
- *
- * suspend() - Called when the sensor should stop using CPU / Batteries and stop
- *             generating messages - e.g. when the UI activity goes into the background
- *             or is closed.
- *
- *             After suspend(), resume() may be called later when the UI is re-displayed,
- *             or the OS may trash the application in which case resume() will never be called.
- *             Thus, suspend() should unregister any sensors or system services and
- *             leave things in a state where they don't waste power or CPU time.
+ * - Create
+ *   This should set up the sensor but NOT start it (i.e. it should not start
+ *   generating messages or using CPU / Battery time)
+ * - {@link #resume()}
+ *   Called when the UI or parent is ready to receive messages.
+ *   Turn 'On' the sensor.
+ * - {@link #suspend()}
+ *   Called when the sensor should stop using CPU / Batteries and stop generating messages,
+ *   e.g. when the UI activity goes into the background or is closed.
+ *   After {@link #suspend()}, {@link #resume()} may be called later when the UI is re-displayed,
+ *   or the OS may trash the application in which case {@link #resume()} will never be called.
+ *   Thus, {@link #suspend()} should unregister any sensors or system services and leave things
+ *   in a state where they do not waste power or CPU time.
+ *   This is typically used when the application is paused, and should leave the sensors
+ *   in a state where they do not consume batteries.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
 public interface IDroidSensor
 {
 
-  // Generic sensor methods, common to all sensors
-  /** Signals whether the Sensor was successfully found, initialized and set up. */
+  /**
+   * Signals whether the Sensor was successfully found, initialized and set up.
+   */
   boolean isOK();
-  /** Signals whether the Sensor is currently producing data. */
+
+  /**
+   * Signals whether the Sensor is currently producing data.
+   */
   boolean isRunning();
 
   /**
    * Stop the sensor from taking readings.
-   * This is typically used when the application is paused, and should leave the sensors in a state
-   * where they don't consume batteries.
+   * This should leave the sensor in a state which does NOT use CPU time or batteries,
+   * suitable for if the application is put into the background indefinitely.
    */
   void suspend();
+
   /**
    * Start taking readings with the sensor.
+   * The sensor will start generating messages.
    */
   void resume();
 
   /**
    * Returns interesting sensor data as a string.
    * Generally only used for debugging.
+   * XXX maybe rename to something like getDebugInfo?
    */
   @Override
   String toString();
