@@ -124,7 +124,7 @@ public class DataService extends Service implements DashMessageListener
   public void setDemo(boolean thisIsDemo)
   {
     // Set the 'Demo' mode flag:
-    deviceGPS.NMEAData.setDemo(thisIsDemo);
+    deviceGPS.getNmeaData().setDemo(thisIsDemo);
     demoData.setDemo(thisIsDemo);
   }
   // ---------------DEMO MODE CODE -------------------------------

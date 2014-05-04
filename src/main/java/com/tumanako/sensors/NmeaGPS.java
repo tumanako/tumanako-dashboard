@@ -46,7 +46,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
   private boolean isAvailable = false;
 
   /** A reference to a NMEA processing object (used to decode NMEA Data strings from GPS) */
-  public NmeaProcessor NMEAData;
+  private final NmeaProcessor nmeaData;
 
 
   public NmeaGPS(Context context)
@@ -54,7 +54,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
     // Create a LocationManager object to get location data from NMEAData
     mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     // Create an NMEA Processor to receive and process NMEA sentences
-    NMEAData = new NmeaProcessor(context);
+    nmeaData = new NmeaProcessor(context);
   }
 
   /**
@@ -81,7 +81,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
   @Override
   public String toString()
   {
-    return NMEAData.toString();
+    return getNmeaData().toString();
   }
 
   /**
@@ -93,13 +93,13 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     // Add a listener to receive NMEA sentences:
     // Tihs causes our NmeaProcessor class to get NMEA messages from the GPS:
-    mLocationManager.addNmeaListener(NMEAData);
+    mLocationManager.addNmeaListener(getNmeaData());
   }
 
   /** Stop the NMEAData listener (saves batteries) */
   public void suspend()
   {
-    mLocationManager.removeNmeaListener(NMEAData);
+    mLocationManager.removeNmeaListener(getNmeaData());
     mLocationManager.removeUpdates(this);
   }
 
@@ -134,5 +134,13 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
   @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
+  }
+
+  /**
+   * A reference to a NMEA processing object (used to decode NMEA Data strings from GPS)
+   * @return the nmeaData
+   */
+  public NmeaProcessor getNmeaData() {
+    return nmeaData;
   }
 }
