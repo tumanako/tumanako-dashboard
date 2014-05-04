@@ -41,45 +41,51 @@ package com.tumanako.dash;
 public class RingBuffer
 {
 
-  private final int bufferSize;        // Number of data points in buffer.
-  private final int bufferFieldCount;  // Number of values to store.
-  private final boolean useAverage;    // Should we keep an average as data points are added?
+  /** Number of data points in buffer. */
+  private final int bufferSize;
+  /** Number of values to store. */
+  private final int bufferFieldCount;
+  /** Should we keep an average as data points are added? */
+  private final boolean useAverage;
 
-  private final float[][] dataBuffer;  // Data buffer
-  private float[] dataAverage;         // Average of the records in the data buffer
+  /** Data buffer */
+  private final float[][] dataBuffer;
+  /** Tracks the average of the records in the data buffer */
+  private float[] dataAverage;
 
-  private int dataPointer = 0;         // Index of current write point in buffer (increments AFTER data write).
-  private int dataLength  = 0;         // The number of records in the buffer.
+  /** Index of current write point in buffer (increments AFTER data write). */
+  private int dataPointer;
 
-  /**************************************************************************************
-
-   Note that dataLength is the number of records actually in the buffer, required because
-   the buffer may not be full. dataLength starts at 0, and increments whenever a record
-   is added.
-
-   When the end of the buffer is reached, dataLength will equal bufferSize. At this point,
-   the next call to AddPoint will overwrite the first element in the buffer. dataLength
-   will remain equal to bufferSize. bufferSize and dataLength can be checked using
-   'Get' methods (see below).
-
-  **************************************************************************************/
+  /**
+   * Note that dataLength is the number of records actually in the buffer.
+   * This is required because the buffer may not be full.
+   * {@link #dataLength} starts at 0, and increments whenever a record is added.
+   *
+   * When the end of the buffer is reached, {@link #dataLength} will equal {@link #bufferSize}.
+   * At this point, the next call to {@link #AddPoint} will overwrite the first element
+   * in the buffer.
+   * {@link #dataLength} will remain equal to {@link #bufferSize}.
+   * {@link #bufferSize} and {@link #dataLength} can be checked using 'Get' methods
+   * (see below).
+   */
+  private int dataLength;
 
 
   /**
+   * Sets up the buffer by creating an array of the appropriate size.
    * @param thisBufferSize - Buffer size. After this many entries have been added, oldest entries are overwritten.
    * @param thisFieldCount - Number of fields to store for each entry. Each entry will be an array of type float of this size.
    * @param thisUseAverage - Should a running average of the buffer contents be maintained?
-   *
-   *  This constructor sets up the buffer by creating an array of the appropriate size.
-   *
-   ****************************************************************************************/
+   */
   public RingBuffer(int thisBufferSize, int thisFieldCount, boolean thisUseAverage)
   {
-    bufferSize       = thisBufferSize;
-    bufferFieldCount = thisFieldCount;
-    useAverage       = thisUseAverage;
-    dataBuffer  = new float[bufferSize][bufferFieldCount];   // Creata a new data buffer.
-    dataAverage = new float[bufferFieldCount];               // Create an array to track the average of field values.
+    this.dataLength = 0;
+    this.dataPointer = 0;
+    this.bufferSize       = thisBufferSize;
+    this.bufferFieldCount = thisFieldCount;
+    this.useAverage       = thisUseAverage;
+    this.dataBuffer  = new float[bufferSize][bufferFieldCount];
+    this.dataAverage = new float[bufferFieldCount];
     Clear();
   }
 
@@ -119,9 +125,8 @@ public class RingBuffer
     // Resets data buffer pointers back to start of buffer.
     dataPointer = 0;
     dataLength  = 0;
-    // Reset averages array:
-    int n;
-    for (n = 0; n < bufferFieldCount; n++) {
+    // Reset averages array
+    for (int n = 0; n < bufferFieldCount; n++) {
       dataAverage[n] = 0f;
     }
   }
@@ -136,8 +141,7 @@ public class RingBuffer
    */
   public void PreFill(float[] theseValues)
   {
-    int n;
-    for (n=0; n<bufferSize; n++) {
+    for (int n = 0; n < bufferSize; n++) {
       dataBuffer[n] = theseValues;
     }
     dataAverage = theseValues;
@@ -147,10 +151,10 @@ public class RingBuffer
 
   /**
    * Adds a datum.
-   *  This adds a datum to the buffer, which causes several things to happen:
-   *   * Oldest datum is overwritten with the new values
-   *   * Buffer pointer is advanced
-   *   * Rolling average is updated (if used).
+   * This adds a datum to the buffer, which causes several things to happen:
+   * - Oldest datum is overwritten with the new values
+   * - Buffer pointer is advanced
+   * - Rolling average is updated (if used).
    *
    * @param theseValues - The array of fields (float values) to be added
    */
@@ -164,26 +168,31 @@ public class RingBuffer
       // See: http://en.wikipedia.org/wiki/Rolling_average
       // Note that there is a special case if we haven't filled the buffer yet.
       // In this case, it's a cumulative average of all values received so far.
-      int n;
-      for (n = 0; n < bufferFieldCount; n++) {
+      for (int n = 0; n < bufferFieldCount; n++) {
         if (dataLength == bufferSize) {
-          // The buffer is full, so update the rolling average:
+          // The buffer is full, so update the rolling average
           // Note that dataPointer is currently pointintg to the OLDEST value
           // in the buffer, i.e. the one we are about to overwrite.
           dataAverage[n] = dataAverage[n]
                            - (dataBuffer[dataPointer][n] / dataLength)
                            + (theseValues[n] / dataLength);
         } else {
-          // Special case: Buffer not yet full. Use cumulative average instead:
+          // Special case: Buffer not yet full. Use cumulative average instead
           dataAverage[n] = dataAverage[n] + ((theseValues[n] - dataAverage[n]) / (dataLength + 1));
         }
       }
     }
-    // Insert an array of values at the buffer data pointer:
+    // Insert an array of values at the buffer data pointer
     dataBuffer[dataPointer] = theseValues.clone();
     dataPointer = dataPointer + 1;
-    if (dataPointer >= bufferSize) dataPointer = 0;            // Max number of points reached; Wrap.
-    if (dataLength < bufferSize) dataLength = dataLength + 1;  // Increment the number of records.
+    if (dataPointer >= bufferSize) {
+      // Max number of points reached; Wrap.
+      dataPointer = 0;
+    }
+    if (dataLength < bufferSize) {
+      // Increment the number of records.
+      dataLength = dataLength + 1;
+    }
   }
 
   /**
@@ -211,7 +220,6 @@ public class RingBuffer
     //
     // If no data have been added, the method returns null!!
     // User should check GetLength if there is any doubt!.
-    //
     int tempIndex = pointIndex;         // Local copy of the requested index (so we can check bounds and change if required)
     if (tempIndex < 0) tempIndex = 0;                             // Data index must be 0 or positive.
     if (tempIndex > (dataLength - 1)) tempIndex = dataLength - 1;   // Data index must be less than the available number of records!
