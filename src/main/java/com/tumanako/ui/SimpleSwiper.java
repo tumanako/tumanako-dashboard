@@ -26,8 +26,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 
 /**
- * Swipe Gesture Detector:
- * -----------------------
+ * Swipe Gesture Detector.
  *
  * Detect swipe left and right gestures. This is done as an extension
  * of the SimpleOnGestureListener class. We'll override the 'onFling'

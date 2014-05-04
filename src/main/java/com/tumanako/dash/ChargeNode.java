@@ -107,7 +107,7 @@ public class ChargeNode implements IDashMessages
   private static final int SEND_PING_EVERY = 10;
   /**
    * Max watchdog counter value.
-   * The chargenode timer will automatically stop if we don't get a 'keepalive' message.
+   * The charge-node timer will automatically stop if we don't get a 'keepalive' message.
    */
   private static final int WATCHDOG_OVERFLOW = 8;
 
@@ -185,11 +185,6 @@ public class ChargeNode implements IDashMessages
     return chargeStatus;
   }
 
-
-
-
-
-
   /**
    * Intent Processor.
    */
@@ -210,7 +205,7 @@ public class ChargeNode implements IDashMessages
 
     switch (message) {
 
-      // ************** Messages from the UI: ****************************
+      // ************** Messages from the UI ****************************
       case CHARGE_NODE_CONNECT:
         // This is actually Connect OR Disconnect (depending on current status).
         if (connectionStatus == STATUS_CONNECTED) {
@@ -341,7 +336,7 @@ public class ChargeNode implements IDashMessages
 
   /** Creates a Runnable which will be called after a delay, to carry out a read of vehicle data. */
   private final Runnable updateTimerTask = new Runnable()
-    {
+  {
     @Override
     public void run()
     {
@@ -421,8 +416,6 @@ public class ChargeNode implements IDashMessages
         false,
         CHARGE_NODE_HTML_DATA));
   }
-
-
 
   /** Charge Start / Stop */
   private void doChargeSet(int newSetting)

@@ -93,10 +93,11 @@ public class SettingsActivity extends Activity implements OnItemClickListener, I
 
   @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
-  {  // We don't need to process any messages.
+  {
+    // We don't need to process any messages.
   }
 
-   /** Displays pop-up TOAST message */
+  /** Displays pop-up TOAST message */
   public void showPopupMessage(String ThisMessage)
   {
     Toast.makeText(getApplicationContext(), ThisMessage, Toast.LENGTH_SHORT).show();

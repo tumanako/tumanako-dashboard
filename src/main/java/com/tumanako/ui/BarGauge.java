@@ -93,13 +93,13 @@ public class BarGauge extends RenderedGauge
       scalePaint.setTextAlign(Paint.Align.RIGHT);
       guageLablelPaint.setTextAlign(Paint.Align.CENTER);
       // Calculate the dimensions of the bar:
-      barAcross = (int)(fBarAcross * drawingWidth);
-      barLong = (int)(fBarLong * drawingHeight);
+      barAcross = (int) (fBarAcross * drawingWidth);
+      barLong = (int) (fBarLong * drawingHeight);
       blockLong = (int) (barLong / (numberScaleTicks-1));
 
       // Loop through the requested number of tick steps and calculate bar blocks...
-      for (int n=0; n<numberScaleTicks; n++) {
-        barRects[n] = new Rect(blockX,(blockY-blockLong)+barSegmentGap,(blockX+barAcross),blockY);
+      for (int n = 0; n < numberScaleTicks; n++) {
+        barRects[n] = new Rect(blockX, (blockY - blockLong) + barSegmentGap, (blockX + barAcross), blockY);
         blockY -= blockLong;
       }
 
@@ -107,7 +107,7 @@ public class BarGauge extends RenderedGauge
       blockX = (int) originX;
       blockY = (int) originY;
       scaleLong = (int) (barLong / (numberDivisions-1));
-      for (int n=0; n<numberDivisions; n++) {
+      for (int n = 0; n < numberDivisions; n++) {
         slabelX[n] = blockX - 3;
         slabelY[n] = blockY + 5;
         blockY -= scaleLong;
@@ -117,13 +117,13 @@ public class BarGauge extends RenderedGauge
       scalePaint.setTextAlign(Paint.Align.CENTER);
       guageLablelPaint.setTextAlign(Paint.Align.RIGHT);
       // Calculate the dimensions of the bar:
-      barAcross = (int)(fBarAcross * drawingHeight);
-      barLong = (int)(fBarLong * drawingWidth);
+      barAcross = (int) (fBarAcross * drawingHeight);
+      barLong = (int) (fBarLong * drawingWidth);
       blockLong = (int) (barLong / (numberScaleTicks-1));
 
       // Loop through the requested number of tick steps and calculate bar blocks...
-      for (int n=0; n<numberScaleTicks; n++) {
-        barRects[n] = new Rect(blockX,(blockY-barAcross),(blockX+blockLong)-barSegmentGap,blockY);
+      for (int n = 0; n < numberScaleTicks; n++) {
+        barRects[n] = new Rect(blockX, (blockY - barAcross), (blockX + blockLong) - barSegmentGap, blockY);
         blockX += blockLong;
       }
 
@@ -131,12 +131,12 @@ public class BarGauge extends RenderedGauge
       blockX = (int) originX;
       blockY = (int) originY;
       scaleLong = (int) (barLong / (numberDivisions-1));
-      for (int n=0; n<numberDivisions; n++) {
+      for (int n = 0; n < numberDivisions; n++) {
         slabelX[n] = blockX;
-        slabelY[n] = (blockY-barAcross-3);
+        slabelY[n] = (blockY - barAcross - 3);
         blockX += scaleLong;
       }
-    }  // [if (isVertical)]
+    }
     invalidate();
   }
 

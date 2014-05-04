@@ -226,7 +226,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     }  else {
       thisDump.append( "Fix: NO FIX\n\n");
     }
-    // -- DEBUG: -- thisDump.append( gpsLastGGA.replace(",",",\n") + "\n\n" + gpsLastVTG.replace(",",",\n");
+    // -- DEBUG: -- thisDump.append( gpsLastGGA.replace(",", ",%n") + "%n%n" + gpsLastVTG.replace(",", ",%n");
     return thisDump.toString();
   }
 
