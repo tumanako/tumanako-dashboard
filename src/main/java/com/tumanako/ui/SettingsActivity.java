@@ -19,7 +19,7 @@ import com.tumanako.sensors.VehicleData;
 import java.util.Set;
 
 public class SettingsActivity extends Activity implements OnItemClickListener, IDashMessages
-  {
+{
 
   /** Message Broadcaster to send Intents to data service */
   private DashMessages dashMessages;
