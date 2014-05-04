@@ -249,6 +249,7 @@ public class VehicleData extends Thread implements DashMessageListener
    */
   private Runnable watchdogTimerTask = new Runnable()
   {
+    @Override
     public void run()
     {
       // Make sure there is no active callback already
