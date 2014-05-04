@@ -158,6 +158,7 @@ public class DataService extends Service implements IDashMessages
     // If the vehicle data connection doesn't exist at this point, create a new one
     if (vehicleData == null) {
       vehicleData = new VehicleData(this);
+      vehicleData.start(); // Launch a new thread to connect to the vehicle with Bluetooth!
     }
   }
 

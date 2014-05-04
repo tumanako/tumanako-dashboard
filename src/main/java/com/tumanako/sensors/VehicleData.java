@@ -188,8 +188,6 @@ public class VehicleData extends Thread implements IDashMessages
     //uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
     //uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
     // ********* TEMP DEBUG **************************
-
-    this.start();     // Launch a new thread to connect to the vehicle with Bluetooth!
   }
 
   /**
