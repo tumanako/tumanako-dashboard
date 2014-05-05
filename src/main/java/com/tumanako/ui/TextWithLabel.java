@@ -28,7 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * Text and Label:
+ * Text and Label.
  *
  * Creates a simple compound control with a text box and a smaller label.
  *
@@ -73,10 +73,10 @@ import android.widget.TextView;
  *    demoTextWithLabel.setText("Hello World!");
  *
  * Other public methods:
- *   setText(String)
- *   setLabel(String)
- *   String getText()
- *   String getLabel()
+ *   {@link #setText(String)}
+ *   {@link #setLabel(String)}
+ *   {@link #getText()}
+ *   {@link #getLabel()}
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
@@ -89,7 +89,7 @@ public class TextWithLabel extends LinearLayout
 
   /**
    * Called when this view is created, probably from inflating
-   * an XML layout file.  Context and attributes are passed on
+   * an XML layout file. Context and attributes are passed on
    * to super class constructor for basic creation of the view,
    * then custom components are added.
    *
@@ -122,7 +122,7 @@ public class TextWithLabel extends LinearLayout
   /**
    * Extracts custom attributes.
    * Given a set of attributes from the XML layout file, extract
-   * the custom attributes specific to this control:
+   * the custom attributes specific to this control.
    * @param attrs Attributes passed in from the XML parser
    */
   private void getCustomAttributes(AttributeSet attrs)
@@ -133,7 +133,7 @@ public class TextWithLabel extends LinearLayout
     String labelText = a.getString(R.styleable.TextWithLabel_label_text);
     labelSize = a.getInt(R.styleable.TextWithLabel_label_size, 10);
 
-    // Recycle the TypedArray:
+    // Recycle the TypedArray
     a.recycle();
 
     if (mainText != null) setText(mainText);

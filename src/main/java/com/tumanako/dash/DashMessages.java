@@ -48,36 +48,39 @@ import android.support.v4.content.LocalBroadcastManager;
 public class DashMessages extends BroadcastReceiver
 {
 
-  /** Will be used to send and receive intents from other parts of the application (E.g. UI) */
-  private final LocalBroadcastManager messageBroadcaster;
-
   /**
    * String Identifiers to identify different elements of the Intent structure we are using.
-   * This is the name of the integer field in the received intent, which tells us the source of the message.
+   * This is the name of the integer field in the received intent,
+   * which tells us the source of the message.
    */
   public static final String DASHMESSAGE_MESSAGE = "com.tumanako.dash.message";
 
-  /* Extra Data Field Identifiers: *************************************************
+  /** Will be used to send and receive intents from other parts of the application (E.g. UI) */
+  private final LocalBroadcastManager messageBroadcaster;
+
+  /*
+   * Extra Data Field Identifiers.
    * These are used as names for extra data included in the intent.
-   *********************************************************************************/
+   */
   private static final String DASHMESSAGE_FLOAT   = "f";
   private static final String DASHMESSAGE_STRING  = "s";
   private static final String DASHMESSAGE_DATA    = "d";
 
-  private String actionFilter = null;
+  private final String actionFilter;
 
   private final DashMessageListener parent;
 
   public DashMessages(Context context, DashMessageListener callbackParent, String intentActionFilter)
   {
-    parent = callbackParent;
+    this.actionFilter = intentActionFilter;
+    this.parent = callbackParent;
 
-    // Get a Broadcast Manager so we can send out messages to other parts of the app, and receive mesages for this class:
-    messageBroadcaster = LocalBroadcastManager.getInstance(context);
+    // Get a Broadcast Manager so we can send out messages to other parts of the application,
+    // and receive mesages for this class.
+    this.messageBroadcaster = LocalBroadcastManager.getInstance(context);
 
-    // Register to receive messages via Intents if a filter was provided:
+    // Register to receive messages via Intents if a filter was provided
     if (intentActionFilter != null) {
-      actionFilter = intentActionFilter;
       resume();
     }
   }
@@ -87,7 +90,8 @@ public class DashMessages extends BroadcastReceiver
   {
 
     // Get the 'What Message?' from the intent. This is an integer sent by other parts
-    // of the app, which identifies what they are trying to say to us: (note: meaning is defined by derived classes).
+    // of the application, which identifies what they are trying to say to us.
+    // Note: meaning is defined by derived classes
     String action = intent.getAction();
     int message = intent.getIntExtra( DASHMESSAGE_MESSAGE, 0);
 

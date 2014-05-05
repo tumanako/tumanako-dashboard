@@ -71,20 +71,25 @@ public class Dial extends RenderedGauge
     needleLength = (float)drawingWidth * fNeedleLength;
 
     // Loop through the requested number of scale steps and calculate stuff...
-    float scaleAngle = minAngle;   // Angle from origin to initial point on scale in Radians (0 = vertical up)
-    float scaleAngleStep = (maxAngle - minAngle) / (float)(numberDivisions-1);   // Angle step for each scale step
-    for (int n=0; n<numberDivisions; n++) {
-      slabelX[n] = needleX(scaleAngle,needleLength);
-      slabelY[n] = needleY(scaleAngle,needleLength);
+// Angle from origin to initial point on scale in Radians (0 = vertical up)
+    float scaleAngle = minAngle;
+    // Angle step for each scale step
+    float scaleAngleStep = (maxAngle - minAngle) / (float)(numberDivisions - 1);
+    for (int n = 0; n < numberDivisions; n++) {
+      slabelX[n] = needleX(scaleAngle, needleLength);
+      slabelY[n] = needleY(scaleAngle, needleLength);
       scaleAngle = scaleAngle + scaleAngleStep;
     }
     needleLength = needleLength * 0.9f;
-    // Now calculate locations of scale ticks:
-    scaleAngle = minAngle;   // Angle from origin to initial point on scale in Radians (0 = vertical up)
-    scaleAngleStep = (maxAngle - minAngle) / (float)(numberScaleTicks-1);   // Angle step for each scale tick
-    for (int n=0; n<numberScaleTicks; n++) {
-      tickX[n] = needleX(scaleAngle,needleLength);
-      tickY[n] = needleY(scaleAngle,needleLength);
+
+    // Now calculate locations of scale ticks
+    // Angle from origin to initial point on scale in Radians (0 = vertical up)
+    scaleAngle = minAngle;
+    // Angle step for each scale tick
+    scaleAngleStep = (maxAngle - minAngle) / (float)(numberScaleTicks - 1);
+    for (int n = 0; n < numberScaleTicks; n++) {
+      tickX[n] = needleX(scaleAngle, needleLength);
+      tickY[n] = needleY(scaleAngle, needleLength);
       scaleAngle = scaleAngle + scaleAngleStep;
     }
     needleLength = needleLength * 0.9f;
@@ -98,7 +103,7 @@ public class Dial extends RenderedGauge
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
   {
-    // Call the parent class onMeasure FIRST: (see RenderedGauge)
+    // Call the parent class onMeasure FIRST. (see RenderedGauge)
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
     // Now correct the aspect ratio by adjusting the width:
@@ -164,8 +169,8 @@ public class Dial extends RenderedGauge
     /* *** Simple Needle: ***
     float x = needleX(needleAngle);
     float y = needleY(needleAngle);
-    needlePath.moveTo(originX, originY);             // ...Start point!
-    needlePath.lineTo(x,y);                          // ...End point!
+    needlePath.moveTo(originX, originY); // ...Start point!
+    needlePath.lineTo(x,y);              // ...End point!
     *************************/
 
     // **** Prettier Needle: ****
@@ -176,12 +181,12 @@ public class Dial extends RenderedGauge
 
     x = needleX(needleAngle+angles[0],lengths[0]);
     y = needleY(needleAngle+angles[0],lengths[0]);
-    needlePath.moveTo(x, y);            // ...Start point!
+    needlePath.moveTo(x, y);       // ...Start point!
 
     for (int n=1; n<7; n++) {
       x = needleX(needleAngle+angles[n],lengths[n]);
       y = needleY(needleAngle+angles[n],lengths[n]);
-      needlePath.lineTo(x, y);            // ...Next point in sequence!
+      needlePath.lineTo(x, y);     // ...Next point in sequence!
     }
   }
 
@@ -190,8 +195,8 @@ public class Dial extends RenderedGauge
   {
     super.onLayout(changed, left, top, right, bottom);
     // Layout Time: We should now have measurements for our view area, so we can calculate positions
-    // and sizes for dial elements:
-    // **** Get actual layout parameters: ****
+    // and sizes for dial elements.
+    // Get actual layout parameters.
     if (changed) {
       Log.i( UIActivity.APP_TAG, "  Dial -> onLayout Changed!! ");
       calcDial();
@@ -203,8 +208,8 @@ public class Dial extends RenderedGauge
   {
     super.onDraw(canvas);
 
-    // *** Draw the scale 'ticks': ***
-    // Draw the scale text (if required):
+    // Draw the scale 'ticks'.
+    // Draw the scale text (if required).
     if (showTicks) {
       for (int n = 0; n < numberScaleTicks; n++) {
         if (n < numberColours) tickPaint.setColor(scaleColours[n]);
@@ -213,7 +218,7 @@ public class Dial extends RenderedGauge
       }
     }
 
-    // *** Draw the needle: ****
+    // Draw the needle.
     needlePaint.setColor(0xA0F00000);
     canvas.drawPath(needlePath, needlePaint);
   }

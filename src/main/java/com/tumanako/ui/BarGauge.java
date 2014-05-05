@@ -28,25 +28,31 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 
 /**
- * Bar Gauge: Experimental! Derived from RenderedGauge. See RenderedGauge.java for attribute definitions.
+ * Bar Gauge: Experimental! Derived from RenderedGauge.
+ * See {@link RenderedGauge} for attribute definitions.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
 public class BarGauge extends RenderedGauge
 {
 
-  private boolean measurementsValid = false;   // Set to true once we have measurments (after onLayout)
+  /** Set to true once we have measurements (after onLayout) */
+  private boolean measurementsValid = false;
 
-  // Calculated internal values (based on actual size of dial, and generated at runtime):
+  // Calculated internal values (based on actual size of dial, and generated at runtime)
   private int barLong = 0;
   private int barAcross = 0;
   private int numberBlocks = 0;
 
-  private float blockValue = 1f;    // Will be the gauge value represented by one complete block.
-  private int blockLong = 1;        // Will be the pixel length of a single block on the bar.
+  /** Will be the gauge value represented by one complete block. */
+  private float blockValue = 1f;
+  /** Will be the pixel length of a single block on the bar. */
+  private int blockLong = 1;
 
-  private int lastDrawnBlock = -1;  // Index of last complete block on the scale.
-  private Rect lastBlockRect;       // Will be a Rect used to draw the last bare block (smaller than a full block).
+  /** Index of last complete block on the scale. */
+  private int lastDrawnBlock = -1;
+  /** Will be a Rectangle used to draw the last bare block (smaller than a full block). */
+  private Rect lastBlockRect;
 
   private final Paint barPaint;
   private final Rect[] barRects;
@@ -59,8 +65,9 @@ public class BarGauge extends RenderedGauge
 
     numberBlocks = numberScaleTicks-1;
 
-    // Array of rectangels for drawing bar:
-    barRects = new Rect[numberScaleTicks];  // Will be filled with actual coordinates during calcBar().
+    // Array of rectangels for drawing bar.
+    // Will be filled with actual coordinates during calcBar().
+    barRects = new Rect[numberScaleTicks];
 
     // Paint for Bar:
     barPaint = new Paint();
@@ -153,7 +160,8 @@ public class BarGauge extends RenderedGauge
     // Figure out how many 'blocks' to draw on the bar.
     // We'll draw all the complete blocks, then add another
     // reduced-size block for the last part of the scale:
-    // Note... we can't do this until after 'calcBar()' has been called, which sets up many parameters.
+    // Note: we can't do this until after 'calcBar()' has been called,
+    //   which sets up many parameters.
     if (measurementsValid) {
       lastDrawnBlock = ( (int) ((gaugeValue - scaleMin) / blockValue) ) - 1;
       if (lastDrawnBlock < -1) lastDrawnBlock = -1;  //  ?? Shouldn't happen.
@@ -176,7 +184,10 @@ public class BarGauge extends RenderedGauge
                                     barRects[n].bottom);
         }
       } else {
-        if (lastDrawnBlock > (numberBlocks - 1)) lastDrawnBlock = numberBlocks - 1;  // ??  Shouldn't happen.
+        if (lastDrawnBlock > (numberBlocks - 1)) {
+          // ??  Shouldn't happen.
+          lastDrawnBlock = numberBlocks - 1;
+        }
         lastBlockRect = null; // No last block required.
       }
     } else {

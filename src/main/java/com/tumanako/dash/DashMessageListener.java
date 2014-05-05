@@ -30,12 +30,13 @@ import java.util.EventListener;
 public interface DashMessageListener extends EventListener
 {
 
-  /* Message ID Constants: **************************************************
+  /*
+   * Message ID Constants.
    * These integer IDs are used as the 'value' of the DASHMESSAGE_MESSAGE
    * field in an intent. They identify the source of the message.
    * We define a global list here, and other classes may add their own by
    * using one of these as a base and adding an integer value.
-   **************************************************************************/
+   */
   int DASHMESSAGE_UNSPECIFIED  =    0;
   int NMEA_GPS_SENSOR_ID       =  300;
   int NMEA_PROCESSOR_ID        =  400;

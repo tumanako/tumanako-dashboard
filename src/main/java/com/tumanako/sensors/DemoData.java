@@ -29,11 +29,11 @@ import com.tumanako.dash.DashMessageListener;
 import com.tumanako.ui.UIActivity;
 
 /**
- *  Tumanako Demo Data Input.
+ * Tumanako Demo Data Input.
  *
- *  This class is designed to generate demo data to show the UI
- *  (if a connection to a Tumanako vehicle controller is not
- *  available!)
+ * This class is designed to generate demo data to show the UI
+ * (if a connection to a Tumanako vehicle controller is not
+ * available!)
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */

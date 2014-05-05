@@ -28,37 +28,35 @@ import android.os.SystemClock;
 import com.tumanako.dash.DashMessageListener;
 
 /**
- *  NMEA NMEAData Listener and Processor.
+ * NMEA NMEAData Listener and Processor.
  *
- *  Implements the GpsStatus.NmeaListener interface, which receives NMEA
- *  sentences from the NMEAData.
+ * Implements the GpsStatus.NmeaListener interface, which receives NMEA
+ * sentences from the NMEAData.
  *
- *  This class also includes filters to select specific NMEA strings and
- *  extract the data fields.
+ * This class also includes filters to select specific NMEA strings and
+ * extract the data fields.
  *
- *  Methods are provided to return the extracted gps data to a parent
- *  class.
+ * Methods are provided to return the extracted GPS data to a parent
+ * class.
  *
- *  Call isFixGood() to check whether good NMEA data are being received.
+ * Call isFixGood() to check whether good NMEA data are being received.
  *
- *  To Use:
+ * To Use:
  *
- *  First create a NmeaGPS object (see NmeaGPS.java). That class will
- *  create an instance of this class to receive and process NMEA data.
+ * First create a {@link NmeaGPS} object. That class will
+ * create an instance of this class to receive and process NMEA data.
  *
- *  Once up and running, this class generates an intent whenever GPS data are
- *  updated, used to signal other components that they can request elements
- *  of the new data by calling getTime(), getLat(), etc as needed.
+ * Once up and running, this class generates an intent whenever GPS data are
+ * updated, used to signal other components that they can request elements
+ * of the new data by calling getTime(), getLat(), etc as needed.
  *
  * NOTE:
- *  Currently, any other component which wants actual GPS data
- *  must obtain a reference to this instance (through NmeaGPS class) and
- *  retrieve the data with calls to getTime(), getLat(), etc.
- *  TO DO: Could send out an intent on data update, containing a
- *  Bundle of GPS data. That way no direct reference to this instance
- *  would be needed!
- *  QUESTION: Would this be wasteful if only some of the GPS values
- *  were needed?
+ *   Currently, any other component which wants actual GPS data
+ *   must obtain a reference to this instance (through {@link NmeaGPS}) and
+ *   retrieve the data with calls to {@link #getTime()}, {@link #getLat()}, etc.
+ *   TODO Could send out an intent on data update, containing a Bundle of GPS data.
+ *     That way no direct reference to this instance would be needed!
+ *   XXX Would this be wasteful if only some of the GPS values were needed?
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
@@ -96,15 +94,17 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
   /** System time (mS) for the last position update. */
   private long    timeLastPosition = 0L;
   /**
-   * Do we have a current fix? True when we are receiving good NMEA data;
-   * false if NMEA data is empty (i.e. no fix)
-   * NOTE: This only looks at the last NMEA we received; if NMEA data stop all together, isFixGood may still be true.
-   * See IsFixGood() method below (also checks for time since last NMEA data).
+   * Do we have a current fix? <code>true</code> when we are receiving good NMEA data;
+   * <code>false</code> if NMEA data is empty (no fix).
+   * NOTE: This only looks at the last NMEA we received; if NMEA data stop all together,
+   * isFixGood may still be true.
+   * See {@link #isFixGood()} below (also checks for time since last NMEA data).
    */
   private boolean isFixGood        = false;
 
   /**
-   * If no NMEA sentences received after this many mS, we'll declare that the NMEAData has stopped.
+   * If no NMEA sentences received after this many mSec,
+   * we will declare that the NMEAData has stopped.
    */
   private static final int NMEA_WAIT_TIMEOUT = 3000;
 
@@ -176,8 +176,10 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
     // Overrides normal operation in demo mode:
     if (isDemo) return true;
     // ---------------DEMO MODE CODE -------------------------------
-    //  If isFixGood and it's been less than NMEA_WAIT_TIMEOUT mS since the last good NMEA data, this is a good fix!
-    return isFixGood && (timeLastPosition > NMEA_WAIT_TIMEOUT) && (timeLastPosition + NMEA_WAIT_TIMEOUT) > SystemClock.elapsedRealtime();
+    //  If {@link #isFixGood} and it's been less than {@link #NMEA_WAIT_TIMEOUT} mSec
+    // since the last good NMEA data, this is a good fix!
+    return isFixGood && (timeLastPosition > NMEA_WAIT_TIMEOUT)
+        && (timeLastPosition + NMEA_WAIT_TIMEOUT) > SystemClock.elapsedRealtime();
   }
 
   public String getLastGGA()
@@ -278,7 +280,8 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
     // Example NMEA data sentence:
     //  "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47"
 
-    isLastSentence = false;  // Set to true when we receive the last sentence in a sentence cycle (GSA sentence).
+    // Set to true when we receive the last sentence in a sentence cycle (GSA sentence).
+    isLastSentence = false;
 
     if (thisNMEA.length() < 6) return;   // Can't decode string - not enough data!
 
@@ -289,7 +292,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
     String[] nmeaParts = thisNMEA.split(",");
 
     // Select and process the sentences we want to use:
-    /*********************************************************************************************/
+    // *********************************************************************************************
     if (nmeaSentenceID.equals("GGA")) {
       // GGA String -
       // Essential Fix Data ($GPGGA,Time, Lat, Lon, Qual, Sats, HDOP, Alt,M, Geoid,M, , , Checksum):
@@ -309,7 +312,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
           isFixGood = (gpsQual > 0);
           timeLastPosition = SystemClock.elapsedRealtime();  //  We have a position fix!
         } catch (NumberFormatException e) {
-          // Number format exception... Indicates that we aren't receiving good data. (e.g. empty fields)
+          // This exception indicates that we are not receiving good data. (e.g. empty fields)
           isFixGood = false;
         }
       }
@@ -327,7 +330,7 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
           isFixGood = true;                                  //
           timeLastPosition = SystemClock.elapsedRealtime();  // We have VTG data!
         } catch (NumberFormatException e) {
-          // Number format exception... Indicates that we aren't receiving good data. (e.g. empty fields)
+          // This exception indicates that we are not receiving good data. (e.g. empty fields)
           isFixGood = false;
         }
       }
@@ -356,8 +359,8 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, Dash
     if (thisLatLon.length() < 7) return 0.0;   // Should have at least 'DDMM.MM'.
     try {
       int dotAt = thisLatLon.indexOf(".");
-      final double degrees = Double.valueOf(thisLatLon.substring(0,dotAt-2));
-      final double minutes = Double.valueOf(thisLatLon.substring(dotAt-2));
+      final double degrees = Double.valueOf(thisLatLon.substring(0, dotAt - 2));
+      final double minutes = Double.valueOf(thisLatLon.substring(dotAt - 2));
       return degrees + (minutes / 60.0);
     } catch (NumberFormatException e) {
       return 0.0; // On error, give up and return 0.0

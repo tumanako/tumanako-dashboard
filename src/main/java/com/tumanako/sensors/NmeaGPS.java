@@ -58,9 +58,9 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
   }
 
   /**
-   * Is the NMEAData OK / available?
+   * Is the NMEAData OK / available?.
    * Note - NMEAData status found to be slow in changing. It's better to look at
-   * isFixGood() method of NMEAData object to see if a fix is available.
+   * {@link NmeaProcessor#isFixGood()} method of NMEAData object to see if a fix is available.
    */
   @Override
   public boolean isOK()
@@ -92,7 +92,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
     // Register the listener with the Location Manager to receive location updates:
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     // Add a listener to receive NMEA sentences:
-    // Tihs causes our NmeaProcessor class to get NMEA messages from the GPS:
+    // This causes our NmeaProcessor to get NMEA messages from the GPS:
     mLocationManager.addNmeaListener(getNmeaData());
   }
 
@@ -104,12 +104,12 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
   }
 
   @Override
-  public void onLocationChanged(Location arg0)
+  public void onLocationChanged(Location location)
   {
   }
 
   @Override
-  public void onProviderDisabled(String arg0)
+  public void onProviderDisabled(String provider)
   {
   }
 
@@ -121,13 +121,13 @@ public class NmeaGPS implements LocationListener, IDroidSensor, DashMessageListe
   @Override
   public void onStatusChanged(String provider, int status, Bundle extras)
   {
-    // *** NMEAData Status: *****
-    //  0 = OUT_OF_SERVICE
-    //  1 = TEMPORARILY_UNAVAILABLE
-    //  2 = AVAILABLE
+    // NMEAData Status:
+    //   0 = OUT_OF_SERVICE
+    //   1 = TEMPORARILY_UNAVAILABLE
+    //   2 = AVAILABLE
     //
     // Note - NMEAData status found to be slow in changing. Just look at
-    // isFixGood() method of NMEAData object to see if a fix is available.
+    // {@link NmeaProcessor#isFixGood()} to see if a fix is available.
     isAvailable = (status == 2);
   }
 

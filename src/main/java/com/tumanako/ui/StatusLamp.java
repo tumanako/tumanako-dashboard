@@ -71,16 +71,17 @@ import android.widget.ImageView;
 }
  *
  * To access the lamp from code and turn it on or off, use something like this:
- *
- *   private StatusLamp demoStatusLamp;
- *   demoStatusLamp = (StatusLamp)   findViewById(R.id.demoStatusLamp);
- *   demoStatusLamp.turnOn();
+ * {@code
+    private StatusLamp demoStatusLamp;
+    demoStatusLamp = (StatusLamp) findViewById(R.id.demoStatusLamp);
+    demoStatusLamp.turnOn();
+}
  *
  * Easy as that!
  *
  * Other public methods:
- *   turnOff()
- *   getStatus()
+ *   {@link #turnOff()}
+ *   {@link #getState()}
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
@@ -104,14 +105,14 @@ public class StatusLamp extends ImageView
    */
   public StatusLamp(Context context, AttributeSet attrs)
   {
-    // Call the super class constructor to create a basic ImageView:
+    // Call the super class constructor to create a basic ImageView
     super(context, attrs);
 
-    // Get attributes from XML file:
+    // Get attributes from XML file.
     // This method also loads the 'On' and 'Off' bitmaps for the lamp.
     getCustomAttributes(attrs);
 
-    // Set Lamp State:
+    // Set Lamp State.
     if (lampState) turnOn();
     else           turnOff();
   }
@@ -119,7 +120,7 @@ public class StatusLamp extends ImageView
   /**
    * Extracts custom attributes.
    * Given a set of attributes from the XML layout file, extract
-   * the custom attributes specific to the StatusLamp:
+   * the custom attributes specific to the StatusLamp.
    * @param attrs - Attributes passed in from the XML parser
    */
   private void getCustomAttributes(AttributeSet attrs)
@@ -132,7 +133,7 @@ public class StatusLamp extends ImageView
     int idBitmapLampOff = a.getResourceId(R.styleable.StatusLamp_off_bitmap, R.drawable.greenglobe_off);
     String initialStatus = a.getString(R.styleable.StatusLamp_initial_status);
 
-    // Recycle the TypedArray:
+    // Recycle the TypedArray.
     a.recycle();
 
     // Load the bitmaps for the lamp:
@@ -160,7 +161,7 @@ public class StatusLamp extends ImageView
 
   /**
    * Returns the current lamp state.
-   * @return true = Lamp is on; false = lamp is off.
+   * @return <code>true</code> = Lamp is on; <code>false</code> = lamp is off.
    */
   public boolean getState()
   {

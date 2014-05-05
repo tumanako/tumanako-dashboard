@@ -174,15 +174,18 @@ public class VehicleData extends Thread implements DashMessageListener
     vehicledataContext = context;
 
     // Bluetooth Init
-    myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // Build a UUID for a RfComm connection (used when connecting)
-    bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();          // Create a Bluetooth adaptor object
+    //   Build a UUID for a RfComm connection (used when connecting)
+    myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    //   Create a Bluetooth adaptor object
+    bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     isBTConnected = false;
 
-    dashMessages = new DashMessages(context, this, VEHICLE_DATA);     // We are extending the 'DashMessages' class, and we need to call its Constructor here.
+    // We are extending the 'DashMessages' class, and we need to call its constructor here.
+    dashMessages = new DashMessages(context, this, VEHICLE_DATA);
     dashMessages.resume();
 
-    // Setup the Bluetooth Watchdog Timer
-    watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);   // ...Callback in n milliseconds!
+    // Setup the Bluetooth Watchdog Timer, callback in n milliseconds
+    watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);
 
     // ********* TEMP DEBUG **************************
     //uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
@@ -239,9 +242,12 @@ public class VehicleData extends Thread implements DashMessageListener
     btClose();   // Close the BT connection
 
     // Stop the update timer if it is running
-    watchdogTimer.removeCallbacks(watchdogTimerTask); // Stop the timer.
-    dashMessages.suspend();                           // Stop the IDashMessages object (unregisters the intent listener)
-    isBTConnected = false;                            // Tell the BT connection thread to exit.
+    //   Stop the timer.
+    watchdogTimer.removeCallbacks(watchdogTimerTask);
+    //   Stop the IDashMessages object (unregisters the intent listener)
+    dashMessages.suspend();
+    //   Tell the BT connection thread to exit.
+    isBTConnected = false;
   }
 
   /**
@@ -379,20 +385,31 @@ public class VehicleData extends Thread implements DashMessageListener
 
     // ************* Try to establish a BT Connection ***********************************
     try {
-      if (btSocket != null) btSocket.close();                                 // If there's already a BT Socket open, close it.
-      btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);   // Create a new BT Socket for RF Comm connection.
+      if (btSocket != null) {
+        // If there's already a BT Socket open, close it.
+        btSocket.close();
+      }
+      // Create a new BT Socket for RF Comm connection.
+      btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);
       //Log.i(UIActivity.APP_TAG, "             -> Socket Created. " );
-      bluetoothAdapter.cancelDiscovery();                                     // Cancel any Bluetooth discovery that's running (in case another app started it...) According to the docs, we should do this...
-      btSocket.connect();                                                     // Attempt to connect!!!
+      // Cancel any Bluetooth discovery that's running (in case an other application started it...)
+      // According to the docs, we should do this...
+      bluetoothAdapter.cancelDiscovery();
+      // Attempt to connect!!!
+      btSocket.connect();
     } catch (IOException ioe) {
       //Log.i(UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
-      // Our attempt to open a BT connection caused an IO exception. This could be due to a bug in
-      // the Bluetooth class. Try again using a call to an internal method in createRfcommSocket class:
-      // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android )
+      // Our attempt to open a BT connection caused an IO exception.
+      // This could be due to a bug in the Bluetooth class.
+      // Try again using a call to an internal method in createRfcommSocket class:
+      // (See http://stackoverflow.com/questions/4444235/problems-connecting-with-bluetooth-android)
       Method m;
       try {
         m = btVehicleSensor.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-        if (btSocket != null) btSocket.close(); // If there's already a BT Socket open, close it.
+        if (btSocket != null) {
+          // If there's already a BT Socket open, close it.
+          btSocket.close();
+        }
         btSocket = (BluetoothSocket)m.invoke(btVehicleSensor, 1);
         btSocket.connect();
       } catch (Exception e) {
@@ -406,12 +423,12 @@ public class VehicleData extends Thread implements DashMessageListener
     // Connected! Try to open streams...
     try {
       //Log.i(UIActivity.APP_TAG, "             -> CONNECTED. " );
-      btStreamIn  = btSocket.getInputStream();                 // Get input and output streams
-      btStreamOut = btSocket.getOutputStream();                // for communication through the socket.
+      btStreamIn  = btSocket.getInputStream();  // Get input and output streams
+      btStreamOut = btSocket.getOutputStream(); // for communication through the socket.
       //Log.i(UIActivity.APP_TAG, "             -> IO Streams Open! " );
       return true;                                  // SUCCESS!!
     } catch (IOException e) {
-      // An error occurred during BT comms setup:
+      // An error occurred during BT comms setup
       Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
       Log.i(UIActivity.APP_TAG, e.getMessage());
       return false;  // Give up.

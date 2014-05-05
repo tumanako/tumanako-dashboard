@@ -36,7 +36,7 @@ import android.view.WindowManager;
  * labels) will return a number > 1.0
  *
  * Calculations are carried out in the constructor. The multiplier can then be
- * requested using "getFontScale()"
+ * requested using {@link #getFontScale()}.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
@@ -50,9 +50,9 @@ public class ScaledFont
   public ScaledFont(Context context)
   {
 
-    // ------- Calculate a good font size multiplier for labels, based on screen resolution. ------------
+    // Calculate a good font size multiplier for labels, based on screen resolution.
 
-    // First, find the window size:
+    // First, find the window size.
     Display thisDisplay = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
     float windowWidth  = thisDisplay.getWidth();   // Width of the screen

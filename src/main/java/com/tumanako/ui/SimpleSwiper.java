@@ -63,12 +63,16 @@ public class SimpleSwiper extends SimpleOnGestureListener
       if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
               return false;
 
-      // *** Swipe Filtering: ***
+      // Swipe Filtering.
       // Detects a Left or Right swipe if the 'fling' was long enough and
       // the velocity high enough.
-      if      (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+      if        (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+          && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+      {
         ((UIActivity)uiContext).nextScreen();
-      } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+      } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+          && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+      {
         ((UIActivity)uiContext).prevScreen();
       }
     } catch (Exception e) {

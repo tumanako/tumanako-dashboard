@@ -32,25 +32,28 @@ import android.util.Log;
 import android.view.View;
 
 /**
- * Rendered Gauge - Base Class:
+ * Rendered Gauge - Base Class.
  * This is the basis for the rendered dial and rendered bar controls,
  * which have a lot in common!
  *
  * Uses custom attributes, which are set in the Layout XML to
- * control the appearance of the control. The following are recognised:
+ * control the appearance of the control. The following are recognized:
 
  *  minimum_scale    - float: Lowest scale value
  *  scale_step       - float: Size of scale step
  *  number_divisions - integer: How many divisions on the scale.* See Note.
- *  scale_tick_step  - float: Size of step for tick marks between major scale steps. Should be a division of scale_step.
- *  label_format     - string: Format string for numeric scale labels. (See String.format function) e.g. "%.1f"
- *  colours          - string: Comma-seperated list of colour values to apply to the scale / bar. See Note.
+ *  scale_tick_step  - float: Size of step for tick marks between major scale steps.
+ *                            Should be a division of scale_step.
+ *  label_format     - string: Format string for numeric scale labels.
+ *                             (See {@link String#format}) e.g. "%.1f"
+ *  colours          - string: Comma-separated list of colour values to apply to the scale / bar. See Note.
  *  gauge_label      - string: Specify a static label to show on the control.
  *  label_x          - float: x position of gauge label (as a fraction of view width)
  *  label_y          - float: y position of gauge label (as a fraction of view height)
  *
  * These attributes apply only to 'Dial' gauges derived from this class:
- *  minimum_angle    - integer: Needle angle for lowest scale value, in DEGREES; 0 = vertical up; -90 = horizontal to left, etc.
+ *  minimum_angle    - integer: Needle angle for lowest scale value, in DEGREES; 0 = vertical up;
+ *                              -90 = horizontal to left, etc.
  *  maximum_angle    - integer: Needle angle for highest scale value, as above.
  *  origin_x         - float: x position of needle origin (as a fraction of view width)
  *  origin_y         - float: y position of needle origin (as a fraction of view height)
@@ -58,7 +61,8 @@ import android.view.View;
 
  * These attributes apply only to 'Bar' gauges derived from this class:
  *  orientation      - string: "vertical" or "horizontal"
- *  scale_position   - string: "left" or "right". Specifies the position of the scale relative to the bar for a bar plot. Use "left" for top if the bar is horizontal.
+ *  scale_position   - string: "left" or "right". Specifies the position of the scale relative to
+ *                             the bar for a bar plot. Use "left" for top if the bar is horizontal.
  *
  * NOTE:
  *  Scale Maximum:  Highest scale value is determined from (scale_step * number_divisions) +  minimum_scale
@@ -70,9 +74,10 @@ import android.view.View;
  *  The 'colours' attribute specifies a list of colours, as follows:
  *    "0xFFFFC0FF,0xC0FFC0FF,0xA0FFC0FF"
  *
- *  Each Hex number represents a colour (RRGGBBAA). These are applied to each Tick Step on the scale; i.e.
- *  the first colour is applied to the first division, second to the second, etc. If there are too few colours,
- *  the last colour is applied to all remaining steps.
+ *  Each Hex number represents a colour (RRGGBBAA).
+ *  These are applied to each Tick Step on the scale; i.e. the first colour is applied
+ *  to the first division, second to the second, etc.
+ *  If there are too few colours, the last colour is applied to all remaining steps.
  *
  * Note that there must also be a values\attrs.xml file which defines the custom
  * attributes.  It should look like this:
@@ -112,7 +117,7 @@ public class RenderedGauge extends View
   protected int drawingWidth = 0;
   protected int drawingHeight = 0;
 
-  // Internal constants to remember the guage attributes:
+  // Internal constants to remember the guage attributes
   protected float scaleMin = 0f;
   protected float scaleMax = 0f;
   protected float deltaScale = 0f;
@@ -133,20 +138,20 @@ public class RenderedGauge extends View
   protected boolean showTicks = true;
   protected boolean showGaugeLabel = true;
 
-  // Internal constants to remember the gauge attributes (Dial Specific):
+  // Internal constants to remember the gauge attributes (Dial Specific)
   protected float minAngle = 0f;
   protected float maxAngle = 0f;
   protected float deltaAngle = 0f;
   protected float fNeedleLength = 0f;
 
-  // Internal constants to remember the gauge attributes (Bar Specific):
+  // Internal constants to remember the gauge attributes (Bar Specific)
   protected boolean isVertical = true;
   protected boolean isScaleLeft = true;
   protected float fBarAcross = 0f;
   protected float fBarLong = 0f;
   protected int barSegmentGap = 1;
 
-  // Calculated internal values (based on actual size of guage, and generated at runtime):
+  // Calculated internal values (based on actual size of guage, and generated at runtime)
   protected float originX = 0f;       // Needle Origin in screen coordinates inside the canvas of the control
   protected float originY = 0f;       //
   protected float labelX = 0f;        // Dial label Origin in screen coordinates inside the canvas of the control
@@ -157,14 +162,15 @@ public class RenderedGauge extends View
   protected float[] tickX;            // } Will contain locations of scale tick marks once they are known.
   protected float[] tickY;            // }
 
-  // Runtime Data Values:
-  protected float gaugeValue = 0f;   // The value we are currently representing
+  // Runtime Data Values
+  /** The value we are currently representing */
+  protected float gaugeValue = 0f;
 
-  // Paint for scale text:
+  /** Paint for scale text */
   protected Paint scalePaint = new Paint();
-  // Paint for scale ticks:
+  /** Paint for scale ticks */
   protected Paint tickPaint = new Paint();
-  // Paint for gauge label:
+  /** Paint for gauge label */
   protected Paint guageLablelPaint = new Paint();
 
   protected static final int DEFAULT_BAR_COLOUR = 0xFF00C000;
@@ -180,31 +186,31 @@ public class RenderedGauge extends View
 
     //uiContext = context;
 
-    // Get Font Scale:
+    // Get Font Scale
     fontScale = new ScaledFont(context);
 
-    // Load custom attributes from XML:
+    // Load custom attributes from XML
     getCustomAttributes(atttibutes);
 
-    // Create the arrays to store pre-calculated scale data:
+    // Create the arrays to store pre-calculated scale data
     slabelX = new float[numberDivisions];
     slabelY = new float[numberDivisions];
     scaleLabels = new String[numberDivisions];
     tickX = new float[numberScaleTicks];
     tickY = new float[numberScaleTicks];
 
-    // Default paint for scale:
+    // Default paint for scale
     scalePaint.setColor(Color.BLACK);
     scalePaint.setTextSize(fontScale.getFontScale() * 12);
     scalePaint.setTextAlign(Paint.Align.CENTER);
     scalePaint.setTypeface(Typeface.DEFAULT_BOLD);
     scalePaint.setAntiAlias(true);
 
-    // Default paint for scale ticks:
+    // Default paint for scale ticks
     tickPaint.setColor(DEFAULT_TICK_COLOUR);
     tickPaint.setAntiAlias(true);
 
-    // Default paint for gauge label:
+    // Default paint for gauge label
     guageLablelPaint.setColor(Color.BLACK);
     guageLablelPaint.setTextSize(14);
     guageLablelPaint.setTextAlign(Paint.Align.CENTER);
@@ -217,7 +223,7 @@ public class RenderedGauge extends View
    * Extracts custom attributes.
    * Given a set of attributes from the XML layout file, extract
    * the custom attributes specific to this control.
-   * Also calculates some derived values based on teh specified
+   * Also calculates some derived values based on the specified
    * attributes.
    *
    * @param attrs - Attributes passed in from the XML parser
@@ -226,7 +232,7 @@ public class RenderedGauge extends View
   {
     TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.RenderedGauge );
 
-    // ---- Attributes common to all derived controls: -------------------------
+    // Attributes common to all derived controls
     scaleMin         = a.getFloat(R.styleable.RenderedGauge_minimum_scale, 0f);
     scaleStep        = a.getFloat(R.styleable.RenderedGauge_scale_step , 1f);
     numberDivisions  = a.getInt(R.styleable.RenderedGauge_number_divisions,5);
@@ -235,30 +241,30 @@ public class RenderedGauge extends View
     tickSize         = (int)(a.getFloat(R.styleable.RenderedGauge_scale_tick_size,2.0f) * fontScale.getFontScale());
     fOriginX         = a.getFloat(R.styleable.RenderedGauge_origin_x , 0.5f);
     fOriginY         = a.getFloat(R.styleable.RenderedGauge_origin_y , 0.5f);
-    // Gauge label and position:
+    // Gauge label and position
     fLabelX = a.getFloat(R.styleable.RenderedGauge_label_x , 0.5f);
     fLabelY = a.getFloat(R.styleable.RenderedGauge_label_y , 0.3f);
     gaugeLabel = a.getString(R.styleable.RenderedGauge_gauge_label);
     if (gaugeLabel == null) gaugeLabel = "";
-    // Scale labels - format and colours:
+    // Scale labels - format and colours
     labelFormat = a.getString(R.styleable.RenderedGauge_label_format);
     if (labelFormat == null) labelFormat = "%.0f";
     String sScaleColours = a.getString(R.styleable.RenderedGauge_colours);
     if (sScaleColours == null) sScaleColours = "";
     scaleColours = extractColours(sScaleColours);
     numberColours = scaleColours.length;
-    // What to show:
+    // What to show
     showScale = a.getBoolean(R.styleable.RenderedGauge_show_scale, true);
     showTicks = a.getBoolean(R.styleable.RenderedGauge_show_ticks, true);
     showGaugeLabel = a.getBoolean(R.styleable.RenderedGauge_show_gauge_Label, true);
 
-    // ---- Attributes for the Dial: -----------------------------------
+    // Attributes for the Dial
     minAngle   = ((float)a.getInt(R.styleable.RenderedGauge_minimum_angle , -90) / 180f) * (float)Math.PI;  // NOTE: Angle attribute in Degrees; But store Radians.
     maxAngle   = ((float)a.getInt(R.styleable.RenderedGauge_maximum_angle ,  90) / 180f) * (float)Math.PI;  //
     deltaAngle = maxAngle - minAngle;
     fNeedleLength = a.getFloat(R.styleable.RenderedGauge_needle_length , 0.35f);
 
-    // ---- Attributes for the bar guage: -----------------------------------
+    // Attributes for the bar guage
     String gaugeOrientation = a.getString(R.styleable.RenderedGauge_orientation);
     if (gaugeOrientation == null) gaugeOrientation = "vertical";
     if (gaugeOrientation.equals("horizontal")) isVertical = false;
@@ -271,14 +277,14 @@ public class RenderedGauge extends View
     fBarLong   = a.getFloat(R.styleable.RenderedGauge_bar_long , 0f);
     barSegmentGap = a.getInt(R.styleable.RenderedGauge_segment_gap, 1);
 
-    // Recycle the TypedArray:
+    // Recycle the TypedArray
     a.recycle();
   }
 
 
 
   /**
-   * Extract Colours from attribute value:
+   * Extract Colours from attribute value.
    *
    * The 'colour' attribute specifies a list of colours to use for the scale
    * divisions. The attribute is a string, and should be in the following format:
@@ -298,14 +304,14 @@ public class RenderedGauge extends View
    * integers is returned.
    *
    * If:
-   *  *String is null, empty or can't be interpreted as a number:
-   *    -Returns an array with a single entry containing a default colour
+   * - String is null, empty or can't be interpreted as a number:
+   *    + Returns an array with a single entry containing a default colour
    *
-   *  *One or more string elements are found (i.e. data separated by commas):
-   *    -Returns an array of integers with matching number of entries
+   * - One or more string elements are found (i.e. data separated by commas):
+   *    + Returns an array of integers with matching number of entries
    *
-   *  *One or more of the elements in the input string can't be converted to an integer:
-   *    -The invalid entry will contain the default colour in the returned string.
+   * - One or more of the elements in the input string can't be converted to an integer:
+   *    + The invalid entry will contain the default colour in the returned string.
    *
    *
    * @param colourData - String containing colour data (e.g. "FFC0D0F0,FFCFDFFF,FFFF0000")
@@ -313,19 +319,22 @@ public class RenderedGauge extends View
    */
   private int[] extractColours(String colourData)
   {
-    // Create a default colour array: This is an array with only one entry (the default colour):
+    // Create a default colour array: This is an array with only one entry (the default colour)
     int[] defaultColours = { DEFAULT_BAR_COLOUR };
-    // Use String.split to split the string at each "," character. Makes an array of sub-strings.
+    // Use {@link String#split} to split the string at each "," character.
+    // Creates an array of sub-strings.
     String[] splitColours = colourData.split(",");
     if (splitColours.length > 0) {
-      // Length of split array greater than 0, so we found at least one comma seperated string element:
+      // Length of split array greater than 0, so we found at least one comma seperated string element.
       // Create an array to return integer colour values.
-      int[] theseColours = new int[splitColours.length];  // Same number of integer entries as there are string elements.
-      // Loop through the array of string elements we found, and try to extract the colour value from each:
+      // Same number of integer entries as there are string elements.
+      int[] theseColours = new int[splitColours.length];
+      // Loop through the array of string elements we found,
+      // and try to extract the colour value from each.
       for (int n=0; n<splitColours.length; n++) {
         // Use a Try / Catch block, and try to interpret the colour value with "Integer.parseInt".
-        // If this fails, it should throw an exception. In that case, we'll just use the default colour
-        // for the corresponding colour entry:
+        // If this fails, it should throw an exception.
+        // In that case, we'll just use the default colour for the corresponding colour entry.
         try {
           theseColours[n] = (int)Long.parseLong(splitColours[n],16);
         } catch (NumberFormatException e) {
@@ -334,7 +343,7 @@ public class RenderedGauge extends View
       }
       return theseColours;
     } else {
-      return defaultColours;     // No strings found... return default (one-entry array).
+      return defaultColours; // No strings found... return default (one-entry array).
     }
   }
 
@@ -365,7 +374,7 @@ public class RenderedGauge extends View
 
     setValue(scaleMin);
 
-    // ------- Set a good font size for labels, based on screen resolution. ------------
+    // Set a good font size for labels, based on screen resolution.
     guageLablelPaint.setTextSize(fontScale.getFontScale() * 14.0f );
 
     invalidate();
@@ -422,8 +431,10 @@ public class RenderedGauge extends View
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
   {
-    // The widthMeasureSpec and heightMeasureSpec contain width and height specifications packed into an integer.
-    // We need to carefully check and decode these. We'll use a couple of helper functions to do this:
+    // The widthMeasureSpec and heightMeasureSpec contain width
+    // and height specifications packed into an integer.
+    // We need to carefully check and decode these.
+    // We'll use a couple of helper functions to do this.
     setMeasuredDimension(measureThis(widthMeasureSpec),  measureThis(heightMeasureSpec));
   }
 
@@ -431,14 +442,14 @@ public class RenderedGauge extends View
   protected void onLayout (boolean changed, int left, int top, int right, int bottom)
   {
     // Layout Time: We should now have measurements for our view area, so we can calculate positions
-    // and sizes for gauge elements:
-    // **** Get actual layout parameters: ****
+    // and sizes for gauge elements
+    // Get actual layout parameters
     if (changed) {
       // --DEBUG!--
       Log.i( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
       drawingWidth = this.getWidth();
       drawingHeight = this.getHeight();
-      calcGauge();                      // Calculate various generic values applying to all gauge types.
+      calcGauge(); // Calculate various generic values applying to all gauge types.
     }
   }
 

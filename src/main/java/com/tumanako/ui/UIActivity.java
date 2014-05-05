@@ -52,8 +52,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Main UI Activity:
- *  -Displays the UI!
+ * Main UI Activity.
+ * - Displays the UI!
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
@@ -62,7 +62,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
   public static final String APP_TAG = "TumanakoDash";
 
-  // **** Tabs and Swipes: ***************************
+  // Tabs and Swipes
   private TabHost tabHost;
   private int currentTab = 0;
   private static final int MIN_TAB = 0;
@@ -85,7 +85,10 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
   /** Use this to count uiTimer intervals during which no data have been received. */
   private int uiResetCounter = 0;
-  /** If the counter exceeds UI_RESET_AFTER, reset the UI (i.e. clear old data which we assume is no longer valid). */
+  /**
+   * If the counter exceeds UI_RESET_AFTER, reset the UI
+   * (i.e. clear old data which we assume is no longer valid).
+   */
   private static final int UI_RESET_AFTER = 6;
   private int chargeNodeResetCounter = 0;
   private static final int CHARGENODE_RESET_AFTER = 20;
@@ -109,7 +112,8 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   }
 
   /**
-   * Create UI: Called when the activity is first created
+   * Create UI.
+   * Called when the activity is first created.
    */
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -194,11 +198,11 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     dashMessages = new DashMessages( this, this, UI_INTENT_IN );
 
     // -------- Restore Saved Preferences (if any): -------------------
-    /***
+    /*
     SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
     totalEnergy    = 25.0;  //settings.getFloat( "totalEnergy", 0 );
     totalDistance  = settings.getFloat( "totalDistance", 0 );
-    ***/
+    */
 
 
     // -------- Restore saved instence state if one exists: ---------------------
@@ -233,16 +237,15 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     tabHost.setCurrentTab(currentTab);
   }
 
-
   /** Save a copy of some data to the Preferences */
   private void saveSettings()
   {
-    /***
+    /*
     SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
     SharedPreferences.Editor editor = settings.edit();
     editor.putInteger("isDemo", false);
-    editor.commit();        // Commit the edits!
-    ***/
+    editor.commit(); // Commit the edits!
+    */
   }
 
   // ---------------DEMO MODE CODE -------------------------------
@@ -262,10 +265,8 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   }
   // ---------------DEMO MODE CODE -------------------------------
 
-
-
   /**
-   * Get Hours:
+   * Returns Hours.
    * Given a decimal number of hours (e.g. 1.5), return the
    * number of hours as an integer (i.e. truncate the fractional part).
    * @param decimalHours - Decimal Hours (i.e. 1.5 = 1 Hr 30 Mins).
@@ -277,7 +278,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   }
 
   /**
-   * Get Minutes:
+   * Returns Minutes.
    * Given a decimal number of hours (e.g. 1.5), return the
    * number of minutes as an integer (i.e. fractional part multiplied by 60)
    * @param decimalHours - Decimal Hours (i.e. 1.5 = 1 Hr 30 Mins).
@@ -288,43 +289,40 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     return (int)((decimalHours - (float)((int)(decimalHours))) * 60);
   }
 
-
-
   /** Toast Message */
   private void showMessage(String ThisMessage)
   {
-    // *** Displays pop-up TOAST message: **
+    // Displays pop-up TOAST message
     Toast.makeText(getApplicationContext(), ThisMessage, Toast.LENGTH_SHORT).show();
   }
-
 
   /** Reset UI to default */
   private void uiReset()
   {
     // Primary Data:
-    ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue (  0f );
-    ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue (  0f );
-    ((BarGauge)uiWidgets.get("barTMotor"))               .setValue (  0f );
-    ((BarGauge)uiWidgets.get("barTController"))          .setValue (  0f );
-    ((BarGauge)uiWidgets.get("barTBattery"))             .setValue (  0f );
+    ((Dial)uiWidgets.get("dialMotorRPM"))        .setValue(0f);
+    ((Dial)uiWidgets.get("dialMainBatteryKWh"))  .setValue(0f);
+    ((BarGauge)uiWidgets.get("barTMotor"))       .setValue(0f);
+    ((BarGauge)uiWidgets.get("barTController"))  .setValue(0f);
+    ((BarGauge)uiWidgets.get("barTBattery"))     .setValue(0f);
     ((StatusLamp)uiWidgets.get("lampData")).turnOff();
     ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
     ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
     ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
     ((StatusLamp)uiWidgets.get("lampReverse")).turnOff();
     // Secondary Data:
-    ((TextWithLabel)uiWidgets.get("textDriveTime"))     .setText   (  "00:00" );
-    ((TextWithLabel)uiWidgets.get("textDriveRange"))    .setText   (  "0"     );
-    ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText  (  "0.0"   );
+    ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText("00:00");
+    ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText("0");
+    ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText("0.0");
     // System Data:
-    ((TextWithLabel)uiWidgets.get("textMainBattVlts"))  .setText   (  "0.0"   );
-    ((TextWithLabel)uiWidgets.get("textMainBattAH"))    .setText   (  "0.0"   );
+    ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText("0.0");
+    ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText("0.0");
     ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
   }
 
   private void chargeNodeUIReset()
   {
-    // Charge Node UI Reset:
+    // Charge Node UI Reset
     //--DEBUG!--
     Log.i(APP_TAG,"UIActivity -> chargeNodeUIReset()");
     ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
@@ -344,7 +342,10 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     return gestureDetector.onTouchEvent(event);
   }
 
-  /** Click Event: (Can be used with buttons and other controls) */
+  /**
+   * Click Event.
+   * Can be used with buttons and other controls.
+   */
   @Override
   public void onClick(View viewClicked)
   {
@@ -353,14 +354,15 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     //  The code checks the ID of the view which generated the event
     //  (i.e. the button) and takes the appropriate action.
 
-    /*** Get the User and Password values from the Charge Node form and place in a bundle: ***/
+    //Get the User and Password values from the Charge Node form and place in a bundle
     Bundle chargeUIData = new Bundle();
     chargeUIData.putString("j_username", ((EditText)uiWidgets.get("editTextUser")).getText().toString() );
     chargeUIData.putString("j_password", ((EditText)uiWidgets.get("editTextPassword")).getText().toString() );
 
     switch (viewClicked.getId()) {
       case R.id.buttonConnectToNode:
-        dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CONNECT, null, null, chargeUIData );  // Send intent to ChargeNode class, including the login details.
+        // Send intent to ChargeNode class, including the login details.
+        dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CONNECT, null, null, chargeUIData );
         break;
       case R.id.buttonChargeStart:
         dashMessages.sendData( ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_CHARGESTART, null, null, chargeUIData );
@@ -378,12 +380,12 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     // Process long press events for this activity:
     // (Could use to reset trip data)
     switch (MyView.getId()) {
-    /****
+    /*
       case R.id.textviewDistIndicator:
         totalEnergy    = 0;
         totalDistance  = 0;
         break;
-     ***/
+     */
     }
     return true;
   }
@@ -392,7 +394,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   @Override
   public boolean onOptionsItemSelected(MenuItem item)
   {
-    // Check to see which menu item was selected:
+    // Check to see which menu item was selected
     switch (item.getItemId()) {
       case R.id.menuitemShowPrimary:
         tabHost.setCurrentTab(0);
@@ -463,11 +465,11 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     super.onResume();
     dashMessages.resume();
 
-
-    // Register to receive messages via Intents:
-    //LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver,  new IntentFilter(IDroidSensor.SENSOR_INTENT_ACTION));
-      // We are registering an observer (messageReceiver) to receive Intents
-      // with actions named IDroidSensor.SENSOR_INTENT_ACTION (see IDroidSensor.java for constant defn.).
+    // Register to receive messages via Intents
+    //LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter(IDroidSensor.SENSOR_INTENT_ACTION));
+    // We are registering an observer (messageReceiver) to receive Intents
+    // with actions named {@link IDroidSensor#SENSOR_INTENT_ACTION}
+    // (see {@link IDroidSensor} for constant definitions).
 
     // Start the data server (in case it's not already going; doesn't matter if it is).
     startService(dataIntent);
@@ -477,8 +479,10 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     if (isDemo) startDemo();
     else        stopDemo();
     // ---------------DEMO MODE CODE -------------------------------
-    uiTimer.removeCallbacks(uiTimerTask);                // ...Make sure there is no active callback already....
-    uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);   // ...Callback in n seconds!
+    // Make sure there is no active callback already
+    uiTimer.removeCallbacks(uiTimerTask);
+    // Callback in n seconds
+    uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);
   }
 
   /**
@@ -509,12 +513,13 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     Log.d(APP_TAG,"UIActivity -> onPause()");
     super.onPause();
     dashMessages.suspend();
-    uiTimer.removeCallbacks(uiTimerTask);      // ...Make sure there is no active callback already....
+    uiTimer.removeCallbacks(uiTimerTask); // Make sure there is no active callback already
   }
 
   /**
    * Save State Event.
-   * Save state info before the application is hidden / rotated / etc (or otherwise trashed by the OS).
+   * Save state info before the application is hidden / rotated / etc
+   * (or otherwise trashed by the OS).
    */
   @Override
   public void onSaveInstanceState(Bundle outState)
@@ -529,7 +534,8 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
 
   /**
    * UI Stop Event.
-   * Activity is about to be destroyed. Save Prefs.
+   * Activity is about to be destroyed.
+   * Save Preferences.
    */
   @Override
   protected void onStop()
@@ -559,24 +565,30 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       // Send Keep Alive to data service, etc:
       dashMessages.sendData(DataService.DATA_SERVICE, DataService.DATA_SERVICE_KEEPALIVE, null, null, null);
       dashMessages.sendData(VehicleData.VEHICLE_DATA, VehicleData.VEHICLE_DATA_KEEPALIVE, null, null, null);
-      if (currentTab == 3) dashMessages.sendData(ChargeNode.CHARGE_NODE_INTENT,ChargeNode.CHARGE_NODE_KEEPALIVE, null, null, null);
-        // Note: We only sent keepalives to the Charge Node class when the user is on the charge node page.
-        // The effect of this is that they will disconnect from the charger if they leave the charge node page.
-        // May want to change later - depends on how the charging interface works (this is just a demo).
-      // Update UI Reset Counter:
+      if (currentTab == 3) {
+        dashMessages.sendData(ChargeNode.CHARGE_NODE_INTENT,ChargeNode.CHARGE_NODE_KEEPALIVE, null, null, null);
+      }
+      // XXX We only sent keep-alives to the ChargeNode class when the user is on the charge node page.
+      // The effect of this is that they will disconnect from the charger if they leave the charge node page.
+      // May want to change later - depends on how the charging interface works (this is just a demo).
+
+      // Update UI Reset Counter
       uiResetCounter++;
       if (uiResetCounter > UI_RESET_AFTER) {
         uiResetCounter = 0;
-        uiReset();   // Reset the UI if we receive no data for a certain time interval.
+        uiReset(); // Reset the UI if we receive no data for a certain time interval.
       }
       chargeNodeResetCounter++;
       if (chargeNodeResetCounter > CHARGENODE_RESET_AFTER) {
         chargeNodeResetCounter = 0;
         chargeNodeUIReset();
       }
-      // Start the timer for next UI Uodate:
-      uiTimer.removeCallbacks(uiTimerTask);               // ...Make sure there is no active callback already....
-      uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
+
+      // Start the timer for next UI Update
+      //   Make sure there is no active callback already
+      uiTimer.removeCallbacks(uiTimerTask);
+      //   Callback later!
+      uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);
     }
   };
 
@@ -592,8 +604,9 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     }
 
     if (message == DashMessageListener.CHARGE_NODE_ID) {
-      // Data Message from Charge Node...
-      // If string data is included in the Intent, assume it's some HTML for the webview control to display:
+      // Data Message from Charge Node
+      // If string data is included in the Intent,
+      // assume it's some HTML for the webview control to display
       //if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadUrl(stringData);
       chargeNodeResetCounter = 0;
       if (stringData != null) ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(stringData, "text/html", null);
@@ -613,36 +626,38 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       } else {
         ((StatusLamp)uiWidgets.get("lampCharging")).turnOn();
       }
-      //((TextWithLabel)uiWidgets.get("textChargeCurrent"))      .setText   ( String.format("%.0f",chargeCurrent) );
-      //((TextWithLabel)uiWidgets.get("textChargeAH"))           .setText   ( String.format("%.1f",chargeAH)      );
+      //((TextWithLabel)uiWidgets.get("textChargeCurrent")) .setText(String.format("%.0f",chargeCurrent));
+      //((TextWithLabel)uiWidgets.get("textChargeAH"))      .setText(String.format("%.1f",chargeAH)     );
     }
 
     if (message == DashMessageListener.VEHICLE_DATA_ID) {
-      // ******************** Data from the Vehicle Data senor *************************************
-      Set<String> keys = data.keySet();               // Get a list of data keys in the bundle of submitted data.
-      Iterator<String> myIterator = keys.iterator();  // This is an iterator to iterate over the list.
+      // Data from the Vehicle Data senor
+      //   Get a list of data keys in the bundle of submitted data.
+      Set<String> keys = data.keySet();
+      //   This is an iterator to iterate over the list.
+      Iterator<String> myIterator = keys.iterator();
       String key;
       float valueFloat;
       while (myIterator.hasNext()) {
         key = myIterator.next();
         valueFloat = data.getFloat(key, 0.0f);
 
-        // ****** Data Messages from vehicle data input ********************************************
+        // Data Messages from vehicle data input
         // TODO refactor this into an else-if chain
-        if (key.equals("DATA_MOTOR_RPM"))         ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue  (valueFloat / 1000  );
-        if (key.equals("DATA_MAIN_BATTERY_KWH"))  ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue  (valueFloat         );
+        if (key.equals("DATA_MOTOR_RPM"))         ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue(valueFloat / 1000);
+        if (key.equals("DATA_MAIN_BATTERY_KWH"))  ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue(valueFloat       );
 
-        if (key.equals("DATA_MOTOR_TEMP"))        ((BarGauge)uiWidgets.get("barTMotor"))               .setValue  (valueFloat );
-        if (key.equals("DATA_CONTROLLER_TEMP"))   ((BarGauge)uiWidgets.get("barTController"))          .setValue  (valueFloat );
-        if (key.equals("DATA_MAIN_BATTERY_TEMP")) ((BarGauge)uiWidgets.get("barTBattery"))             .setValue  (valueFloat );
+        if (key.equals("DATA_MOTOR_TEMP"))        ((BarGauge)uiWidgets.get("barTMotor"))               .setValue(valueFloat);
+        if (key.equals("DATA_CONTROLLER_TEMP"))   ((BarGauge)uiWidgets.get("barTController"))          .setValue(valueFloat);
+        if (key.equals("DATA_MAIN_BATTERY_TEMP")) ((BarGauge)uiWidgets.get("barTBattery"))             .setValue(valueFloat);
 
-        if (key.equals("DATA_ACC_BATTERY_VLT"))   ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText   (String.format("%.1f", valueFloat) );
+        if (key.equals("DATA_ACC_BATTERY_VLT"))   ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText(String.format("%.1f", valueFloat));
 
-        if (key.equals("DATA_DRIVE_TIME"))        ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText   (String.format("%1d:%02d", getHours(valueFloat), getMinutes(valueFloat) ) );
-        if (key.equals("DATA_DRIVE_RANGE"))       ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText   (String.format("%.0f", valueFloat) );
+        if (key.equals("DATA_DRIVE_TIME"))        ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText(String.format("%1d:%02d", getHours(valueFloat), getMinutes(valueFloat)));
+        if (key.equals("DATA_DRIVE_RANGE"))       ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText(String.format("%.0f", valueFloat));
 
-        if (key.equals("DATA_MAIN_BATTERY_VLT"))  ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText   (String.format("%.1f", valueFloat) );
-        if (key.equals("DATA_MAIN_BATTERY_AH"))   ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText   (String.format("%.1f", valueFloat) );
+        if (key.equals("DATA_MAIN_BATTERY_VLT"))  ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText(String.format("%.1f", valueFloat));
+        if (key.equals("DATA_MAIN_BATTERY_AH"))   ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText(String.format("%.1f", valueFloat));
 
         if (key.equals("DATA_DATA_OK")) {
           if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampData")).turnOn();

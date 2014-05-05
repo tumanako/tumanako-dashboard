@@ -49,7 +49,8 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
 
   /** Keep-alive Timer Handler */
   private Handler uiTimer = new Handler();
-  private static final int UPDATE_EVERY = 500;   // Update the UI every n mSeconds.
+  /** Update the UI every n mSeconds. */
+  private static final int UPDATE_EVERY = 500;
 
   private ListView deviceList;
   private String[] addressList;
@@ -60,10 +61,11 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
     super.onCreate(savedInstanceState);
     setContentView(R.layout.settings);
 
-    dashMessages = new DashMessages(this, this, SETTINGS_ACTIVITY);    // We are extending the 'DashMessages' class, and we need to call its Constructor here.
+    // We are extending the 'DashMessages' class, and we need to call its constructor here.
+    dashMessages = new DashMessages(this, this, SETTINGS_ACTIVITY);
     dashMessages.resume();
 
-    // Get a reference to the Bluetooth Devices listview:
+    // Get a reference to the Bluetooth devices listview
     deviceList = (ListView) findViewById(R.id.listBluetoothDevices);
 
     // Populate the list of Bluetooth adaptors:
@@ -80,15 +82,17 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
         i++;
       }
     } else {
-      // No paired bluetooth devices!
+      // No paired bluetooth devices
       showPopupMessage("No paired devices found!");
     }
     deviceList.setAdapter(listAdapter);
     deviceList.setOnItemClickListener(this);
 
-    // Set up update timer to keep services alive:
-    uiTimer.removeCallbacks(uiTimerTask);            // ...Make sure there is no active callback already....
-    uiTimer.postDelayed(uiTimerTask, UPDATE_EVERY);  // ...Callback later!
+    // Set up update timer to keep services alive
+    //   Make sure there is no active callback already
+    uiTimer.removeCallbacks(uiTimerTask);
+    //   Callback later!
+    uiTimer.postDelayed(uiTimerTask, UPDATE_EVERY);
   }
 
   @Override
@@ -113,8 +117,9 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("btDeviceName", selectedDevice);
         editor.putString("btDeviceAddress",addressList[position]);
-        editor.commit();        // Commit the edits!
-        // Sed an intent message to the bluetooth connection to tell it that the address has changed:
+        editor.commit(); // Commit the edits!
+        // Send an intent message to the bluetooth connection
+        // to tell it that the address has changed
         dashMessages.sendData(VehicleData.VEHICLE_DATA, VehicleData.VEHICLE_DATA_BTADDRESS_CHANGE, null, null, null);
         finish();
         break;
@@ -136,12 +141,12 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
     @Override
     public void run()
     {
-      uiTimer.removeCallbacks(uiTimerTask);            // ...Make sure there is no active callback already....
-      // Send Keep Alive to data service, etc:
+      uiTimer.removeCallbacks(uiTimerTask); // Make sure there is no active callback already
+      // Send Keep Alive to data service, etc
       dashMessages.sendData(DataService.DATA_SERVICE, DataService.DATA_SERVICE_KEEPALIVE, null, null, null);
       dashMessages.sendData(VehicleData.VEHICLE_DATA, VehicleData.VEHICLE_DATA_KEEPALIVE, null, null, null);
-      //dashMessages.sendData(ChargeNode.CHARGE_NODE_INTENT,ChargeNode.CHARGE_NODE_KEEPALIVE, null, null, null);
-      uiTimer.postDelayed(uiTimerTask, UPDATE_EVERY);  // ...Callback later!
+      //dashMessages.sendData(ChargeNode.CHARGE_NODE_INTENT, ChargeNode.CHARGE_NODE_KEEPALIVE, null, null, null);
+      uiTimer.postDelayed(uiTimerTask, UPDATE_EVERY);  // Callback later!
     }
   };
 }

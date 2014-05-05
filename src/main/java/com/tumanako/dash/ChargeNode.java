@@ -39,12 +39,12 @@ import org.json.JSONObject;
  * A WebView control displays data supplied by the charge node (HTML).
  * Buttons in the UI generate intents which this class catches.
  *
- *  -Connect to Node: Look for the server and display its web page
+ * - Connect to Node: Look for the server and display its web page
  *   if found. NOTE: Must already have a WiFi connection to the node.
  *
- *  -Start Charge: Tell the node that we want some power!
+ * - Start Charge: Tell the node that we want some power!
  *
- *  -Stop Charge: Tell the node that we've had enough.
+ * - Stop Charge: Tell the node that we've had enough.
  *
  *  While connected to the node, we will periodically poll it to
  *  get some status information.
@@ -63,17 +63,17 @@ public class ChargeNode implements DashMessageListener
 
   // ************* Message IDs: Used to identify specific intent messages.
   /** Send by the UI: tells us to keep alive. */
-  public static final int CHARGE_NODE_KEEPALIVE    = DashMessageListener.CHARGE_NODE_ID +  1;
+  public static final int CHARGE_NODE_KEEPALIVE    = DashMessageListener.CHARGE_NODE_ID + 1;
   /** Send by the UI: tells us to connect to server. */
-  public static final int CHARGE_NODE_CONNECT      = DashMessageListener.CHARGE_NODE_ID +  2;
+  public static final int CHARGE_NODE_CONNECT      = DashMessageListener.CHARGE_NODE_ID + 2;
   /** Send by the UI: tells us to start charging. */
-  public static final int CHARGE_NODE_CHARGESTART  = DashMessageListener.CHARGE_NODE_ID +  3;
+  public static final int CHARGE_NODE_CHARGESTART  = DashMessageListener.CHARGE_NODE_ID + 3;
   /** Send by the UI: tells us to stop charging. */
-  public static final int CHARGE_NODE_CHARGESTOP   = DashMessageListener.CHARGE_NODE_ID +  4;
+  public static final int CHARGE_NODE_CHARGESTOP   = DashMessageListener.CHARGE_NODE_ID + 4;
   /** Passed to, and returned by, the ChargerHTTPConn class. */
-  public static final int CHARGE_NODE_HTML_DATA    = DashMessageListener.CHARGE_NODE_ID +  5;
+  public static final int CHARGE_NODE_HTML_DATA    = DashMessageListener.CHARGE_NODE_ID + 5;
   /** Indicate the data type we expect back from the request. */
-  public static final int CHARGE_NODE_JSON_DATA    = DashMessageListener.CHARGE_NODE_ID +  6;
+  public static final int CHARGE_NODE_JSON_DATA    = DashMessageListener.CHARGE_NODE_ID + 6;
   // ************* Charger Data Tags: **************************************
   // These are used as keys when sending data to the UI as a bundle.
   public static final String CONNECTION_STATUS = "CONSTAT";
@@ -121,12 +121,12 @@ public class ChargeNode implements DashMessageListener
    * This counter will increment on the timer.
    * If not reset (e.g. by Keep Alive message), the timer will stop itself.
    */
-  private int watchdogCounter = 0;
+  private int watchdogCounter;
   /**
    * This counter will increment on the timer.
    * When it reaches SEND_PING_EVERY, a PING is sent to get data from the server.
    */
-  private int pingCounter = 0;
+  private int pingCounter;
 
   private final WeakReference<Context> weakContext;
 
@@ -134,14 +134,17 @@ public class ChargeNode implements DashMessageListener
   private Bundle cookieData = new Bundle();
 
   /** Used to maintain a list of queued HTTP requests. */
-  private Queue<ChargerHTTPConn> requestQueue = new LinkedList<ChargerHTTPConn>();
+  private Queue<ChargerHTTPConn> requestQueue;
 
 
   public ChargeNode(Context context)
   {
-    dashMessages = new DashMessages(context, this, CHARGE_NODE_INTENT);
-    weakContext = new WeakReference<Context>(context);
-    resume();      // Start the update timer!
+    this.watchdogCounter = 0;
+    this.pingCounter = 0;
+    this.requestQueue = new LinkedList<ChargerHTTPConn>();
+    this.dashMessages = new DashMessages(context, this, CHARGE_NODE_INTENT);
+    this.weakContext = new WeakReference<Context>(context);
+    resume(); // Start the update timer!
   }
 
   /**
@@ -367,14 +370,14 @@ public class ChargeNode implements DashMessageListener
         connectionStatus = STATUS_OFFLINE;  // Give up.
         Log.i(UIActivity.APP_TAG, " ChargeNode -> Watchdog Overflow. Stopping. ");
       } else {
-        /***********************************************************************************************
-        * HTTP Request Queue Management:
-        *
-        * Check the status of the first object in the HTTP request queue.
-        *  - If it hasn't started, start it.
-        *  - If it's running, do nothing.
-        *  - If it's finished, throw it away and start the next one!
-        */
+        /* *****************************************************************************************
+         * HTTP Request Queue Management.
+         *
+         * Check the status of the first object in the HTTP request queue.
+         *  - If it hasn't started, start it.
+         *  - If it's running, do nothing.
+         *  - If it's finished, throw it away and start the next one!
+         */
         if ((requestQueue != null) && !requestQueue.isEmpty()) {
           // There is at least one HTTP request in the queue:
           ChargerHTTPConn currentConn = requestQueue.peek(); // Get reference to current (first) item in the queue.
@@ -402,13 +405,13 @@ public class ChargeNode implements DashMessageListener
             break;
 
           case STATUS_CONNECTED:
-            // We are connected: Add to the Ping counter, and send a 'PING' if enough time has passed:
+            // We are connected: Add to the Ping counter, and send a 'PING' if enough time has passed
             pingCounter++;
             if (pingCounter >= SEND_PING_EVERY) {
               pingCounter = 0;
               Log.d(UIActivity.APP_TAG, " ChargeNode -> Ping! ");
               dashMessages.sendData(UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_UPDATING_HTML, makeChargeData(connectionStatus, chargeStatus, 0.0f, 0.0f));
-              requestQueue.add(new ChargerHTTPConn(weakContext,CHARGE_NODE_INTENT,PING_URL,null,cookieData,false,CHARGE_NODE_JSON_DATA));
+              requestQueue.add(new ChargerHTTPConn(weakContext, CHARGE_NODE_INTENT, PING_URL, null, cookieData, false, CHARGE_NODE_JSON_DATA));
             }
             break;
 
@@ -453,8 +456,8 @@ public class ChargeNode implements DashMessageListener
     // This makes a bundle of values containing the charge data:
     // charge status, chrage current and charge amount (ah):
     Bundle chargeData = new Bundle();
-    chargeData.putFloat(CONNECTION_STATUS, (conStatus==STATUS_CONNECTED) ? 1.0f : 0.0f);
-    chargeData.putFloat(CHARGE_STATUS,     (chgStatus==STATUS_CHARGING)  ? 1.0f : 0.0f);
+    chargeData.putFloat(CONNECTION_STATUS, (conStatus == STATUS_CONNECTED) ? 1.0f : 0.0f);
+    chargeData.putFloat(CHARGE_STATUS,     (chgStatus == STATUS_CHARGING)  ? 1.0f : 0.0f);
     chargeData.putFloat(CHARGE_CURRENT,    current);
     chargeData.putFloat(CHARGE_AH,         ah);
     return chargeData;
