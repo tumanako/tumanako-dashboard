@@ -227,10 +227,8 @@ public class ChargerHTTPConn extends Thread implements DashMessageListener
         serverConn.setRequestProperty("Accept-Charset", USE_CHARSET);
         serverConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + USE_CHARSET);
         OutputStream streamOut = serverConn.getOutputStream();
-        // ******** HTTP Connection Debug Info ***********************************
-        Log.i("HTTPConn", "URL:" + connectTo);
-        Log.i("HTTPConn", "POST Data:" + postString);
-        // ***********************************************************************
+        Log.d("HTTPConn", "URL:" + connectTo);
+        Log.d("HTTPConn", "POST Data:" + postString);
         streamOut.write(postString.getBytes(USE_CHARSET));
         streamOut.close();
         Thread.sleep(0); // Give up CPU time (allows for slow data rate).
@@ -256,12 +254,10 @@ public class ChargerHTTPConn extends Thread implements DashMessageListener
 
       responseCode = serverConn.getResponseCode(); // Get the response code.
 
-      // *********** HTTP Connection Debug Info ***********************************
-      Log.i("HTTPConn", "Code:" + responseCode );
-      Log.i("HTTPConn", "Message:" + serverConn.getResponseMessage() );
-      Log.i("HTTPConn", "Redirect To: " + serverConn.getHeaderField("Location") );
-      //Log.i("HTTPConn", "Response:" + httpReceivedData );
-      // **************************************************************************
+      Log.d("HTTPConn", "Code:" + responseCode);
+      Log.d("HTTPConn", "Message:" + serverConn.getResponseMessage());
+      Log.d("HTTPConn", "Redirect To: " + serverConn.getHeaderField("Location"));
+      //Log.d("HTTPConn", "Response:" + httpReceivedData);
 
       /* ********** SolarNode Login Hack *****************************************
        * The following code decides whether this is a successful result when connecting to a

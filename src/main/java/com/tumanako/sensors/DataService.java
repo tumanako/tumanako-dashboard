@@ -110,7 +110,7 @@ public class DataService extends Service implements DashMessageListener
 
   public DataService()
   {
-    Log.i(UIActivity.APP_TAG, " DataService -> Constructor; ");
+    Log.d(UIActivity.APP_TAG, " DataService -> Constructor; ");
   }
 
   /**
@@ -174,7 +174,7 @@ public class DataService extends Service implements DashMessageListener
       // Update Watchdog counter and check for overflow
       updateStop();
       watchdogCounter++;
-//Log.i(UIActivity.APP_TAG, " DataService -> Timer. Counter = " + watchdogCounter);
+      Log.d(UIActivity.APP_TAG, " DataService -> Timer. Counter = " + watchdogCounter);
       if (watchdogCounter > WATCHDOG_OVERFLOW) {
         // Watchdog Expired!
         stopSensors(); // Stop the sensors.
@@ -234,9 +234,9 @@ public class DataService extends Service implements DashMessageListener
   @Override
   public void onCreate()
   {
-    // Sensor Service CREATED:
-    Log.i(UIActivity.APP_TAG, " DataService -> onCreate(); ");
-    // Add some sensors:
+    // Sensor Service CREATED
+    Log.d(UIActivity.APP_TAG, " DataService -> onCreate(); ");
+    // Add some sensors
     deviceGPS    = new NmeaGPS(this);
     dashMessages = new DashMessages(this, this, DATA_SERVICE);
     demoData     = new DemoData(this);
@@ -248,7 +248,7 @@ public class DataService extends Service implements DashMessageListener
   {
     // Start Command: Someone requested that the serice be started:
     super.onStartCommand(intent, flags, startId);
-    Log.i(UIActivity.APP_TAG, " DataService -> Received start id " + startId + ": " + intent);
+    Log.d(UIActivity.APP_TAG, " DataService -> Received start id " + startId + ": " + intent);
     dashMessages.resume();
     updateStart();
     startSensors(); // Start the Sensors (if not already started!)
@@ -259,7 +259,7 @@ public class DataService extends Service implements DashMessageListener
   @Override
   public IBinder onBind(Intent intent)
   {
-    Log.i(UIActivity.APP_TAG, " DataService -> onBind(); " );
+    Log.d(UIActivity.APP_TAG, " DataService -> onBind();");
     dashMessages.resume();
     updateStart();   // Start Update Timer
     startSensors();  // Start the Sensors (if not already started!)
@@ -270,14 +270,14 @@ public class DataService extends Service implements DashMessageListener
   public boolean onUnbind (Intent intent)
   {
     // UNBIND: A client has unbound. Don't need to do anything.
-    Log.i(UIActivity.APP_TAG, " DataService -> onUnBind(); " );
+    Log.d(UIActivity.APP_TAG, " DataService -> onUnBind();");
     return true;
   }
 
   @Override
   public void onRebind (Intent intent)
   {
-    Log.i(UIActivity.APP_TAG, " DataService -> onReBind(); " );
+    Log.d(UIActivity.APP_TAG, " DataService -> onReBind();");
     // REBIND: A client has reconnected to the service after disconnecting.
     dashMessages.resume();
     updateStart();  // Start update timer.
@@ -287,8 +287,8 @@ public class DataService extends Service implements DashMessageListener
   @Override
   public void onDestroy()
   {
-    // Service DESTROYED:
-    Log.i(UIActivity.APP_TAG, " DataService -> onDestroy(); " );
+    // Service DESTROYED
+    Log.d(UIActivity.APP_TAG, " DataService -> onDestroy();");
     // Unregister the Intent listener since the service is about to be destroyed.
     dashMessages.suspend();
     updateStop();      // Stop update timer.
@@ -301,7 +301,7 @@ public class DataService extends Service implements DashMessageListener
   @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
-    //Log.i(UIActivity.APP_TAG, " DataService -> KeepAlive!" );
+    Log.d(UIActivity.APP_TAG, " DataService -> KeepAlive!");
     keepAlive();
     // ---------------DEMO MODE CODE -------------------------------
     if ((message == DATA_SERVICE_DEMO) && (floatData != null)) {

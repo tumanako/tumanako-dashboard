@@ -250,8 +250,8 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   // ---------------DEMO MODE CODE -------------------------------
   private void startDemo()
   {
-    // Send 'DEMO' intent to data service:
-    Log.i(APP_TAG,"UIActivity -> startDemo()");
+    // Send 'DEMO' intent to data service
+    Log.d(APP_TAG, "UIActivity -> startDemo()");
     dashMessages.sendData( DataService.DATA_SERVICE, DataService.DATA_SERVICE_DEMO,1f, null, null );
     isDemo = true;
   }

@@ -371,7 +371,7 @@ public class VehicleData extends Thread implements DashMessageListener
       //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
       return false;
     }
-    //Log.i(UIActivity.APP_TAG, "             -> Adaptor is ON! ");
+    Log.d(UIActivity.APP_TAG, "             -> Adaptor is ON!");
 
     // ****** Get a Bluetooth device for the vehicle sensor ***************
     // We need to retrieve the device address of the selected Bluetooth device from the stored app preferences:
@@ -380,7 +380,7 @@ public class VehicleData extends Thread implements DashMessageListener
     // Check the address:
     if (!BluetoothAdapter.checkBluetoothAddress(btDeviceAddress)) return false;   // Invalid address. Give up.
     btVehicleSensor = bluetoothAdapter.getRemoteDevice(btDeviceAddress);          // "00:12:05:17:91:65" = MDFlyBTSerial Bluetooth serial device (for testing).
-    //Log.i(UIActivity.APP_TAG, "             -> Got remote device OK! " );
+    Log.d(UIActivity.APP_TAG, "             -> Got remote device OK!");
 
     // ************* Try to establish a BT Connection ***********************************
     try {
@@ -390,14 +390,14 @@ public class VehicleData extends Thread implements DashMessageListener
       }
       // Create a new BT Socket for RF Comm connection.
       btSocket = btVehicleSensor.createRfcommSocketToServiceRecord(myUUID);
-      //Log.i(UIActivity.APP_TAG, "             -> Socket Created. " );
+      Log.d(UIActivity.APP_TAG, "             -> Socket Created.");
       // Cancel any Bluetooth discovery that's running (in case an other application started it...)
       // According to the docs, we should do this...
       bluetoothAdapter.cancelDiscovery();
       // Attempt to connect!!!
       btSocket.connect();
     } catch (IOException ioe) {
-      //Log.i(UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround... " );
+      Log.d(UIActivity.APP_TAG, "             -> Connection Attempt Generated Error! Trying Workaround...");
       // Our attempt to open a BT connection caused an IO exception.
       // This could be due to a bug in the Bluetooth class.
       // Try again using a call to an internal method in createRfcommSocket class:
@@ -413,7 +413,7 @@ public class VehicleData extends Thread implements DashMessageListener
         btSocket.connect();
       } catch (Exception e) {
         // Still having errors connecting! Give up.
-        Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up. ");
+        Log.w(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Comm Error Persisted. Giving up.");
         Log.w(UIActivity.APP_TAG, e);
         return false;  // Give up.
       }
@@ -421,15 +421,15 @@ public class VehicleData extends Thread implements DashMessageListener
 
     // Connected! Try to open streams...
     try {
-      //Log.i(UIActivity.APP_TAG, "             -> CONNECTED. " );
+      Log.d(UIActivity.APP_TAG, "             -> CONNECTED.");
       btStreamIn  = btSocket.getInputStream();  // Get input and output streams
       btStreamOut = btSocket.getOutputStream(); // for communication through the socket.
-      //Log.i(UIActivity.APP_TAG, "             -> IO Streams Open! " );
-      return true;                                  // SUCCESS!!
+      Log.d(UIActivity.APP_TAG, "             -> IO Streams Open! " );
+      return true;                              // SUCCESS!!
     } catch (IOException e) {
       // An error occurred during BT comms setup
-      Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams... ");
-      Log.i(UIActivity.APP_TAG, e.getMessage());
+      Log.w(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error opening IO Streams...");
+      Log.w(UIActivity.APP_TAG, e);
       return false;  // Give up.
     }
   }
@@ -456,7 +456,7 @@ public class VehicleData extends Thread implements DashMessageListener
   {
     byte[] byteBuffer = new byte[BT_READ_SIZE];
     StringBuffer btRawData = new StringBuffer();
-    //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");
+    Log.d(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run");
     // Try to open a BT connection
     if (!btOpen()) {
       // Connection failed! Close any open objects and exit.
@@ -465,7 +465,7 @@ public class VehicleData extends Thread implements DashMessageListener
       return;
     }
     isBTConnected = true;
-    //Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected. ");
+    Log.d(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Connected.");
 
       // BT Connection should now be open! Keep listening to the InputStream while connected
     int bytesRead;
@@ -473,20 +473,23 @@ public class VehicleData extends Thread implements DashMessageListener
       // Check to see if the Bluetooth address has changed
       if (isAddressChanged) {
         // To change BT address, we shut down the existing connection and reopen with new address
-//Log.i(UIActivity.APP_TAG, " VehicleData -> BT Address Change! ");
+        Log.d(UIActivity.APP_TAG, " VehicleData -> BT Address Change!");
         isBTConnected = false;
         isAddressChanged = false;
         btClose();     // Close existing connection.
         if (!btOpen()) break;   // If we failed to open a connection, exit BT loop.
         isBTConnected = true;
-//Log.i(UIActivity.APP_TAG, " VehicleData -> BT Reconnected OK. ");
+        Log.d(UIActivity.APP_TAG, " VehicleData -> BT Reconnected OK.");
       }
 // ****** TEMP DEBUG ************************************
-//if (isPing)
-//  {
-//try  {  Log.i("BT_STREAM", String.format("%d",btStreamIn.available()));  } catch (IOException e) {  e.printStackTrace();  }
-//isPing = false;
-//  }
+//      if (isPing) {
+//        try {
+//          Log.d("BT_STREAM", String.format("%d", btStreamIn.available()));
+//        } catch (IOException e) {
+//          e.printStackTrace();
+//        }
+//        isPing = false;
+//      }
 // ****** TEMP DEBUG ************************************
       try {
         // Read bytes from the InputStream:
@@ -523,7 +526,7 @@ public class VehicleData extends Thread implements DashMessageListener
         Thread.sleep(1); // Give up CPU time (waiting for Bluetooth characters is so tedious...)
       } catch (Exception e) {
         // An error occurred during BT comms operation
-        Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
+        Log.w(UIActivity.APP_TAG, " VehicleData -> BT Com Thread: Error During Comms... ");
         isBTConnected = false;
         break;
       }
@@ -532,6 +535,6 @@ public class VehicleData extends Thread implements DashMessageListener
     // Close down the input and ouptut streams and the Bluetooth socket
     stopVehicleData();
     isFinished = true;
-    Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit! ");
+    Log.i(UIActivity.APP_TAG, " VehicleData -> BT Com Thread Exit!");
   }
 }

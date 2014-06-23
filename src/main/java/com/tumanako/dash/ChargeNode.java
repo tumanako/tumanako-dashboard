@@ -278,7 +278,7 @@ public class ChargeNode implements DashMessageListener
             for (int i=0; i<jsonDataSection.length(); i++) {
               JSONObject jsonDataItem = jsonDataSection.getJSONObject(i);
               if (jsonDataItem.has("sourceId") && jsonDataItem.getString("sourceId").equals("/power/switch/2")) {
-                Log.i("HTTPConn", "  FOUND!!! Value = " + String.format("%d", jsonDataItem.getInt("integerValue")));
+                Log.d("HTTPConn", "  FOUND!!! Value = " + String.format("%d", jsonDataItem.getInt("integerValue")));
                 if (jsonDataItem.getInt("integerValue") == 1) {
                   // Charging!
                   chargeStatus = STATUS_CHARGING;
@@ -369,7 +369,7 @@ public class ChargeNode implements DashMessageListener
         // Nothing has happend for a while! Stop the timer and set status to 'Disconnected'.
         chargeStatus = STATUS_NOT_CHARGING;
         connectionStatus = STATUS_OFFLINE;  // Give up.
-        Log.i(UIActivity.APP_TAG, " ChargeNode -> Watchdog Overflow. Stopping. ");
+        Log.i(UIActivity.APP_TAG, " ChargeNode -> Watchdog Overflow. Stopping.");
       } else {
         /* *****************************************************************************************
          * HTTP Request Queue Management.
