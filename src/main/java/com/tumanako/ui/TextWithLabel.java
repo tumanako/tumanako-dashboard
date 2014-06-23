@@ -136,11 +136,8 @@ public class TextWithLabel extends LinearLayout
     // Recycle the TypedArray
     a.recycle();
 
-    if (mainText != null) setText(mainText);
-    else                  setText("");
-
-    if (labelText != null) setLabel(labelText);
-    else                   setLabel("");
+    setText((mainText == null) ? "" : mainText);
+    setLabel((labelText == null) ? "" : labelText);
   }
 
   /**

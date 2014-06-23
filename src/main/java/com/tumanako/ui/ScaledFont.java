@@ -63,8 +63,7 @@ public class ScaledFont
     // We use a 'reference' window size of 480 pixels, which corresponds to a
     // multiplier of 1.0:
 
-    if (windowWidth > windowHeight)  myMultiplier = windowWidth / (float)REF_SIZE;
-    else                             myMultiplier = windowHeight / (float)REF_SIZE;
+    myMultiplier = ((windowWidth > windowHeight) ? windowWidth : windowHeight) / (float)REF_SIZE;
   }
 
   public float getFontScale()
