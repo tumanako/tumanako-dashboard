@@ -603,7 +603,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       showMessage(stringData);
     }
 
-    if (message == DashMessageListener.CHARGE_NODE_ID) {
+    else if (message == DashMessageListener.CHARGE_NODE_ID) {
       // Data Message from Charge Node
       // If string data is included in the Intent,
       // assume it's some HTML for the webview control to display
@@ -623,7 +623,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       //((TextWithLabel)uiWidgets.get("textChargeAH"))      .setText(String.format("%.1f",chargeAH)     );
     }
 
-    if (message == DashMessageListener.VEHICLE_DATA_ID) {
+    else if (message == DashMessageListener.VEHICLE_DATA_ID) {
       // Data from the Vehicle Data senor
       //   Get a list of data keys in the bundle of submitted data.
       Set<String> keys = data.keySet();
@@ -635,46 +635,73 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
         final boolean valueBoolean = (valueFloat == 1f);
 
         // Data Messages from vehicle data input
-        // TODO refactor this into an else-if chain
-        if (key.equals("DATA_MOTOR_RPM"))         ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue(valueFloat / 1000);
-        if (key.equals("DATA_MAIN_BATTERY_KWH"))  ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue(valueFloat       );
-
-        if (key.equals("DATA_MOTOR_TEMP"))        ((BarGauge)uiWidgets.get("barTMotor"))               .setValue(valueFloat);
-        if (key.equals("DATA_CONTROLLER_TEMP"))   ((BarGauge)uiWidgets.get("barTController"))          .setValue(valueFloat);
-        if (key.equals("DATA_MAIN_BATTERY_TEMP")) ((BarGauge)uiWidgets.get("barTBattery"))             .setValue(valueFloat);
-
-        if (key.equals("DATA_ACC_BATTERY_VLT"))   ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText(String.format("%.1f", valueFloat));
-
-        if (key.equals("DATA_DRIVE_TIME"))        ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText(String.format("%1d:%02d", getHours(valueFloat), getMinutes(valueFloat)));
-        if (key.equals("DATA_DRIVE_RANGE"))       ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText(String.format("%.0f", valueFloat));
-
-        if (key.equals("DATA_MAIN_BATTERY_VLT"))  ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText(String.format("%.1f", valueFloat));
-        if (key.equals("DATA_MAIN_BATTERY_AH"))   ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText(String.format("%.1f", valueFloat));
-
-        if (key.equals("DATA_DATA_OK")) {
-          ((StatusLamp)uiWidgets.get("lampData")).setState(valueBoolean);
+        if (     key.equals("DATA_MOTOR_RPM")) {
+          ((Dial)uiWidgets.get("dialMotorRPM"))                .setValue(valueFloat / 1000);
+        }
+        else if (key.equals("DATA_MAIN_BATTERY_KWH")) {
+          ((Dial)uiWidgets.get("dialMainBatteryKWh"))          .setValue(valueFloat);
         }
 
-        if (key.equals(NmeaProcessor.DATA_GPS_HAS_LOCK)) {
-          ((StatusLamp)uiWidgets.get("lampGPS")).setState(valueBoolean);
+        else if (key.equals("DATA_MOTOR_TEMP")) {
+          ((BarGauge)uiWidgets.get("barTMotor"))               .setValue(valueFloat);
+        }
+        else if (key.equals("DATA_CONTROLLER_TEMP")) {
+          ((BarGauge)uiWidgets.get("barTController"))          .setValue(valueFloat);
+        }
+        else if (key.equals("DATA_MAIN_BATTERY_TEMP")) {
+          ((BarGauge)uiWidgets.get("barTBattery"))             .setValue(valueFloat);
         }
 
-        if (key.equals("DATA_CONTACTOR_ON")) {
-          ((StatusLamp)uiWidgets.get("lampContactor")).setState(valueBoolean);
+        else if (key.equals("DATA_ACC_BATTERY_VLT")) {
+          ((TextWithLabel)uiWidgets.get("textAccBatteryVlts")) .setText(String.format("%.1f", valueFloat));
         }
 
-        if (key.equals("DATA_FAULT")) {
-          ((StatusLamp)uiWidgets.get("lampFault")).setState(valueBoolean);
+        else if (key.equals("DATA_DRIVE_TIME")) {
+          ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText(String.format("%1d:%02d", getHours(valueFloat), getMinutes(valueFloat)));
+        }
+        else if (key.equals("DATA_DRIVE_RANGE")) {
+          ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText(String.format("%.0f", valueFloat));
         }
 
-        if (key.equals("DATA_PRECHARGE")) {
-          ((StatusLamp)uiWidgets.get("lampPreCharge")).setState(valueBoolean);
+        else if (key.equals("DATA_MAIN_BATTERY_VLT")) {
+          ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText(String.format("%.1f", valueFloat));
+        }
+        else if (key.equals("DATA_MAIN_BATTERY_AH")) {
+          ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText(String.format("%.1f", valueFloat));
         }
 
-        if (key.equals("DATA_MOTOR_REVERSE")) {
-          ((StatusLamp)uiWidgets.get("lampReverse")).setState(valueBoolean);
+        else if (key.equals("DATA_DATA_OK")) {
+          ((StatusLamp)uiWidgets.get("lampData"))              .setState(valueBoolean);
+        }
+
+        else if (key.equals(NmeaProcessor.DATA_GPS_HAS_LOCK)) {
+          ((StatusLamp)uiWidgets.get("lampGPS"))               .setState(valueBoolean);
+        }
+
+        else if (key.equals("DATA_CONTACTOR_ON")) {
+          ((StatusLamp)uiWidgets.get("lampContactor"))         .setState(valueBoolean);
+        }
+
+        else if (key.equals("DATA_FAULT")) {
+          ((StatusLamp)uiWidgets.get("lampFault"))             .setState(valueBoolean);
+        }
+
+        else if (key.equals("DATA_PRECHARGE")) {
+          ((StatusLamp)uiWidgets.get("lampPreCharge"))         .setState(valueBoolean);
+        }
+
+        else if (key.equals("DATA_MOTOR_REVERSE")) {
+          ((StatusLamp)uiWidgets.get("lampReverse"))           .setState(valueBoolean);
+        }
+
+        else {
+          Log.w(APP_TAG, "Unknown data key: " + key);
         }
       }
+    }
+
+    else {
+      Log.w(APP_TAG, "Unknown message ID: " + message);
     }
   }
 }
