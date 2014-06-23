@@ -122,14 +122,14 @@ public class ChargerHTTPConn extends Thread implements DashMessageListener
     Map<String, List<String>> httpHeaders = serverConn.getHeaderFields();
     Set<String> headerKeys = httpHeaders.keySet();
     for (String headerKey : headerKeys) {
-      // --DEBUG!-- Log.i(UIActivity.APP_TAG, " CommThread -> Header: " + headerKey + "=" + serverConn.getHeaderField(headerKey) );
+      Log.d(UIActivity.APP_TAG, " CommThread -> Header: " + headerKey + "=" + serverConn.getHeaderField(headerKey) );
       if (headerKey.equals("Set-Cookie")) {
         String cookie = serverConn.getHeaderField(headerKey);
         cookie = cookie.substring(0, cookie.indexOf(";"));
         String cookieName = cookie.substring(0, cookie.indexOf("="));
         String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
         cookies.putString(cookieName, cookieValue);
-        // --DEBUG!-- Log.i(UIActivity.APP_TAG, " CommThread -> Set-Cookie: " + cookieName + "=" + cookieValue );
+        Log.d(UIActivity.APP_TAG, " CommThread -> Set-Cookie: " + cookieName + "=" + cookieValue );
       }
     }
     return cookies;
@@ -164,8 +164,9 @@ public class ChargerHTTPConn extends Thread implements DashMessageListener
         }
         if (myIterator.hasNext()) cookieStrings.append("; ");
       }
-      // --DEBUG!-- Log.i(UIActivity.APP_TAG, " CommThread -> Cookies: " +  cookieStrings.toString());
-      return cookieStrings.toString();
+      final String cookieString = cookieStrings.toString();
+      Log.d(UIActivity.APP_TAG, " CommThread -> Cookies: " +  cookieString);
+      return cookieString;
     }
   }
 
@@ -293,7 +294,7 @@ public class ChargerHTTPConn extends Thread implements DashMessageListener
     } catch (Exception e) {
       Log.w("HTTPConn", e);
       comthreadMessages.sendData(responseIntent, CONN_ERROR, null, e.getMessage() , null);
-      // --DEBUG!!--Log.i("HTTPConn", "HTTP Error!");
+      Log.d("HTTPConn", "HTTP Error!");
     }
   }
 

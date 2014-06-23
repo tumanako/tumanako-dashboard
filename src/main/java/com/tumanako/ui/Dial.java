@@ -54,7 +54,7 @@ public class Dial extends RenderedGauge
     // Create re-usable drawing path used to draw the needle:
     needlePath = new Path();
 
-    // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  Dial -> Constructor ");
+    Log.d( UIActivity.APP_TAG, "  Dial -> Constructor ");
 
     // Paint for needle:
     needlePaint = new Paint();

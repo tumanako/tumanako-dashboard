@@ -194,7 +194,7 @@ public class ChargeNode implements DashMessageListener
   @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
-    // --DEBUG!--Log.i(UIActivity.APP_TAG, String.format( " ChargeNode -> Msg Rec: %d", message) );
+    Log.d(UIActivity.APP_TAG, " ChargeNode -> Msg Rec: " + message);
 
     // Message received! Reset the watchdog counter.
     watchdogCounter = 0;
@@ -241,8 +241,7 @@ public class ChargeNode implements DashMessageListener
       case CHARGE_NODE_HTML_DATA:
         // HTTP response received from server.
         if ((connectionStatus == STATUS_CONNECTING) && (data != null) && data.containsKey("ResponseCode")) {
-          // --DEBUG!--
-          Log.d(UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
+          Log.d(UIActivity.APP_TAG, " ChargeNode -> HTTP Response Code: " + data.getInt("ResponseCode"));
           // Check the r4esponse code. Should be 200 if we logged in OK:
           if (data.getInt("ResponseCode", 999) == 200) {
             // Connected OK!
@@ -263,18 +262,18 @@ public class ChargeNode implements DashMessageListener
 
       case CHARGE_NODE_JSON_DATA:
         if (connectionStatus == STATUS_CONNECTED) {
-          Log.i(UIActivity.APP_TAG, String.format( " ChargeNode -> HTTP Response Code: %d", data.getInt("ResponseCode")) );
+          Log.i(UIActivity.APP_TAG, " ChargeNode -> HTTP Response Code: " + ((data == null) ? "null" : data.getInt("ResponseCode")));
           // The text we received back should be JSON data.
           // Parse: (note Try / Catch block to catch JSON errors, in case data can't be parsed).
           try {
             JSONObject jsonReceived = new JSONObject(stringData);  // Parse the JSON data
-            //--DEBUG!!-- Log.i("HTTPConn", String.format("JSON Parsed. %d entries in data section.", jsonDataSection.length() ) );
             // The JSON data should contain 3 sections:
             //   "datumQueryCommand" = JSONData: some name/value pairs with meta data
             //   "data"              = JSONArray: An array of JSON objects containing info about the items at
             //                         the solar node (i.e. switches). This is the data we are interested in.
             //   "tz"                = TIme zone description.
             JSONArray jsonDataSection = jsonReceived.getJSONArray("data");  // Get the "data" array.
+            Log.d("HTTPConn", String.format("JSON Parsed. %d entries in data section.", jsonDataSection.length()));
             // Search the data array for an entry with sourceId = /power/switch/1:
             for (int i=0; i<jsonDataSection.length(); i++) {
               JSONObject jsonDataItem = jsonDataSection.getJSONObject(i);
@@ -288,7 +287,9 @@ public class ChargeNode implements DashMessageListener
                 }
                 dashMessages.sendData( UIActivity.UI_INTENT_IN, DashMessageListener.CHARGE_NODE_ID, null, CHARGE_NODE_OK_HTML, makeChargeData(connectionStatus,chargeStatus,0.0f,0.0f) );
               }
-              //--DEBUG!!--Log.i("HTTPConn", "  sourceId: " + jsonDataItem.getString("sourceId") + "\n  integerValue: " + String.format("%d", jsonDataItem.getInt("integerValue") )  );
+              if (Log.isLoggable("HTTPConn", Log.DEBUG)) {
+                Log.d("HTTPConn", "  sourceId: " + jsonDataItem.getString("sourceId") + "\n  integerValue: " + String.format("%d", jsonDataItem.getInt("integerValue")));
+              }
             }
           } catch (JSONException e) {
             Log.w(UIActivity.APP_TAG, e);
@@ -362,7 +363,7 @@ public class ChargeNode implements DashMessageListener
     public void run()
     {
       timerStop();  // Clears existing timers.
-      //--DEBUG!!-- Log.i(UIActivity.APP_TAG, " ChargeNode -> Timer" );
+      Log.d(UIActivity.APP_TAG, " ChargeNode -> Timer");
       watchdogCounter++;
       if (watchdogCounter >= WATCHDOG_OVERFLOW) {
         // Nothing has happend for a while! Stop the timer and set status to 'Disconnected'.
@@ -384,7 +385,7 @@ public class ChargeNode implements DashMessageListener
           if (!currentConn.isAlive()) {
             // Current item is not "Alive" (i.e. running). Has it started yet?
             if (currentConn.isRun()) {
-              //--DEBUG!!--- Log.i(UIActivity.APP_TAG, " ChargeNode -> Thread Finished. Removing From Queue. " );
+              Log.d(UIActivity.APP_TAG, " ChargeNode -> Thread Finished. Removing From Queue.");
               // The thread has run, so it must have finished!
               currentConn = null;
               requestQueue.poll();   // Removes the item from the queue.
@@ -392,7 +393,7 @@ public class ChargeNode implements DashMessageListener
             }
             // NOW: If we still have a valid HTTP connection item from the queue, we know it needs to be started.
             if (currentConn != null) {
-              //--DEBUG!!--- Log.i(UIActivity.APP_TAG, " ChargeNode -> Starting HTTP Conn From Queue. " );
+              Log.d(UIActivity.APP_TAG, " ChargeNode -> Starting HTTP Conn From Queue.");
               currentConn.run();
             }
           }

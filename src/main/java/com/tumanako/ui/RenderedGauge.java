@@ -445,8 +445,7 @@ public class RenderedGauge extends View
     // and sizes for gauge elements
     // Get actual layout parameters
     if (changed) {
-      // --DEBUG!--
-      Log.i( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
+      Log.d( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
       drawingWidth = this.getWidth();
       drawingHeight = this.getHeight();
       calcGauge(); // Calculate various generic values applying to all gauge types.

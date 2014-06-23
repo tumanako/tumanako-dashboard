@@ -168,8 +168,7 @@ public class VehicleData extends Thread implements DashMessageListener
 
   public VehicleData(Context context)
   {
-
-    // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> Constructor; ");
+    Log.d(UIActivity.APP_TAG, " VehicleData -> Constructor; ");
 
     vehicledataContext = context;
 
@@ -238,7 +237,7 @@ public class VehicleData extends Thread implements DashMessageListener
   private void stopVehicleData()
   {
     // Stop the vehicle sensor
-    // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
+    Log.d(UIActivity.APP_TAG, " VehicleData -> stopVehicleData(); ");
     btClose();   // Close the BT connection
 
     // Stop the update timer if it is running
@@ -438,7 +437,7 @@ public class VehicleData extends Thread implements DashMessageListener
   /** Bluetooth socket close / cleanup */
   private void btClose()
   {
-    // --DEBUG!!-- Log.i(UIActivity.APP_TAG, " VehicleData -> btClose(); ");
+    Log.d(UIActivity.APP_TAG, " VehicleData -> btClose(); ");
     try {
        if (btStreamIn != null)  btStreamIn.close();
        if (btStreamOut != null) btStreamOut.close();

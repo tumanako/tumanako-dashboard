@@ -26,6 +26,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 
 /**
  * Bar Gauge: Experimental! Derived from RenderedGauge.
@@ -61,7 +62,7 @@ public class BarGauge extends RenderedGauge
   {
     super(context, atttibutes);
 
-    // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  Dial -> Constructor ");
+    Log.d( UIActivity.APP_TAG, "  BarGauge -> Constructor ");
 
     numberBlocks = numberScaleTicks-1;
 
@@ -205,7 +206,7 @@ public class BarGauge extends RenderedGauge
     // and sizes for dial elements:
     // **** Get actual layout parameters: ****
     if (changed) {
-      // -- DEBUG!! -- Log.i( UIActivity.APP_TAG, "  BarGauge -> onLayout Changed!! ");
+      Log.d( UIActivity.APP_TAG, "  BarGauge -> onLayout Changed!! ");
       calcBar();
       measurementsValid = true;
     }

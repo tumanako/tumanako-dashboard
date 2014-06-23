@@ -27,6 +27,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import com.tumanako.ui.UIActivity;
 
 /**
  * Tumanako Dash Message Receiver / Broadcaster.
@@ -103,7 +105,7 @@ public class DashMessages extends BroadcastReceiver
     if (intent.hasExtra(DASHMESSAGE_STRING)) stringData = intent.getStringExtra(DASHMESSAGE_STRING);
     if (intent.hasExtra(DASHMESSAGE_DATA)  ) data       = intent.getBundleExtra(DASHMESSAGE_DATA);
 
-    // --DEBUG!-- Log.i(UIActivity.APP_TAG, String.format( " DashMessages -> Msg Rec: %d", message) );
+    Log.d(UIActivity.APP_TAG, String.format( " DashMessages -> Msg Rec: %d", message) );
 
     parent.messageReceived(action, message, floatData, stringData, data);
   }

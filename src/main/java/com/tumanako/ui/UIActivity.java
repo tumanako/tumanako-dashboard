@@ -146,8 +146,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     tabHost.addTab(tabSystemData);
     tabHost.addTab(tabChargeNode);
 
-    // --DEBUG!!--
-    Log.i(APP_TAG,"UIActivity -> onCreate()");
+    Log.d(APP_TAG,"UIActivity -> onCreate()");
 
     // **** Calc height of dials based on width: ****************
     //int thisWidth =   ((Dial) findViewById(R.id.dialMotorRPM)).getWidth();
@@ -323,8 +322,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   private void chargeNodeUIReset()
   {
     // Charge Node UI Reset
-    //--DEBUG!--
-    Log.i(APP_TAG,"UIActivity -> chargeNodeUIReset()");
+    Log.d(APP_TAG,"UIActivity -> chargeNodeUIReset()");
     ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).setState(false);
     ((StatusLamp)uiWidgets.get("lampCharging")).setState(false);
     ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
@@ -595,8 +593,12 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
   @Override
   public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
   {
-    // --DEBUG!-- Log.i(APP_TAG, String.format( "UIActivity -> Message Rec; Mesage: %d; ", message) + action);
-    // --DEBUG!-- if (stringData != null) Log.i(APP_TAG, "stringData -> " + stringData);
+    if (Log.isLoggable(APP_TAG, Log.DEBUG)) {
+      Log.d(APP_TAG, String.format( "UIActivity -> Message Rec; Mesage: %d; ", message) + action);
+      if (stringData != null) {
+        Log.d(APP_TAG, "stringData -> " + stringData);
+      }
+    }
     uiResetCounter = 0;   // Reset the UI Reset Counter whenever we get some data from an input source.
 
     if (message == UI_TOAST_MESSAGE) {
