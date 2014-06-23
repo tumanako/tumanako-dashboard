@@ -50,7 +50,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
   public static final String SETTINGS_ACTIVITY = "com.tumanako.ui.settings";
 
   /** Keep-alive Timer Handler */
-  private Handler uiTimer = new Handler();
+  private final Handler uiTimer = new Handler();
   /** Update the UI every n mSeconds. */
   private static final int UPDATE_EVERY = 500;
 
@@ -136,7 +136,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
    * Note that this is a low priority UI update for
    * triggering a keep-alive signal to data service.
    */
-  private Runnable uiTimerTask = new Runnable()
+  private final Runnable uiTimerTask = new Runnable()
   {
     @Override
     public void run()
