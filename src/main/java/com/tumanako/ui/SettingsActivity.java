@@ -33,10 +33,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.DashMessageListener;
+import com.tumanako.dash.DashMessages;
 import com.tumanako.sensors.DataService;
 import com.tumanako.sensors.VehicleData;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class SettingsActivity extends Activity implements OnItemClickListener, DashMessageListener
@@ -53,7 +55,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
   private static final int UPDATE_EVERY = 500;
 
   private ListView deviceList;
-  private String[] addressList;
+  private List<String> addressList;
 
   @Override
   public void onCreate(Bundle savedInstanceState)
@@ -73,13 +75,11 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
     if (pairedDevices.size() > 0) {
-      addressList = new String[pairedDevices.size()];
-      int i = 0;
+      addressList = new ArrayList<String>(pairedDevices.size());
       for (BluetoothDevice device : pairedDevices) {
         String deviceBTName = device.getName();
         listAdapter.add(deviceBTName);
-        addressList[i] = device.getAddress();
-        i++;
+        addressList.add(device.getAddress());
       }
     } else {
       // No paired bluetooth devices
@@ -116,7 +116,7 @@ public class SettingsActivity extends Activity implements OnItemClickListener, D
         SharedPreferences settings = getSharedPreferences(UIActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("btDeviceName", selectedDevice);
-        editor.putString("btDeviceAddress",addressList[position]);
+        editor.putString("btDeviceAddress", addressList.get(position));
         editor.commit(); // Commit the edits!
         // Send an intent message to the bluetooth connection
         // to tell it that the address has changed
