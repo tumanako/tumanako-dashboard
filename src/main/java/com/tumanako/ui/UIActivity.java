@@ -305,11 +305,11 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     ((BarGauge)uiWidgets.get("barTMotor"))       .setValue(0f);
     ((BarGauge)uiWidgets.get("barTController"))  .setValue(0f);
     ((BarGauge)uiWidgets.get("barTBattery"))     .setValue(0f);
-    ((StatusLamp)uiWidgets.get("lampData")).turnOff();
-    ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
-    ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
-    ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
-    ((StatusLamp)uiWidgets.get("lampReverse")).turnOff();
+    ((StatusLamp)uiWidgets.get("lampData")).setState(false);
+    ((StatusLamp)uiWidgets.get("lampGPS")).setState(false);
+    ((StatusLamp)uiWidgets.get("lampContactor")).setState(false);
+    ((StatusLamp)uiWidgets.get("lampFault")).setState(false);
+    ((StatusLamp)uiWidgets.get("lampReverse")).setState(false);
     // Secondary Data:
     ((TextWithLabel)uiWidgets.get("textDriveTime"))      .setText("00:00");
     ((TextWithLabel)uiWidgets.get("textDriveRange"))     .setText("0");
@@ -317,7 +317,7 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     // System Data:
     ((TextWithLabel)uiWidgets.get("textMainBattVlts"))   .setText("0.0");
     ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText("0.0");
-    ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
+    ((StatusLamp)uiWidgets.get("lampPreCharge")).setState(false);
   }
 
   private void chargeNodeUIReset()
@@ -325,8 +325,8 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
     // Charge Node UI Reset
     //--DEBUG!--
     Log.i(APP_TAG,"UIActivity -> chargeNodeUIReset()");
-    ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
-    ((StatusLamp)uiWidgets.get("lampCharging")).turnOff();
+    ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).setState(false);
+    ((StatusLamp)uiWidgets.get("lampCharging")).setState(false);
     ((WebView)uiWidgets.get("webChargeNodeContent")).loadData(ChargeNode.CHARGE_NODE_DEFAULT_HTML, "text/html", null);
     ((Button)uiWidgets.get("buttonConnectToNode")).setText("Connect");
   }
@@ -614,18 +614,11 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       //Float chargeCurrent = data.getFloat(ChargeNode.CHARGE_CURRENT, 0.0f);
       //Float chargeAH      = data.getFloat(ChargeNode.CHARGE_AH, 0.0f);
       // Get the status lamp values:
-      if (data.getFloat(ChargeNode.CONNECTION_STATUS, 0.0f) == 0.0f ) {
-        ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOff();
-        ((Button)uiWidgets.get("buttonConnectToNode")).setText("Connect");
-      } else {
-        ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).turnOn();
-        ((Button)uiWidgets.get("buttonConnectToNode")).setText("Disconnect");
-      }
-      if (data.getFloat(ChargeNode.CHARGE_STATUS, 0.0f) == 0.0f ) {
-        ((StatusLamp)uiWidgets.get("lampCharging")).turnOff();
-      } else {
-        ((StatusLamp)uiWidgets.get("lampCharging")).turnOn();
-      }
+      final boolean connected = (data.getFloat(ChargeNode.CONNECTION_STATUS, 0.0f) != 0.0f);
+      ((StatusLamp)uiWidgets.get("lampChargeNodeOnline")).setState(connected);
+      ((Button)uiWidgets.get("buttonConnectToNode")).setText(connected ? "Disconnect" : "Connect");
+      final boolean charging = (data.getFloat(ChargeNode.CHARGE_STATUS, 0.0f) != 0.0f);
+      ((StatusLamp)uiWidgets.get("lampCharging")).setState(charging);
       //((TextWithLabel)uiWidgets.get("textChargeCurrent")) .setText(String.format("%.0f",chargeCurrent));
       //((TextWithLabel)uiWidgets.get("textChargeAH"))      .setText(String.format("%.1f",chargeAH)     );
     }
@@ -636,11 +629,10 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
       Set<String> keys = data.keySet();
       //   This is an iterator to iterate over the list.
       Iterator<String> myIterator = keys.iterator();
-      String key;
-      float valueFloat;
       while (myIterator.hasNext()) {
-        key = myIterator.next();
-        valueFloat = data.getFloat(key, 0.0f);
+        final String key = myIterator.next();
+        final float valueFloat = data.getFloat(key, 0.0f);
+        final boolean valueBoolean = (valueFloat == 1f);
 
         // Data Messages from vehicle data input
         // TODO refactor this into an else-if chain
@@ -660,33 +652,27 @@ public class UIActivity extends Activity implements OnClickListener, OnLongClick
         if (key.equals("DATA_MAIN_BATTERY_AH"))   ((TextWithLabel)uiWidgets.get("textMainBattAH"))     .setText(String.format("%.1f", valueFloat));
 
         if (key.equals("DATA_DATA_OK")) {
-          if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampData")).turnOn();
-          else                  ((StatusLamp)uiWidgets.get("lampData")).turnOff();
+          ((StatusLamp)uiWidgets.get("lampData")).setState(valueBoolean);
         }
 
         if (key.equals(NmeaProcessor.DATA_GPS_HAS_LOCK)) {
-          if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampGPS")).turnOn();
-          else                  ((StatusLamp)uiWidgets.get("lampGPS")).turnOff();
+          ((StatusLamp)uiWidgets.get("lampGPS")).setState(valueBoolean);
         }
 
         if (key.equals("DATA_CONTACTOR_ON")) {
-          if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampContactor")).turnOn();
-          else                  ((StatusLamp)uiWidgets.get("lampContactor")).turnOff();
+          ((StatusLamp)uiWidgets.get("lampContactor")).setState(valueBoolean);
         }
 
         if (key.equals("DATA_FAULT")) {
-          if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampFault")).turnOn();
-          else                  ((StatusLamp)uiWidgets.get("lampFault")).turnOff();
+          ((StatusLamp)uiWidgets.get("lampFault")).setState(valueBoolean);
         }
 
         if (key.equals("DATA_PRECHARGE")) {
-          if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOn();
-          else                  ((StatusLamp)uiWidgets.get("lampPreCharge")).turnOff();
+          ((StatusLamp)uiWidgets.get("lampPreCharge")).setState(valueBoolean);
         }
 
         if (key.equals("DATA_MOTOR_REVERSE")) {
-          if (valueFloat == 1f) ((StatusLamp)uiWidgets.get("lampReverse")).turnOn();
-          else                  ((StatusLamp)uiWidgets.get("lampReverse")).turnOff();
+          ((StatusLamp)uiWidgets.get("lampReverse")).setState(valueBoolean);
         }
       }
     }

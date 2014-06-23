@@ -74,21 +74,20 @@ import android.widget.ImageView;
  * {@code
     private StatusLamp demoStatusLamp;
     demoStatusLamp = (StatusLamp) findViewById(R.id.demoStatusLamp);
-    demoStatusLamp.turnOn();
+    demoStatusLamp.setStatus(true);
 }
  *
  * Easy as that!
- *
- * Other public methods:
- *   {@link #turnOff()}
- *   {@link #getState()}
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
 public class StatusLamp extends ImageView
 {
 
-  private boolean lampState = false;  // true = Lamp On; false = Lamp Off.
+  /**
+   * true = Lamp On; false = Lamp Off.
+   */
+  private boolean lampState = false;
 
   // Bitmaps to represent lamp state (on / off):
   private Bitmap bitmapLampOn;
@@ -108,19 +107,17 @@ public class StatusLamp extends ImageView
     // Call the super class constructor to create a basic ImageView
     super(context, attrs);
 
-    // Get attributes from XML file.
-    // This method also loads the 'On' and 'Off' bitmaps for the lamp.
+    // Get attributes from XML file and load bitmaps for the lamp
     getCustomAttributes(attrs);
 
-    // Set Lamp State.
-    if (lampState) turnOn();
-    else           turnOff();
+    setLampBitmap(lampState);
   }
 
   /**
    * Extracts custom attributes.
-   * Given a set of attributes from the XML layout file, extract
-   * the custom attributes specific to the StatusLamp.
+   * Given a set of attributes from the XML layout file,
+   * extract the custom attributes specific to the StatusLamp.
+   * This method also loads the 'On' and 'Off' bitmaps for the lamp.
    * @param attrs - Attributes passed in from the XML parser
    */
   private void getCustomAttributes(AttributeSet attrs)
@@ -147,16 +144,23 @@ public class StatusLamp extends ImageView
     }
   }
 
-  public void turnOn()
+  /**
+   * Set visual lamp state.
+   * @param on whether to display the on or the off bitmap
+   */
+  private void setLampBitmap(boolean on)
   {
-    setImageBitmap(bitmapLampOn);
-    lampState = true;
+    setImageBitmap(on ? bitmapLampOn : bitmapLampOff);
   }
 
-  public void turnOff()
+  /**
+   * Sets the current lamp state.
+   * @param on <code>true</code> = Lamp is on; <code>false</code> = lamp is off.
+   */
+  public void setState(boolean on)
   {
-    setImageBitmap(bitmapLampOff);
-    lampState = false;
+    setLampBitmap(on);
+    lampState = on;
   }
 
   /**
