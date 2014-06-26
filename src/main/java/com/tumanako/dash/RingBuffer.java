@@ -22,6 +22,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 package com.tumanako.dash;
 
 import java.util.AbstractList;
+import java.util.Arrays;
 
 /**
  * Ring Buffer Class with float[] entries.
@@ -128,9 +129,7 @@ public class RingBuffer extends AbstractList<float[]>
     dataPointer = 0;
     dataLength  = 0;
     // Reset averages array
-    for (int n = 0; n < bufferFieldCount; n++) {
-      dataAverage[n] = 0f;
-    }
+    Arrays.fill(dataAverage, 0f);
   }
 
   @Override
