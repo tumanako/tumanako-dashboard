@@ -30,14 +30,14 @@ import android.util.FloatMath;
 import android.util.Log;
 
 /**
- * Dial: Experimental! Derived from RenderedGauge. See RenderedGauge.java for attribute definitions.
+ * Dial: Experimental! Derived from RenderedGauge.
+ * See {@link RenderedGauge} for attribute definitions.
  *
  * @author Jeremy Cole-Baker / Riverhead Technology
  */
 public class Dial extends RenderedGauge
 {
-
-  // Calculated internal values (based on actual size of dial, and generated at runtime):
+  // Calculated internal values (based on actual size of dial, and generated at runtime)
   private float needleLength = 0f;  // Length of needle in screen coordinates
 
   // Runtime Data Values:

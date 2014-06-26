@@ -176,15 +176,11 @@ public class RenderedGauge extends View
   protected static final int DEFAULT_BAR_COLOUR = 0xFF00C000;
   protected static final int DEFAULT_TICK_COLOUR = 0xA0F00000;
 
-  //protected Context uiContext;
-
   private final ScaledFont fontScale;
 
   public RenderedGauge(Context context, AttributeSet atttibutes)
   {
     super(context, atttibutes);
-
-    //uiContext = context;
 
     // Get Font Scale
     fontScale = new ScaledFont(context);
@@ -217,7 +213,6 @@ public class RenderedGauge extends View
     guageLablelPaint.setTypeface(Typeface.DEFAULT_BOLD);
     guageLablelPaint.setAntiAlias(true);
   }
-
 
   /**
    * Extracts custom attributes.
@@ -280,8 +275,6 @@ public class RenderedGauge extends View
     // Recycle the TypedArray
     a.recycle();
   }
-
-
 
   /**
    * Extract Colours from attribute value.
@@ -386,12 +379,12 @@ public class RenderedGauge extends View
    */
   public void setValue(float value)
   {
-    // Set the new value:
+    // Set the new value
     gaugeValue = value;
-    // Clamp the new value to make sure it's within the scale range:
+    // Clamp the new value to make sure it's within the scale range
     if (gaugeValue > scaleMax) gaugeValue = scaleMax;
     if (gaugeValue < scaleMin) gaugeValue = scaleMin;
-    // Invalidate the view so that it will be redrawn:
+    // Invalidate the view so that it will be redrawn
     invalidate();
   }
 
@@ -405,7 +398,7 @@ public class RenderedGauge extends View
   }
 
   /**
-   * Checks a supplied width or height spec, and decide whether to override it.
+   * Checks a supplied width or height spec, and decides whether to override it.
    */
   private int measureThis(int measureSpec)
   {
@@ -418,8 +411,10 @@ public class RenderedGauge extends View
     } else {
       // We might have been given an indication of maximum size:
       result = 320;   // We'll try 320 pixels.
-      if (specMode == MeasureSpec.AT_MOST) result = specSize;
-         // Respect AT_MOST value if that was what is called for by measureSpec
+      if (specMode == MeasureSpec.AT_MOST) {
+        result = specSize;
+      }
+      // Respect AT_MOST value if that was what is called for by measureSpec
     }
     return result;
   }
@@ -439,19 +434,27 @@ public class RenderedGauge extends View
   }
 
   @Override
-  protected void onLayout (boolean changed, int left, int top, int right, int bottom)
+  protected void onLayout(boolean changed, int left, int top, int right, int bottom)
   {
-    // Layout Time: We should now have measurements for our view area, so we can calculate positions
-    // and sizes for gauge elements
+    // Layout Time: We should now have measurements for our view area,
+    // so we can calculate positions and sizes for gauge elements
+
     // Get actual layout parameters
     if (changed) {
-      Log.d( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
+      Log.d(UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
       drawingWidth = this.getWidth();
       drawingHeight = this.getHeight();
       calcGauge(); // Calculate various generic values applying to all gauge types.
     }
   }
 
+  /**
+   * Override this in derived classes to draw more widgets...
+   * Note: Derived classes must also call this method with 'super.onDraw()' to make sure
+   * the View onDraw is called and that drawing width and height are calculated
+   * during the first draw (see above).
+   * @param canvas
+   */
   @Override
   protected void onDraw(Canvas canvas)
   {
@@ -467,11 +470,5 @@ public class RenderedGauge extends View
         canvas.drawText(scaleLabels[n], slabelX[n], slabelY[n], scalePaint);
       }
     }
-
-    // Override this in derived classes to draw more widgets...
-    //
-    // Note: Derived classes must also call this method with 'super.onDraw()' to make sure
-    // the View onDraw is called and that drawing width and height are calculated
-    // during the first draw (see above).
   }
 }

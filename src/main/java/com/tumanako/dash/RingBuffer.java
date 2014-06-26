@@ -24,7 +24,7 @@ package com.tumanako.dash;
 import java.util.AbstractList;
 
 /**
- * Float Ring Buffer Class:
+ * Ring Buffer Class with float[] entries.
  *
  * Create a ring buffer to store some numeric values of type 'float':
  * This will make an array of the values, and track the last value
@@ -42,7 +42,6 @@ import java.util.AbstractList;
  */
 public class RingBuffer extends AbstractList<float[]>
 {
-
   /** Number of data points in buffer. */
   private final int bufferSize;
   /** Number of values to store. */
@@ -180,11 +179,12 @@ public class RingBuffer extends AbstractList<float[]>
           // Note that dataPointer is currently pointintg to the OLDEST value
           // in the buffer, i.e. the one we are about to overwrite.
           dataAverage[n] = dataAverage[n]
-                           - (dataBuffer[dataPointer][n] / dataLength)
-                           + (theseValues[n] / dataLength);
+              - (dataBuffer[dataPointer][n] / dataLength)
+              + (theseValues[n] / dataLength);
         } else {
           // Special case: Buffer not yet full. Use cumulative average instead
-          dataAverage[n] = dataAverage[n] + ((theseValues[n] - dataAverage[n]) / (dataLength + 1));
+          dataAverage[n] = dataAverage[n]
+              + ((theseValues[n] - dataAverage[n]) / (dataLength + 1));
         }
       }
     }
@@ -206,35 +206,33 @@ public class RingBuffer extends AbstractList<float[]>
   /**
    * Returns a datum.
    * Gets back an arbitrary entry from the buffer. See notes below.
+   * NOTE that if less than the maximum number of records have been entered
+   * into the buffer, the length of the buffer will be less than the maximum size.
+   * In this case, pointIndex will only go back to the earliest record, no further.
+   * In other words, if only 2 records have actually been placed in the buffer,
+   * values of pointIndex greater than 1 will still return the 1'th entry.
    *
-   * @param pointIndex - Index of point to retrieve. 0 = most recent; 1 = next most recent, etc.
+   * @param pointIndex Index of point to retrieve.
+   *   0 = most recent, 1 = 2nd most recent, 2 = 3rd most recent, etc.
+   *   If it exceeds the length of the buffer, the oldest value is returned.
    * @return Array of float values representing the fields from the requested buffer entry.
+   *   If no data has been added, the method returns null!!
+   *   User should check GetLength if there is any doubt!.
    */
   @Override
   public float[] get(int pointIndex)
   {
-    // Retrieves a specific point. pointIndex is a number indicating
-    // the point to get, such that:
-    //
-    //  0 = Most recent;
-    //  1 = 2nd most recent;
-    //  2 = 3rd most recent; Etc.
-    //
-    // If n exceeds the length of the buffer, the oldest value is returned.
-    // NOTE that if less than the maximum number of records have been entererd
-    // into the buffer, the length of the buffer will be less than the maximum size.
-    // In this case, n will only go back to the earliest record, no further.
-    // In other words, if only 2 records have actually been placed in the buffer,
-    // values of n greater than 1 will still return the 1'th entry.
-    //
     // If no data have been added, the method returns null!!
     // User should check GetLength if there is any doubt!.
     int tempIndex = pointIndex;         // Local copy of the requested index (so we can check bounds and change if required)
     if (tempIndex < 0) tempIndex = 0;                             // Data index must be 0 or positive.
     if (tempIndex > (dataLength - 1)) tempIndex = dataLength - 1;   // Data index must be less than the available number of records!
-    int thisPointer = dataPointer - (pointIndex + 1);             // Temporary data pointer.
-    if (thisPointer < 0) thisPointer = thisPointer + bufferSize;  // Buffer loops around. Add bufferSize to get to correct position.
-    return dataBuffer[thisPointer].clone();                       // Return a copy of the requested data point.
+
+    int thisPointer = dataPointer - (pointIndex + 1); // Temporary data pointer.
+    if (thisPointer < 0) {
+      thisPointer = thisPointer + bufferSize; // Buffer loops around. Add bufferSize to get to correct position.
+    }
+    return dataBuffer[thisPointer].clone(); // Return a copy of the requested data point.
   }
 
   /**

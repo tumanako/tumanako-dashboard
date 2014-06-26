@@ -49,16 +49,12 @@ import com.tumanako.ui.UIActivity;
  */
 public class DashMessages extends BroadcastReceiver
 {
-
   /**
    * String Identifiers to identify different elements of the Intent structure we are using.
    * This is the name of the integer field in the received intent,
    * which tells us the source of the message.
    */
   public static final String DASHMESSAGE_MESSAGE = "com.tumanako.dash.message";
-
-  /** Will be used to send and receive intents from other parts of the application (E.g. UI) */
-  private final LocalBroadcastManager messageBroadcaster;
 
   /*
    * Extra Data Field Identifiers.
@@ -68,8 +64,12 @@ public class DashMessages extends BroadcastReceiver
   private static final String DASHMESSAGE_STRING  = "s";
   private static final String DASHMESSAGE_DATA    = "d";
 
+  /**
+   * Will be used to send and receive intents from other parts of the application,
+   * for example from the UI.
+   */
+  private final LocalBroadcastManager messageBroadcaster;
   private final String actionFilter;
-
   private final DashMessageListener parent;
 
   public DashMessages(Context context, DashMessageListener callbackParent, String intentActionFilter)
@@ -94,18 +94,24 @@ public class DashMessages extends BroadcastReceiver
     // Get the 'What Message?' from the intent. This is an integer sent by other parts
     // of the application, which identifies what they are trying to say to us.
     // Note: meaning is defined by derived classes
-    String action = intent.getAction();
-    int message = intent.getIntExtra( DASHMESSAGE_MESSAGE, 0);
+    final String action = intent.getAction();
+    final int message = intent.getIntExtra(DASHMESSAGE_MESSAGE, 0);
 
     Float floatData = null;
     String stringData = null;
     Bundle data = null;
 
-    if (intent.hasExtra(DASHMESSAGE_FLOAT) ) floatData  = intent.getFloatExtra(DASHMESSAGE_FLOAT, 0f);
-    if (intent.hasExtra(DASHMESSAGE_STRING)) stringData = intent.getStringExtra(DASHMESSAGE_STRING);
-    if (intent.hasExtra(DASHMESSAGE_DATA)  ) data       = intent.getBundleExtra(DASHMESSAGE_DATA);
+    if (intent.hasExtra(DASHMESSAGE_FLOAT)) {
+      floatData  = intent.getFloatExtra(DASHMESSAGE_FLOAT, 0f);
+    }
+    if (intent.hasExtra(DASHMESSAGE_STRING)) {
+      stringData = intent.getStringExtra(DASHMESSAGE_STRING);
+    }
+    if (intent.hasExtra(DASHMESSAGE_DATA)) {
+      data       = intent.getBundleExtra(DASHMESSAGE_DATA);
+    }
 
-    Log.d(UIActivity.APP_TAG, String.format( " DashMessages -> Msg Rec: %d", message) );
+    Log.d(UIActivity.APP_TAG, String.format(" DashMessages -> Msg Rec: %d", message));
 
     parent.messageReceived(action, message, floatData, stringData, data);
   }
@@ -116,11 +122,17 @@ public class DashMessages extends BroadcastReceiver
    */
   public void sendData(String action, int message, Float floatData, String stringData, Bundle data)
   {
-    Intent intent = new Intent(action);
+    final Intent intent = new Intent(action);
     intent.putExtra(DASHMESSAGE_MESSAGE, message);
-    if (floatData  != null) intent.putExtra(DASHMESSAGE_FLOAT,  floatData);
-    if (stringData != null) intent.putExtra(DASHMESSAGE_STRING, stringData);
-    if (data       != null) intent.putExtra(DASHMESSAGE_DATA,   data);
+    if (floatData != null) {
+      intent.putExtra(DASHMESSAGE_FLOAT,  floatData);
+    }
+    if (stringData != null) {
+      intent.putExtra(DASHMESSAGE_STRING, stringData);
+    }
+    if (data != null) {
+      intent.putExtra(DASHMESSAGE_DATA,   data);
+    }
     messageBroadcaster.sendBroadcast(intent);
   }
 

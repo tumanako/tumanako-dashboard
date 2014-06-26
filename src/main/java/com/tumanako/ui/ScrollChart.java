@@ -115,7 +115,7 @@ public class ScrollChart extends View
     // Convert the data in the data buffer to coordinates for the chart
     int lastPointIndex = NUMBER_POINTS - 1;
     for (int n = 0; n < NUMBER_POINTS; n++) {
-         yCoord[n] = drawingTop + (dataBuffer.get(lastPointIndex-n)[0] * drawingHeight);
+         yCoord[n] = drawingTop + (dataBuffer.get(lastPointIndex - n)[0] * drawingHeight);
     }
 
     // Generate a filled path object to represent the path

@@ -180,7 +180,7 @@ public class DataService extends Service implements DashMessageListener
         stopSensors(); // Stop the sensors.
         stopSelf();    // Stop the service!
       } else {
-        /* ******** Check Bluetooth Connection: **********
+        /* ******** Check Bluetooth Connection *********
          * We call startVehicleData() to check the bluetooth connection.
          * Note that if it's already connected and active, startVehicleData()
          * won't do anything. If the connection has been lost and the

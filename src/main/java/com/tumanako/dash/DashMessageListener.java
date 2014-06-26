@@ -29,7 +29,6 @@ import java.util.EventListener;
  */
 public interface DashMessageListener extends EventListener
 {
-
   /*
    * Message ID Constants.
    * These integer IDs are used as the 'value' of the DASHMESSAGE_MESSAGE
