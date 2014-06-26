@@ -223,15 +223,14 @@ public class RingBuffer extends AbstractList<float[]>
    * @return Array of float values representing the fields from the requested buffer entry.
    *   If no data has been added, the method returns null!!
    *   User should check GetLength if there is any doubt!.
+   * @throws IndexOutOfBoundsException {@inheritDoc}
    */
   @Override
   public float[] get(int pointIndex)
   {
-    // If no data have been added, the method returns null!!
-    // User should check GetLength if there is any doubt!.
-    int tempIndex = pointIndex;         // Local copy of the requested index (so we can check bounds and change if required)
-    if (tempIndex < 0) tempIndex = 0;                             // Data index must be 0 or positive.
-    if (tempIndex > (dataLength - 1)) tempIndex = dataLength - 1;   // Data index must be less than the available number of records!
+    if ((pointIndex < 0) || (pointIndex >= dataLength)) {
+      throw new IndexOutOfBoundsException("Can not fetch element " + pointIndex + " from buffer of size " + dataLength);
+    }
 
     int thisPointer = dataPointer - (pointIndex + 1); // Temporary data pointer.
     if (thisPointer < 0) {
