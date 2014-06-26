@@ -149,9 +149,9 @@ public class RingBuffer extends AbstractList<float[]>
   public void fill(float[] theseValues)
   {
     for (int n = 0; n < bufferSize; n++) {
-      dataBuffer[n] = theseValues;
+      dataBuffer[n] = theseValues.clone();
     }
-    dataAverage = theseValues;
+    dataAverage = theseValues.clone();
     dataPointer = 0;
     dataLength  = bufferSize;
   }
