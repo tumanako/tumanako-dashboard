@@ -144,7 +144,7 @@ public class ChargeNode implements DashMessageListener
     this.requestQueue = new LinkedList<ChargerHTTPConn>();
     this.dashMessages = new DashMessages(context, this, CHARGE_NODE_INTENT);
     this.weakContext = new WeakReference<Context>(context);
-    resume(); // Start the update timer!
+    timerStart(); // Start the update timer!
   }
 
   /**

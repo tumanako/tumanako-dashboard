@@ -87,7 +87,7 @@ public class RingBuffer extends AbstractList<float[]>
     this.useAverage       = thisUseAverage;
     this.dataBuffer  = new float[bufferSize][bufferFieldCount];
     this.dataAverage = new float[bufferFieldCount];
-    clear();
+    empty();
   }
 
   /**
@@ -122,8 +122,7 @@ public class RingBuffer extends AbstractList<float[]>
    * Resets the buffer.
    * This method replaces the buffer content with 0s.
    */
-  @Override
-  public void clear()
+  private void empty()
   {
     // Resets data buffer pointers back to start of buffer.
     dataPointer = 0;
@@ -132,6 +131,12 @@ public class RingBuffer extends AbstractList<float[]>
     for (int n = 0; n < bufferFieldCount; n++) {
       dataAverage[n] = 0f;
     }
+  }
+
+  @Override
+  public void clear()
+  {
+    empty();
   }
 
   /**

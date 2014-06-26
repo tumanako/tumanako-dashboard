@@ -81,10 +81,7 @@ public class DashMessages extends BroadcastReceiver
     // and receive mesages for this class.
     this.messageBroadcaster = LocalBroadcastManager.getInstance(context);
 
-    // Register to receive messages via Intents if a filter was provided
-    if (intentActionFilter != null) {
-      resume();
-    }
+    registerReceiver();
   }
 
   @Override
@@ -143,12 +140,18 @@ public class DashMessages extends BroadcastReceiver
     }
   }
 
-  public void resume()
+  /**
+   * Register to receive messages via Intents if a filter was provided.
+   */
+  private void registerReceiver()
   {
     if (actionFilter != null) {
-      messageBroadcaster.registerReceiver(this,  new IntentFilter(actionFilter));
+      messageBroadcaster.registerReceiver(this, new IntentFilter(actionFilter));
     }
-    // We are registering an observer (messageReceiver) to receive Intents
-    // with action named.
+  }
+
+  public void resume()
+  {
+    registerReceiver();
   }
 }
