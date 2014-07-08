@@ -238,7 +238,7 @@ public class Dial extends RenderedGauge
     // **** Get actual layout parameters: ****
     if (changed)
       {
-      Log.i( UIActivity.APP_TAG, "  Dial -> onLayout Changed!! ");      
+   // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  Dial -> onLayout Changed!! ");      
       calcDial();
       }
     }

@@ -110,16 +110,16 @@ public class VehicleData extends Thread implements IDashMessages
   /*****************************************************************/
    
   
-  /****** Vehicle Data Message Intent Filter: *********/
-  public static final String VEHICLE_DATA = "com.tumanako.sensors.vehicledata";  
-       // We will catch any intents with this identifier.  
+  /****** Vehicle Data Message Intent Filters: *********/
+  public static final String VEHICLE_DATA                  = "VEHICLE_DATA";  
+  public static final String VEHICLE_DATA_KEEPALIVE        = "VEHICLE_DATA_KEEPALIVE";  
+  public static final String VEHICLE_DATA_BTADDRESS_CHANGE = "VEHICLE_DATA_BTADDRESS";
+  public static final String intentFilters[] = 
+    {
+    VEHICLE_DATA_KEEPALIVE,
+    VEHICLE_DATA_BTADDRESS_CHANGE
+    };
     
-  /****** Message types we recognise: ******************
-   * Used in the 'message' field of intents sent to us: 
-   * ***************************************************/
-  public static final int VEHICLE_DATA_KEEPALIVE         = IDashMessages.VEHICLE_DATA_ID + 1;   // A 'KeepAlive' message, telling us that the UI is still active and the connection is still required.   
-  public static final int VEHICLE_DATA_BTADDRESS_CHANGE  = IDashMessages.VEHICLE_DATA_ID + 2;   // Bluetooth address change! (I.e. user selected different BT device). New address will be included in stringData field of message.
-  
 
   private DashMessages dashMessages;
   private int watchdogCounter = 0;
@@ -130,7 +130,7 @@ public class VehicleData extends Thread implements IDashMessages
    * This update timer can be used to trigger output of
    * debug info during BT operations. 
    * Warning! May not stop timer on thread completion!! 
-   ******************************************************/
+   ******************************************************
   private volatile boolean isPing = false;
   private Handler uiTimer = new Handler();
   private static final int UI_UPDATE_EVERY = 500;   // Update the UI every n mSeconds.
@@ -143,7 +143,7 @@ public class VehicleData extends Thread implements IDashMessages
     //  uiTimer.postDelayed(uiTimerTask, UI_UPDATE_EVERY);  // ...Callback later!
       } 
     };
-  /*******************************************************/
+  *******************************************************/
 
   
   // ************** Constructor: *****************************************
@@ -159,8 +159,7 @@ public class VehicleData extends Thread implements IDashMessages
     bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();                   // Create a Bluetooth adaptor object
     isBTConnected = false;
     
-    dashMessages = new DashMessages(context, this, VEHICLE_DATA);    // We are extending the 'DashMessages' class, and we need to call its Constructor here. 
-    dashMessages.resume();
+    dashMessages = new DashMessages(context, this, intentFilters);    // We are extending the 'DashMessages' class, and we need to call its Constructor here. 
 
     /****** Setup Bluetooth Watchdog Timer: ********/
     watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);      // ...Callback in n milliseconds!
@@ -183,13 +182,13 @@ public class VehicleData extends Thread implements IDashMessages
  /********** Dash Message Received: *************************************
   * Called when we receive an intent message via our Dashmessage object.   
   ***********************************************************************/
- public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
+ public void messageReceived(String action, Integer intData, Float floatData, String stringData, Bundle bundleData )
    {
    // Message Intent Received: Check type of message. 
    // We respond to 'keep alive' messages and bluetooth address changes.
    watchdogCounter = 0;     // Whatever the type of message, treat it as a 'keep alive' event and reset watchdog counter. 
    
-   if (message == VEHICLE_DATA_BTADDRESS_CHANGE) 
+   if (action.equals(VEHICLE_DATA_BTADDRESS_CHANGE)) 
      {
      // Bluetooth device address has changed! Note: We'll only do this if we've been sent a string (should be new address).  
      isAddressChanged = true;    // This flag tells the connection thread to reconnect with the new address. 
@@ -242,6 +241,8 @@ public class VehicleData extends Thread implements IDashMessages
      watchdogTimer.removeCallbacks(watchdogTimerTask);                    // ...Make sure there is no active callback already....
      watchdogCounter++;
 
+     // !!DEBUG!! Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> Tick. Counter:" + watchdogCounter );
+     
      if (watchdogCounter > BT_WATCHDOG_MAXCOUNT) stopVehicleData();                                                   // Watchdog Counter Overflow! We haven't been told to keep going, so stop the BT thread:
      else                                        watchdogTimer.postDelayed(watchdogTimerTask, BT_WATCHDOG_TIME);      // ...Callback in n milliseconds!
 
@@ -333,7 +334,6 @@ public class VehicleData extends Thread implements IDashMessages
     vehicleData.putFloat("DATA_CONTACTOR_ON",      contactorOn       );
     vehicleData.putFloat("DATA_FAULT",             faultOn           );
     vehicleData.putFloat("DATA_MAIN_BATTERY_KWH",  kWh               );
-    vehicleData.putFloat("DATA_ACC_BATTERY_VLT",   voltAcc           );
     vehicleData.putFloat("DATA_MOTOR_RPM",         motorRPM          );
     vehicleData.putFloat("DATA_MOTOR_REVERSE",     motorReverse      );
     vehicleData.putFloat("DATA_MAIN_BATTERY_TEMP", tPack             );
@@ -346,10 +346,9 @@ public class VehicleData extends Thread implements IDashMessages
     vehicleData.putFloat("DATA_DATA_OK",           1f                );
     vehicleData.putFloat("DATA_DRIVE_TIME",        0f                );
     vehicleData.putFloat("DATA_DRIVE_RANGE",       0f                );
-
+    vehicleData.putFloat("DATA_ACC_BATTERY_VLT",   voltAcc           );
     // Now transmit the data to the UI by sending a message!  
-    dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData );
-        
+    dashMessages.sendData( VEHICLE_DATA, null, null, null, vehicleData );   
     }
   
      
@@ -372,7 +371,7 @@ public class VehicleData extends Thread implements IDashMessages
      /***** Make sure the bluetooth adaptor is on: *******/ 
      if ((bluetoothAdapter == null) || (bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON))
        {
-       //dashMessages.sendData( UIActivity.UI_INTENT_IN, UIActivity.UI_TOAST_MESSAGE, null, "Bluetooth Adaptor Not Available!", null );
+       //dashMessages.sendData( UIActivity.UI_TOAST_MESSAGE, null, null, "Bluetooth Adaptor Not Available!", null );
        return false;
        }
 //Log.i(com.tumanako.ui.UIActivity.APP_TAG, "             -> Adaptor is ON! ");
@@ -483,7 +482,7 @@ public class VehicleData extends Thread implements IDashMessages
       {
       byte[] byteBuffer = new byte[BT_READ_SIZE];
       StringBuffer btRawData = new StringBuffer();
-//Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");      
+// !!DEBUG!! Log.i(com.tumanako.ui.UIActivity.APP_TAG, " VehicleData -> BT Com Thread Run ");      
       // Try to open a BT connection: 
       if (!btOpen())
         {

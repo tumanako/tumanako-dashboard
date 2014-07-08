@@ -28,8 +28,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
-import com.tumanako.dash.IDashMessages;
-
 
 /*********************************************************************************************
  * NMEA NMEAData Receiver: 
@@ -43,7 +41,7 @@ import com.tumanako.dash.IDashMessages;
  *
  *********************************************************************************************/
 
-public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages 
+public class NmeaGPS implements LocationListener, IDroidSensor 
   {
 
   private LocationManager mLocationManager;
@@ -98,7 +96,7 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     // Add a listener to receive NMEA sentences:
     // Tihs causes our NmeaProcessor class to get NMEA messages from the GPS:
-    mLocationManager.addNmeaListener(NMEAData); 
+    mLocationManager.addNmeaListener(NMEAData);
     }
 
   
@@ -147,13 +145,6 @@ public class NmeaGPS implements LocationListener, IDroidSensor, IDashMessages
       {  isAvailable = false;  }
     }
 
-
-
-
-  public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data)
-    {  }
-
- 
   
 
   

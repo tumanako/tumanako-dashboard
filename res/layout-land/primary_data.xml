@@ -2,7 +2,7 @@
 <!-- LANDSCAPE Layout!! -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
     android:id="@+id/layoutPrimaryData"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -37,7 +37,8 @@
             app:origin_y="0.85"
             app:scale_step="1"
             app:scale_tick_size="3"
-            app:scale_tick_step="0.5" />
+            app:scale_tick_step="0.5" 
+            app:update_action="DATA_MOTOR_RPM" />
 
         <com.tumanako.ui.StatusLamp
             android:id="@+id/lampReverse"
@@ -47,7 +48,8 @@
             android:padding="2dp"
             app:initial_status="off"
             app:off_bitmap="@drawable/reverse_off"
-            app:on_bitmap="@drawable/reverse_on" />
+            app:on_bitmap="@drawable/reverse_on" 
+            app:update_action="DATA_MOTOR_REVERSE" />
 
         <com.tumanako.ui.Dial
             android:id="@+id/dialMainBatteryKWh"
@@ -69,7 +71,8 @@
             app:origin_y="0.85"
             app:scale_step="10"
             app:scale_tick_size="3"
-            app:scale_tick_step="5" />
+            app:scale_tick_step="5" 
+            app:update_action="DATA_MAIN_BATTERY_KWH" />
     </LinearLayout>
 
     <LinearLayout
@@ -93,7 +96,8 @@
                 android:padding="3dp"
                 app:initial_status="off"
                 app:off_bitmap="@drawable/data_off"
-                app:on_bitmap="@drawable/data_on" />
+                app:on_bitmap="@drawable/data_on" 
+                app:update_action="DATA_DATA_OK" />
 
             <com.tumanako.ui.StatusLamp
                 android:id="@+id/lampContactor"
@@ -102,7 +106,8 @@
                 android:padding="3dp"
                 app:initial_status="off"
                 app:off_bitmap="@drawable/contactor_off"
-                app:on_bitmap="@drawable/contactor_on" />
+                app:on_bitmap="@drawable/contactor_on" 
+                app:update_action="DATA_CONTACTOR_ON" />
         </LinearLayout>
 
         <LinearLayout
@@ -118,7 +123,8 @@
                 android:padding="3dp"
                 app:initial_status="off"
                 app:off_bitmap="@drawable/gps_off"
-                app:on_bitmap="@drawable/gps_on" />
+                app:on_bitmap="@drawable/gps_on" 
+                app:update_action="DATA_GPS_HAS_LOCK" />
 
             <com.tumanako.ui.StatusLamp
                 android:id="@+id/lampFault"
@@ -127,7 +133,8 @@
                 android:padding="3dp"
                 app:initial_status="on"
                 app:off_bitmap="@drawable/fault_off"
-                app:on_bitmap="@drawable/fault_on" />
+                app:on_bitmap="@drawable/fault_on"
+                app:update_action="DATA_FAULT" />
         </LinearLayout>
 
         <!-- Temp Gauges: ====================================== -->
@@ -162,7 +169,8 @@
                 app:scale_step="10"
                 app:scale_tick_step="5"
                 app:segment_gap="2"
-                app:show_scale="false" />
+                app:show_scale="false" 
+                app:update_action="DATA_MOTOR_TEMP" />
 
             <com.tumanako.ui.BarGauge
                 android:id="@+id/barTController"
@@ -187,7 +195,8 @@
                 app:scale_step="10"
                 app:scale_tick_step="5"
                 app:segment_gap="2"
-                app:show_scale="false" />
+                app:show_scale="false" 
+                app:update_action="DATA_CONTROLLER_TEMP"  />
 
             <com.tumanako.ui.BarGauge
                 android:id="@+id/barTBattery"
@@ -212,7 +221,8 @@
                 app:scale_step="10"
                 app:scale_tick_step="5"
                 app:segment_gap="2"
-                app:show_scale="false" />
+                app:show_scale="false" 
+                app:update_action="DATA_MAIN_BATTERY_TEMP"  />
         </LinearLayout>
     </LinearLayout>
 

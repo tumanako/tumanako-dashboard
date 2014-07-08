@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Track Mode - Lap Data Display -->
+
+
+<!-- PORTRAIT Layout!! -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutLapData"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="0"
+    android:orientation="vertical"
+    android:padding="3dp"   >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Power Remaining"
+        android:textSize="10pt" />
+
+    
+    <!-- ===== Power Remaining:  ===== -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/bgbox_alt"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="0dp" >
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textLapsRemaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center_horizontal"
+            android:textSize="32pt"
+            app:label_size="14"
+            app:label_text=" Laps "
+            app:textbox_text="0"
+            app:update_action="DATA_LAPS_REMAINING"  />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textLapKWHrRemaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="32pt"
+            app:label_size="14"
+            app:label_text="  KWHr "
+            app:textbox_text="0.00" 
+            app:update_action="DATA_KWH_REMAINING"  />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="This Lap"
+        android:textSize="10pt" />
+
+    <!-- ===== Current Lap...  ===== -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/bgbox"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="vertical"
+        android:padding="3dp" >
+
+        <!-- ===== Current Lap: KWhr...  ===== -->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:gravity="bottom|center_horizontal"
+            android:orientation="horizontal"
+            android:padding="0dp" >
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textSize="32pt"
+                app:label_size="14"
+                app:label_text=" Lap: "
+                app:textbox_text="" />
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center_horizontal"
+                android:textSize="32pt"
+                app:label_size="14"
+                app:label_text=" "
+                app:textbox_text="0" 
+                app:update_action="DATA_LAP_NUMBER" />
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapKWHrSoFar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:gravity="center_horizontal"
+                android:textSize="32pt"
+                app:label_size="14"
+                app:label_text="  KWHr "
+                app:textbox_text="0.00" 
+                app:update_action="DATA_LAP_KWH"  />
+        </LinearLayout>
+
+        <!-- ===== Current Lap: Time...  ===== -->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:gravity="bottom|center_horizontal"
+            android:orientation="horizontal"
+            android:padding="3dp" >
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:gravity="center_horizontal"
+                android:textSize="32pt"
+                app:label_size="14"
+                app:label_text=" "
+                app:textbox_text="00:00.0" 
+                app:update_action="DATA_LAP_TIME"  />
+
+        </LinearLayout>
+
+        <!-- ===== Current Lap: Distance...  ===== -->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:gravity="bottom|center_horizontal"
+            android:orientation="horizontal"
+            android:padding="3dp" >
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapDistLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="18pt"
+                app:label_size="14"
+                app:label_text=" Dist: "
+                app:textbox_text="" />
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:gravity="center_horizontal"
+                android:textSize="18pt"
+                app:label_size="14"
+                app:label_text="  m  "
+                app:textbox_text="0.00" 
+                app:update_action="DATA_START_RANGE" />
+
+            <com.tumanako.ui.TextWithLabel
+                android:id="@+id/textLapDistanceMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:gravity="center_horizontal"
+                android:textColor="#FF00C000"
+                android:textSize="18pt"
+                app:label_size="14"
+                app:label_text="  Avg KWHr   "
+                app:textbox_text="0.00" 
+                app:update_action="DATA_LAP_AVG_KWH" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ******* Previous Laps: *************** -->
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Previous Laps"
+        android:textSize="10pt" />
+
+    <!-- ******* Previous Laps - 1 *************** -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/bgbox"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+<!--         <com.tumanako.ui.TextWithLabel -->
+<!--             android:id="@+id/textPrevLapLabel1" -->
+<!--             android:layout_width="0dp" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_weight="1" -->
+<!--             android:gravity="center_horizontal" -->
+<!--             android:textSize="24pt" -->
+<!--             app:label_text=" Lap: " -->
+<!--             app:textbox_text="" /> -->
+
+<!--         <com.tumanako.ui.TextWithLabel -->
+<!--             android:id="@+id/textPrevLapNo1" -->
+<!--             android:layout_width="0dp" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_weight="2" -->
+<!--             android:gravity="center_horizontal" -->
+<!--             android:textSize="24pt" -->
+<!--             app:label_text=" " -->
+<!--             app:textbox_text="0"  -->
+<!--             app:update_action="DATA_LAP_NUMBER_1"  /> -->
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapTime1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" "
+            app:textbox_text="00:00.0"
+            app:update_action="DATA_LAP_TIME_1" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapKWHr1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text="  KWHr  "
+            app:textbox_text="0.00"
+            app:update_action="DATA_LAP_KWH_1"  />
+    </LinearLayout>
+
+    <!-- ******* Previous Laps - 2 *************** -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/bgbox_alt"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+  <!--       <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapLabel2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" Lap: "
+            app:textbox_text="" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapNo2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" "
+            app:textbox_text="0" 
+            app:update_action="DATA_LAP_NUMBER_2" /> -->
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapTime2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" "
+            app:textbox_text="00:00.0" 
+            app:update_action="DATA_LAP_TIME_2" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapKWHr2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text="  KWHr  "
+            app:textbox_text="0.00" 
+            app:update_action="DATA_LAP_KWH_2"  />
+    </LinearLayout>
+
+    <!-- ******* Previous Laps - 3 *************** -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/bgbox"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+<!--         <com.tumanako.ui.TextWithLabel -->
+<!--             android:id="@+id/textPrevLapLabel3" -->
+<!--             android:layout_width="0dp" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_weight="1" -->
+<!--             android:gravity="center_horizontal" -->
+<!--             android:textSize="24pt" -->
+<!--             app:label_text=" Lap: " -->
+<!--             app:textbox_text="" /> -->
+
+<!--         <com.tumanako.ui.TextWithLabel -->
+<!--             android:id="@+id/textPrevLapNo3" -->
+<!--             android:layout_width="0dp" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_weight="2" -->
+<!--             android:gravity="center_horizontal" -->
+<!--             android:textSize="24pt" -->
+<!--             app:label_text=" " -->
+<!--             app:textbox_text="0"  -->
+<!--             app:update_action="DATA_LAP_NUMBER_3" /> -->
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapTime3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" "
+            app:textbox_text="00:00.0" 
+            app:update_action="DATA_LAP_TIME_3" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapKWHr3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text="  KWHr  "
+            app:textbox_text="0.00"
+            app:update_action="DATA_LAP_KWH_3"   />
+    </LinearLayout>
+
+    <!-- ******* Previous Laps - 4 *************** -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/bgbox_alt"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+<!--         <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapLabel4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" Lap: "
+            app:textbox_text="" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapNo4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" "
+            app:textbox_text="0" 
+            app:update_action="DATA_LAP_NUMBER_4" /> -->
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapTime4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text=" "
+            app:textbox_text="00:00.0"
+            app:update_action="DATA_LAP_TIME_4" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textPrevLapKWHr4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:gravity="center_horizontal"
+            android:textSize="24pt"
+            app:label_text="  KWHr  "
+            app:textbox_text="0.00"
+            app:update_action="DATA_LAP_KWH_4"  />
+    </LinearLayout>
+
+</LinearLayout>

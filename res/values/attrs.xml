@@ -1,49 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-  <declare-styleable name="StatusLamp">
-      <attr name="on_bitmap" format="string" />
-      <attr name="off_bitmap" format="string" />
-      <attr name="initial_status" format="string" />
-  </declare-styleable>    
-  
-  <declare-styleable name="TextWithLabel">
-     <attr name="main_text" format="string" />
-     <attr name="label_text" format="string" />
-     <attr name="label_size" format="integer" />
-  </declare-styleable>  
+
+  <declare-styleable name="App">  
+      <attr name="update_action"  format="string" />
+      <attr name="click_action"   format="string" />
+  </declare-styleable>
 
   
-  <!-- These attributes are used by the Dial and Bar controls: -->
+  <declare-styleable name="TextBox">
+      <attr name="textbox_text"           format="string" />
+      <attr name="textbox_default_text"   format="string" />
+  </declare-styleable>
+  
+  
+  <declare-styleable name="Label">
+      <attr name="label_text"             format="string" />
+      <attr name="label_size"             format="integer" />
+  </declare-styleable>
+
+  
+  <declare-styleable name="StatusLamp">
+      <attr name="on_bitmap"              format="string" />
+      <attr name="off_bitmap"             format="string" />
+      <attr name="initial_status"         format="string" />
+      <attr name="default_status"         format="string" />
+  </declare-styleable>    
+  
+
+  <!-- These attributes are used by the Dial and Bar controls: --> 
   <declare-styleable name="RenderedGauge">
       <!-- Both: -->
-      <attr name="minimum_scale"     format="float" />
-      <attr name="scale_step"        format="float" />
-      <attr name="number_divisions"  format="integer" />
-      <attr name="scale_tick_step"   format="float" />
-      <attr name="scale_tick_size"   format="integer" />
-      <attr name="origin_x"          format="float" />
-      <attr name="origin_y"          format="float" />
-      <attr name="label_format"      format="string" />
-      <attr name="colours"           format="string" />                
-      <attr name="gauge_label"       format="string" />
-      <attr name="label_x"           format="float" />
-      <attr name="label_y"           format="float" />
-      <attr name="show_scale"        format="boolean" />
-      <attr name="show_ticks"        format="boolean" />
-      <attr name="show_gauge_Label"  format="boolean" />                    
+      <attr name="minimum_scale"         format="float" />
+      <attr name="scale_step"            format="float" />
+      <attr name="number_divisions"      format="integer" />
+      <attr name="scale_tick_step"       format="float" />
+      <attr name="scale_tick_size"       format="integer" />
+      <attr name="origin_x"              format="float" />
+      <attr name="origin_y"              format="float" />
+      <attr name="label_format"          format="string" />
+      <attr name="colours"               format="string" />                
+      <attr name="gauge_label"           format="string" />
+      <attr name="label_x"               format="float" />
+      <attr name="label_y"               format="float" />
+      <attr name="show_scale"            format="boolean" />
+      <attr name="show_ticks"            format="boolean" />
+      <attr name="show_gauge_Label"      format="boolean" />
+      <attr name="gauge_default_value"   format="float" />
       <!-- Dial Only: -->
-      <attr name="minimum_angle"     format="integer" />
-      <attr name="maximum_angle"     format="integer" />
-      <attr name="needle_length"     format="float" />
+      <attr name="minimum_angle"         format="integer" />
+      <attr name="maximum_angle"         format="integer" />
+      <attr name="needle_length"         format="float" />
       <!-- Bar Only: -->
-      <attr name="orientation"       format="string" />
-      <attr name="scale_position"    format="string" />
-      <attr name="bar_across"        format="float" />
-      <attr name="bar_long"          format="float" />
-      <attr name="segment_gap"       format="integer" />
+      <attr name="orientation"           format="string" />
+      <attr name="scale_position"        format="string" />
+      <attr name="bar_across"            format="float" />
+      <attr name="bar_long"              format="float" />
+      <attr name="segment_gap"           format="integer" />
       
   </declare-styleable>
-        
-  
+          
 </resources>

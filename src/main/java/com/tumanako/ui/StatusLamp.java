@@ -22,10 +22,14 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
+import com.tumanako.dash.DashMessages;
+import com.tumanako.dash.IDashMessages;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -61,15 +65,22 @@ import android.widget.ImageView;
  *   on_bitmap      - Bitmap resource to display when lamp is 'On'
  *   off_bitmap     - Bitmap resource to display when lamp is 'Off'
  *   initial_status - Should the lamp be on or off initially? ("on" or "off").  
- *   
+ *   default_status - What status should the lamp revert to on reset?
  *   It should look like this: 
  *
     <?xml version="1.0" encoding="utf-8"?>
+    
      <resources>
+       <declare-styleable name="App">  
+         <attr name="update_action"  format="string" />
+       </declare-styleable>
+
+
        <declare-styleable name="StatusLamp">
           <attr name="on_bitmap" format="string" />
           <attr name="off_bitmap" format="string" />
           <attr name="initial_status" format="string" />
+          <attr name="default_status" format="string" />
       </declare-styleable>    
     </resources>  
 
@@ -92,11 +103,15 @@ import android.widget.ImageView;
 
 
 
-public class StatusLamp extends ImageView
+public class StatusLamp extends ImageView implements IDashMessages
   {
+  private String updateAction;
+  private DashMessages dashMessages;
 
   private boolean lampState = false;  // true = Lamp On; false = Lamp Off. 
 
+  private boolean defaultState = false; // Will be set to this when the UI is reset. 
+  
   // Bitmaps to represent lamp state (on / off): 
   private Bitmap bitmapLampOn;
   private Bitmap bitmapLampOff;
@@ -122,6 +137,10 @@ public class StatusLamp extends ImageView
     // This method also loads the 'On' and 'Off' bitmaps for the lamp.  
     getCustomAttributes(attrs);
 
+    // Set up a DashMessages class to recieve intents:
+    String [] messageFilters = { updateAction, UIActivity.UI_RESET };
+    dashMessages = new DashMessages( context, this, messageFilters );
+    
     // Set Lamp State:
     if (lampState) turnOn();
     else           turnOff();
@@ -136,18 +155,17 @@ public class StatusLamp extends ImageView
    * @param attrs - Attributes passed in from the XML parser 
    *****************************************************************/
   private void getCustomAttributes(AttributeSet attrs)
-    { 
+    {
     TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.StatusLamp );
-
     // Look up the resource ID of the bitmaps named for 'off' and 'on' in the XML. 
     // If they can't be found, a default is used. (probably means we made a typo in the XML...)
     int idBitmapLampOn  = a.getResourceId(R.styleable.StatusLamp_on_bitmap, R.drawable.greenglobe_on);
     int idBitmapLampOff = a.getResourceId(R.styleable.StatusLamp_off_bitmap, R.drawable.greenglobe_off);
     String initialStatus = a.getString(R.styleable.StatusLamp_initial_status);
-
+    String defaultStatus = a.getString(R.styleable.StatusLamp_default_status);
     // Recycle the TypedArray: 
     a.recycle();
-    
+
     // Load the bitmaps for the lamp: 
     bitmapLampOn   = BitmapFactory.decodeResource( getResources(), idBitmapLampOn  );
     bitmapLampOff  = BitmapFactory.decodeResource( getResources(), idBitmapLampOff );
@@ -155,7 +173,18 @@ public class StatusLamp extends ImageView
     // Set initial status: (note that default is Off):  
     if (initialStatus != null) 
       if (initialStatus.equals("on")) lampState = true;  // Turn on the lamp if initial_status is "on"!
-    
+
+    if (defaultStatus != null)
+      if (defaultStatus.equals("on")) defaultState = true;  
+
+    // Get the "update" action: 
+    a = getContext().obtainStyledAttributes( attrs, R.styleable.App);
+    updateAction = a.getString(R.styleable.App_update_action);
+    a.recycle();    // Recycle the TypedArray.
+    if (updateAction == null) updateAction = UIActivity.UI_NOTHING;  
+    // ...Default UI update action if no action specified. This indicates that no update action should be taken.
+    //    UIActivity.UI_NOTHING should not be used in any actual intent. 
+
     }
 
   
@@ -178,6 +207,12 @@ public class StatusLamp extends ImageView
     }
   
   
+  /****** Reset to default state: ***********/
+  public void reset()
+    {
+    if (defaultState) turnOn();
+    else              turnOff();
+    }
   
   
   
@@ -187,7 +222,26 @@ public class StatusLamp extends ImageView
   public boolean getState()
     {  return lampState;  }
 
+
+
+  public void messageReceived(String action, Integer intData, Float floatData, String stringData, Bundle bundleData)
+    {
+    if (action.equals(UIActivity.UI_RESET))
+      {
+      // RESET intent has been received: 
+      reset();
+      }
+    else
+      {
+      // UPDATE intent: Set guage value to the float contained in the floatData parameter:
+      if (null != floatData)
+        {
+        if (floatData == 1f) turnOn();
+        else                 turnOff();
+        }
+      }
+    }
   
   
   
-  }
+ }  // Class

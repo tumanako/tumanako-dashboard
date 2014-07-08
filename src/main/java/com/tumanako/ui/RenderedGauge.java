@@ -22,6 +22,9 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 
 *************************************************************************************/
 
+import com.tumanako.dash.DashMessages;
+import com.tumanako.dash.IDashMessages;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -31,6 +34,7 @@ import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.util.Log;
@@ -56,14 +60,16 @@ import android.view.WindowManager;
  *  gauge_label      - string: Specify a static label to show on the control.
  *  label_x          - float: x position of guage label (as a fraction of view width)
  *  label_y          - float: y position of guage label (as a fraction of view height)
- *  
+ *
+ *  gauge_default_value - Default value to set guage to then UI is reset 
+ *   
  * These attributes apply only to 'Dial' guages derived from this class: 
  *  minimum_angle    - integer: Needle angle for lowest scale value, in DEGREES; 0 = vertical up; -90 = horizontal to left, etc.  
  *  maximum_angle    - integer: Needle angle for highest scale value, as above.  
  *  origin_x         - float: x position of needle origin (as a fraction of view width)
  *  origin_y         - float: y position of needle origin (as a fraction of view height)
  *  needle_length    - float: Length of needle, as a fraction of VIEW WIDTH. 
-      
+ *
  * These attributes apply only to 'Bar' guages derived from this class:
  *  orientation      - string: "vertical" or "horizontal"
  *  scale_position   - string: "left" or "right". Specifies the position of the scale relative to the bar for a bar plot. Use "left" for top if the bar is horizontal.
@@ -87,6 +93,12 @@ import android.view.WindowManager;
  *
  <?xml version="1.0" encoding="utf-8"?>
   <resources>
+  
+   <declare-styleable name="App">  
+      <attr name="update_action"  format="string" />
+   </declare-styleable>
+
+  
    <!-- These attributes are used by the Dial and Bar controls: -->
    <declare-styleable name="RenderedGauge">
       <!-- Both: -->
@@ -98,7 +110,8 @@ import android.view.WindowManager;
       <attr name="colours"           format="string" />                
       <attr name="gauge_label"       format="string" />
       <attr name="label_x"           format="float" />
-      <attr name="label_y"           format="float" />  
+      <attr name="label_y"           format="float" />
+      <attr name="gauge_default_value" format="float" />  
       <!-- Dial Only: -->
       <attr name="minimum_angle"     format="integer" />
       <attr name="maximum_angle"     format="integer" />
@@ -117,8 +130,11 @@ import android.view.WindowManager;
  *
  */
 
-public class RenderedGauge extends View
+public class RenderedGauge extends View implements IDashMessages
   {
+  
+  private String updateAction;
+  private DashMessages dashMessages;
   
   protected int drawingWidth = 0;
   protected int drawingHeight = 0;
@@ -144,6 +160,8 @@ public class RenderedGauge extends View
   protected boolean showTicks = true;
   protected boolean showGaugeLabel = true;
 
+  protected float defaultValue = 0f;
+  
   // Internal constants to remember the gauge attributes (Dial Specific):  
   protected float minAngle = 0f; 
   protected float maxAngle = 0f;
@@ -181,17 +199,15 @@ public class RenderedGauge extends View
   protected static final int DEFAULT_BAR_COLOUR = 0xFF00C000;
   protected static final int DEFAULT_TICK_COLOUR = 0xA0F00000;
   
-  //protected Context uiContext;
-    
   private final ScaledFont fontScale;
+
+  
   
   // ********** Constructor: ***************************
   public RenderedGauge(Context context, AttributeSet atttibutes)
     {
     super(context, atttibutes);
     
-    //uiContext = context;
-       
     // Get Font Scale: 
     fontScale = new ScaledFont(context);
     
@@ -222,7 +238,11 @@ public class RenderedGauge extends View
     guageLablelPaint.setTextAlign(Paint.Align.CENTER);
     guageLablelPaint.setTypeface(Typeface.DEFAULT_BOLD);
     guageLablelPaint.setAntiAlias(true);
-        
+
+    // Set up a DashMessages class to recieve intents:
+    String [] messageFilters = { updateAction, UIActivity.UI_RESET };
+    dashMessages = new DashMessages( context, this, messageFilters );
+ 
     }
   
   
@@ -240,9 +260,8 @@ public class RenderedGauge extends View
    * 
    *****************************************************************/
   private void getCustomAttributes(AttributeSet attrs)
-    { 
+    {
     TypedArray a = getContext().obtainStyledAttributes( attrs, R.styleable.RenderedGauge );
-
     // ---- Attributes common to all derived controls: -------------------------
     scaleMin         = a.getFloat(R.styleable.RenderedGauge_minimum_scale, 0f); 
     scaleStep        = a.getFloat(R.styleable.RenderedGauge_scale_step , 1f); 
@@ -252,6 +271,8 @@ public class RenderedGauge extends View
     tickSize         = (int)(a.getFloat(R.styleable.RenderedGauge_scale_tick_size,2.0f) * fontScale.getFontScale());
     fOriginX         = a.getFloat(R.styleable.RenderedGauge_origin_x , 0.5f);
     fOriginY         = a.getFloat(R.styleable.RenderedGauge_origin_y , 0.5f);
+    defaultValue     = a.getFloat(R.styleable.RenderedGauge_gauge_default_value, scaleMin);
+    
     // Gauge label and position:     
     fLabelX = a.getFloat(R.styleable.RenderedGauge_label_x , 0.5f);
     fLabelY = a.getFloat(R.styleable.RenderedGauge_label_y , 0.3f);
@@ -290,7 +311,16 @@ public class RenderedGauge extends View
 
     // Recycle the TypedArray: 
     a.recycle();
+    
+    // Get the "update" action: 
+    a = getContext().obtainStyledAttributes( attrs, R.styleable.App);
+    updateAction = a.getString(R.styleable.App_update_action);
+    a.recycle();    // Recycle the TypedArray.
+    if (updateAction == null) updateAction = UIActivity.UI_NOTHING;  
+    // ...Default UI update action if no action specified. This indicates that no update action should be taken.
+    //    UIActivity.UI_NOTHING should not be used in any actual intent. 
 
+    
     }
   
   
@@ -420,6 +450,10 @@ public class RenderedGauge extends View
     {  return gaugeValue;  }
   
   
+  /***** Reset the guage to its default positon: ****/
+  public void reset()
+    {  setValue(defaultValue);  }
+  
   
   
   
@@ -468,8 +502,7 @@ public class RenderedGauge extends View
     // **** Get actual layout parameters: ****
     if (changed)
       {
-      // --DEBUG!-- 
-      Log.i( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
+      // --DEBUG!-- Log.i( UIActivity.APP_TAG, "  RenderedGauge -> onLayout Changed!! ");
       drawingWidth = this.getWidth();
       drawingHeight = this.getHeight();
       calcGauge();                      // Calculate various generic values applying to all gauge types.
@@ -497,6 +530,28 @@ public class RenderedGauge extends View
     // the View onDraw is called and that drawing width and height are calculated
     // during the first draw (see above).
     
+    }
+
+
+
+  
+  
+
+
+
+  public void messageReceived(String action, Integer intData, Float floatData, String stringData, Bundle bundleData)
+    {
+    if (action.equals(UIActivity.UI_RESET))
+      {
+      // RESET intent has been received: 
+      reset();
+      }
+    else
+      {
+      // UPDATE intent: Set guage value to the float contained in the floatData parameter:
+      if (null != floatData) setValue(floatData);
+      }
+
     }
 
   

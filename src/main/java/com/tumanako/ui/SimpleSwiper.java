@@ -75,9 +75,9 @@ public class SimpleSwiper extends SimpleOnGestureListener
       // Detects a Left or Right swipe if the 'fling' was long enough and 
       // the velocity high enough. 
       
-      if      (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)  ((UIActivity)uiContext).nextScreen();
+      if      (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)  ((DashActivity)uiContext).nextScreen();
       
-      else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)  ((UIActivity)uiContext).prevScreen();
+      else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)  ((DashActivity)uiContext).prevScreen();
       
       } 
     catch (Exception e) 

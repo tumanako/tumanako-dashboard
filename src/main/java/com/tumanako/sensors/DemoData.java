@@ -25,9 +25,11 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.IDashMessages;
 import com.tumanako.ui.UIActivity;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 
 /****************************************************************
@@ -46,14 +48,8 @@ import android.os.Handler;
 public class DemoData implements IDashMessages  
   {
 
-  private final int UPDATE_INTERVAL = 200;                  // Data send interval (ms)
-  private Handler updateTimer = new Handler();
-
-  
-  /****** Demo Data Message Intent Filter: *********/
-  public static final String DEMO_DATA = "com.tumanako.sensors.demodata";  
-       // We will catch any intents with this identifier.  
-    
+  private final int UPDATE_INTERVAL = 50;                  // Data send interval (ms)
+  private Handler updateTimer = new Handler(); 
   
   private boolean isRunning = false;  // Demo mode is running flag!
   private float kWh = 0f; 
@@ -69,8 +65,7 @@ public class DemoData implements IDashMessages
   // ************** Constructor: *****************************************
   public DemoData(Context context)
     {
-    dashMessages = new DashMessages(context, this, DEMO_DATA);    // We are extending the 'DashMessages' class, and we need to call its Constructor here. 
-    dashMessages.resume();
+    dashMessages = new DashMessages(context, this, null);    // We are extending the 'DashMessages' class, and we need to call its Constructor here. 
     }
 
   
@@ -93,7 +88,7 @@ public class DemoData implements IDashMessages
   * Called when we receive an intent message via our Dashmessage object.
   * Don't actually do anything!    
   ***********************************************************************/
- public void messageReceived(String action, int message, Float floatData, String stringData, Bundle data )
+ public void messageReceived(String action, Integer intData, Float floatData, String stringData, Bundle bundleData )
    {   }
   
  
@@ -119,7 +114,24 @@ public class DemoData implements IDashMessages
  
  
  
+ 
+
+ 
+  /**
+    Convert a 'time' in decimal format to a string
+    
+    E.g. 8.5 is converted to "8:30".
+    
+     @param time in decimal format
+     @return String containing formated version of time
+   ********************************************************************/
+  private String getTime( float time )
+    {
+    return String.format("%1d:%02d", (int)(time), (int)((time - (float)((int)(time))) * 60) );
+    }
   
+ 
+ 
   
   
   /********************* Update Timer: **********************************************
@@ -129,36 +141,46 @@ public class DemoData implements IDashMessages
    {
    public void run()  
      {
+
+// -- DEBUG!! -- Log.i(com.tumanako.ui.UIActivity.APP_TAG, " DemoData -> Tick (=data update)." );
+     
      updateTimer.removeCallbacks(updateTimerTask);                    // ...Make sure there is no active callback already....
 
      /***** Generate some fake data  and send it to the UI: ***************/
-     kWh = kWh + 1f;  if (kWh > 30f) kWh = 10f;
-     float thisRPM = ((android.util.FloatMath.sin((float)(System.currentTimeMillis() % 12000) / 1909f  ) + 0.3f) * 3000f);
+     kWh = kWh - 0.11f;  if (kWh < 0f) kWh = 30f;
+     float thisRPM = (float) ((java.lang.Math.sin((float)(System.currentTimeMillis() % 12000) / 1909f  ) + 0.3f) * 3000f);
      float demoFault   = (thisRPM < -1500)                              ? 1f : 0f;
      float demoReverse = (thisRPM < 0)                                  ? 1f : 0f;  
      float contactorOn = (thisRPM > 1)                                  ? 1f : 0f;
      float preCharge = ((System.currentTimeMillis() % 300) > 100)  ? 1f : 0f;
      float driveTime  = (avgEnergyPerHour > 0f)  ?  (kWh / avgEnergyPerHour) : 99.99f; 
      float driveRange = (avgEnergyPerKm   > 0f)  ?  (kWh / avgEnergyPerKm)   : 9999f;
-     Bundle vehicleData = new Bundle();
-     vehicleData.putFloat("DATA_CONTACTOR_ON",      contactorOn       );
-     vehicleData.putFloat("DATA_FAULT",             demoFault         );
-     vehicleData.putFloat("DATA_MAIN_BATTERY_KWH",  kWh               );
-     vehicleData.putFloat("DATA_ACC_BATTERY_VLT",   12.6f             );
-     vehicleData.putFloat("DATA_MOTOR_RPM",         Math.abs(thisRPM) );
-     vehicleData.putFloat("DATA_MOTOR_REVERSE",     demoReverse       );
-     vehicleData.putFloat("DATA_MAIN_BATTERY_TEMP", 60-(thisRPM/100)  );
-     vehicleData.putFloat("DATA_MOTOR_TEMP",        (thisRPM/56)+25   );
-     vehicleData.putFloat("DATA_CONTROLLER_TEMP",   (thisRPM/100)+35  );
-     vehicleData.putFloat("DATA_PRECHARGE",         preCharge         );
-     vehicleData.putFloat("DATA_MAIN_BATTERY_VLT",  133.5f            );
-     vehicleData.putFloat("DATA_MAIN_BATTERY_AH",   189.4f            );
-     vehicleData.putFloat("DATA_AIR_TEMP",          19.6f             );
-     vehicleData.putFloat("DATA_DATA_OK",           1f                );
-     vehicleData.putFloat("DATA_DRIVE_TIME",        driveTime         );
-     vehicleData.putFloat("DATA_DRIVE_RANGE",       driveRange        );
-     dashMessages.sendData( UIActivity.UI_INTENT_IN, IDashMessages.VEHICLE_DATA_ID, null, null, vehicleData );
+
+     // Status Lamps: 
+     dashMessages.sendData( "DATA_DATA_OK",           null, 1f,                              null, null );
+     dashMessages.sendData( "DATA_CONTACTOR_ON",      null, contactorOn,                     null, null );
+     dashMessages.sendData( "DATA_FAULT",             null, demoFault,                       null, null );
+     dashMessages.sendData( "DATA_MOTOR_REVERSE",     null, demoReverse,                     null, null );
+     dashMessages.sendData( "DATA_PRECHARGE",         null, preCharge,                       null, null );
+     // Gauges: 
+     dashMessages.sendData( "DATA_MOTOR_RPM",         null, Math.abs(thisRPM)/1000,          null, null );
+     dashMessages.sendData( "DATA_MAIN_BATTERY_KWH",  null, kWh,                             null, null );
+     // Bar Plots:
+     dashMessages.sendData( "DATA_MAIN_BATTERY_TEMP", null, 60-(thisRPM/100),                null, null );
+     dashMessages.sendData( "DATA_MOTOR_TEMP",        null, (thisRPM/56)+25,                 null, null );
+     dashMessages.sendData( "DATA_CONTROLLER_TEMP",   null, (thisRPM/100)+35,                null, null );
+     // Additional data (displayed in text boxes):    
+     dashMessages.sendData( "DATA_DRIVE_RANGE",       null, driveRange, "%.0f",                    null );
+     dashMessages.sendData( "DATA_ACC_BATTERY_VLT",   null, 12.67f,     "%.2f",                    null );
+     dashMessages.sendData( "DATA_DRIVE_TIME",        null, null,       getTime(driveTime),        null );
+     dashMessages.sendData( "DATA_MAIN_BATTERY_VLT",  null, 133.5f,                          null, null );
+     dashMessages.sendData( "DATA_MAIN_BATTERY_AH",   null, 189.4f,                          null, null );
+     dashMessages.sendData( "DATA_AIR_TEMP",          null, 19.6f,                           null, null );
+    
      /**********************************************************************/
+
+     // Send "UI Updated" message: 
+     dashMessages.sendData( UIActivity.UI_UPDATED, null, null, null, null );
 
      if (isRunning) updateTimer.postDelayed(updateTimerTask, UPDATE_INTERVAL);    // Restart timer.
      } 

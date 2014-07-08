@@ -23,6 +23,7 @@ along with Tumanako.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************************/
 
 
+//import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.DashMessages;
 import com.tumanako.dash.IDashMessages;
 
@@ -30,6 +31,7 @@ import android.content.Context;
 import android.location.GpsStatus;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 
 
 /****************************************************************
@@ -86,7 +88,8 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   private String gpsLastVTG = "";          // VTG strings received (for debugging)
   
   // ***** Information derived during operation: **********
-  private boolean isLastSentence   = false;   // Set to true after the 'GSA' sentence arrives (last in a cycle), and false when any other sentence arrives. 
+  private boolean isLastSentence   = false;   // Set to true after the 'GSA' sentence arrives (last in a cycle), and false when any other sentence arrives.
+  private boolean isDataSent       = false;   // Flag to indicate that the latest update has been sent. Reset when a new cycle is started. 
   private long    timeLastPosition = 0l;      // System time (mS) for the last position update.
   private boolean isFixGood        = false;   // Do we have a current fix? True when we are receiving good NMEA data; false if NMEA data is empty (i.e. no fix)
                                               //  NOTE: This only looks at the last NMEA we received; if NMEA data stop alltogether, isFixGood may still be true. 
@@ -94,16 +97,11 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   
   private static final int NMEA_WAIT_TIMEOUT = 3000;   // If no NMEA sentences received after this many mS, we'll declare that the NMEAData has stopped. 
   
-  
-  // *** GPS Processing / Data Message Type Indicators: ***
-  public static final String NMEA_PROCESSOR_DATA_UPDATED  = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 0  );
-  public static final String NMEA_PROCESSOR_ERROR         = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 99 );
-  
-  public static final String DATA_GPS_HAS_LOCK            = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 1  );
-  public static final String DATA_GPS_TIME                = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 2  );
-  public static final String DATA_GPS_SPEED               = String.format("%d", IDashMessages.NMEA_PROCESSOR_ID + 3  );
-  
- 
+  /****** GPS Data Message Intent Filters: *********/
+  public static final String GPS_POSITION = "DATA_GPS_POSITION";  
+
+    
+  private DashMessages dashMessages;
   
   // ---------------DEMO MODE CODE -------------------------------
   private boolean isDemo = false;  // Demo mode flag!
@@ -112,9 +110,12 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   
   /************************************************************
    * Constructor: Sets up a message broadcaster. 
+   * Nb: We don't receive any messages, so intentFilter is null. 
    ************************************************************/
   public NmeaProcessor(Context context)
-    {  }
+    {  
+    dashMessages = new DashMessages(context, (IDashMessages)this, null);
+    }
 
   
   
@@ -220,13 +221,22 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
   
   private void sendGPSData()
     {
-    // Send some useful GPS data as Intents:
-    float fixGood = (isFixGood) ? 1f : 0f;
     Bundle gpsData = new Bundle();
-    gpsData.putFloat(DATA_GPS_HAS_LOCK, fixGood);
-    gpsData.putFloat(DATA_GPS_TIME,     gpsTime);
-    gpsData.putFloat(DATA_GPS_SPEED,    gpsSpeed);
+    gpsData.putDouble  ( "LAT",    gpsLat    );
+    gpsData.putDouble  ( "LON",    gpsLon    );
+    gpsData.putFloat   ( "TIME",   gpsTime   );
+    gpsData.putFloat   ( "SPEED",  gpsSpeed  );
+    gpsData.putFloat   ( "TRACKT", gpsTrackT );
+    gpsData.putInt     ( "NSATS",  gpsSats   );
+    gpsData.putBoolean ( "FIX",    isFixGood ) ;
+    // Now transmit the data to the UI by sending a message!  
+    dashMessages.sendData( GPS_POSITION, null, null, null, gpsData );
+    isDataSent = true; 
     }
+
+  
+  
+  
   
   
   // ****** NMEA received Method: ************
@@ -234,26 +244,59 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     {
     // Called by the location services when an NMEA sentence is received. 
     nmeaDecode(nmea);
-    
+
     // ---------------DEMO MODE CODE -------------------------------
     // Overrides normal operation in demo mode: 
     if (isDemo)
       {
       //gpsSpeed  = (float)(Math.cos( (double)(System.currentTimeMillis() % 20000) / 3183  ) + 2) * 20;
       isFixGood = true;                    //
-      if (isLastSentence) sendGPSData();   // Send some GPS data as Intents. 
-      return;
       }
     // ---------------DEMO MODE CODE -------------------------------      
         
 
     // Finished one NMEA sentence cycle. Notify UI Class:
-    if (isLastSentence) sendGPSData();   // Send some GPS data as Intents. 
+    if ( (isLastSentence) && (!isDataSent) ) sendGPSData();   // Send some GPS data as Intents.
     }
   
   
   
-  // **** NMEA Sentence filter and decode: ********
+  
+  
+  
+  
+  
+  
+  /**
+   NMEA Sentence filter and decoder <p>
+   
+   Filters out specific NMEA sentences, and decodes the values contained in them. 
+   In particular, it uses the GPGGA sentence to get most data (position, time, etc) 
+   and either GPVTG or GPRMC to get velocity and ground track. <p> 
+   
+   GPS data output seems to vary between devices, in terms of which NMEA sentences are 
+   included. The decoder process makes several assumptions:  <p>
+   
+    <ul>
+     <li>Sentences will be transmitted on an update cycle, assumed to be 1 second. 
+         This means that a number of sentences will be transmitted close together, 
+         followed by a pause
+          
+     <li>Each cycle contains the GPGGA sentence on every device (minimum position information).
+         This sentence must occur BEFORE GPVTG or GPRMC (see below) 
+     
+     <li>Each cycle will include either GPVTG or GPRMC (or both), which will contain velocity 
+         and track information
+         
+     <li>If GPVTG and GPRMC are both included, they will contain the same speed and ground track, 
+         so the first version in each cycle will be used.
+    </ul>
+    
+   The code assumes a new cycle when it receives a GPGGA. The cycle is considered "complete" 
+   and the isLastSentence flag is set when the first of either GPVTG or GPRMC is received. 
+
+   @param thisNMEA  String containing an NMEA sentence from the GPS  
+   */
   private void nmeaDecode( String thisNMEA )
     {
     // Decodes NMEA sentences and sets NMEAData values.
@@ -261,8 +304,8 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     // Example NMEA data sentence: 
     //  "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47"
     
-    isLastSentence = false;  // Set to true when we receive the last sentence in a sentence cycle (GSA sentence).
-    
+    // --DEBUG!!-- Dump NMEA Sentences: Log.i( "NMEA", thisNMEA );
+        
     if (thisNMEA.length() < 6) return;   // Can't decode string - not enough data!
 
     // "GGA" identifies the sentence:
@@ -275,9 +318,12 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
     /*********************************************************************************************/
     if (nmeaSentenceID.equals("GGA"))
       {
-      // GGA String - 
-      // Essential Fix Data ($GPGGA,Time, Lat, Lon, Qual, Sats, HDOP, Alt,M, Geoid,M, , , Checksum):
+      // GGA String - Essential Fix Data:
+      //  $GPGGA,Time, Lat, N|S, Lon, E|W, Qual, Sats, HDOP, Alt,M, Geoid,M, , , Checksum
+      isLastSentence = false;   // Start of new cycle.
+      isDataSent     = false;   //
       gpsLastGGA = thisNMEA;
+      // --DEBUG!!-- dashMessages.sendData( "GPS_GGA", null, null, gpsLastGGA, null );
       if (nmeaParts.length >= 12)
         {
         // Should be at least 12 fields in a GGA String.
@@ -306,10 +352,14 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
         }  // [if (nmeaParts.length >= 12)]
       }  // [if (nmeaSentenceID.equals("GGA"))]
     /*********************************************************************************************/
+    if (isLastSentence) return;  // If we've found the VTG or RMC data, don't bother checking 
+                                 // anything until we receive another GGA.  
+    /*********************************************************************************************/
     if (nmeaSentenceID.equals("VTG"))
       {
-      // VTG String - 
-      // Velocity Made Good - ($GPVTG,TrueTrack,T, MagTrack,M, Speed_knots,N, Speed_kph,K, Checksum)
+      // VTG String - Velocity Made Good:
+      //  $GPVTG,TrueTrack,T, MagTrack,M, Speed_knots,N, Speed_kph,K, Checksum
+      isLastSentence = true;  // A VTG means the end of the cycle (we have all the data we need...). 
       gpsLastVTG = thisNMEA;
       if (nmeaParts.length >= 8)
         {
@@ -318,22 +368,41 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
           {
           gpsSpeed  = Float.valueOf(nmeaParts[7]);
           gpsTrackT = Float.valueOf(nmeaParts[1]);
-          isFixGood = true;                                  //
+          // isFixGood = true;                                  //
           timeLastPosition = SystemClock.elapsedRealtime();  // We have VTG data!
           }
         catch (NumberFormatException e)
           {  
           // Number format exception... Indicates that we aren't receiving good data. (e.g. empty fields) 
-          isFixGood = false;
+          //isFixGood = false; // Ignore
           }
         }  // [if (nmeaParts.length >= 8)]
       }  // [if (nmeaSentenceID.equals("VTG"))]
     /*********************************************************************************************/
-    if (nmeaSentenceID.equals("GSA"))
+    if (nmeaSentenceID.equals("RMC"))
       {
-      // "GSA" should be the last sentence in each NMEA cycle. 
-      isLastSentence = true;
-      }  // [if (nmeaSentenceID.equals("GSA"))]
+      // RMC String - Recommended minimum data: 
+      //  $GPRMC, Time, [A|V], Lat, N|S, Lon, E|W, Speed (Knots), Track (Deg True), Date, MagVariation, E|W, A*4A
+      isLastSentence = true;  // A RMC means the end of the cycle (we have all the data we need...). 
+      gpsLastVTG = thisNMEA;
+      // --DEBUG!!-- dashMessages.sendData( "GPS_VTG", null, null, gpsLastVTG, null );
+      if (nmeaParts.length >= 12)
+        {
+        // Should be at least 12 fields in a RMC String.
+        try
+          {
+          gpsSpeed  = Float.valueOf(nmeaParts[7]) * 1.852f;  // Note: RMC speed is in knots! Convert to kph
+          gpsTrackT = Float.valueOf(nmeaParts[8]);
+          // isFixGood = true;                                  //
+          timeLastPosition = SystemClock.elapsedRealtime();  // We have RMC data!
+          }
+        catch (NumberFormatException e)
+          {  
+          // Number format exception... Indicates that we aren't receiving good data. (e.g. empty fields) 
+          //isFixGood = false; // Ignore
+          }
+        }  // [if (nmeaParts.length >= 8)]
+      }  // [if (nmeaSentenceID.equals("VTG"))]
     /*********************************************************************************************/
     }
   
@@ -369,28 +438,18 @@ public class NmeaProcessor implements GpsStatus.NmeaListener, IDroidSensor, IDas
 
 
 
-  public void messageReceived(String action, int message, Float floatData,
-      String stringData, Bundle data)
-    {
-    // TODO Auto-generated method stub
-    
-    }
+  public void messageReceived(String action, Integer intData, Float floatData, String stringData, Bundle bundleData)
+    {}
 
 
 
   public void suspend()
-    {
-    // TODO Auto-generated method stub
-    
-    }
+    {}
 
 
 
   public void resume()
-    {
-    // TODO Auto-generated method stub
-    
-    }
+    {}
 
   
   

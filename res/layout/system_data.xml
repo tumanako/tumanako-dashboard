@@ -24,7 +24,8 @@
                                        android:layout_width="30dp"  android:layout_height="30dp"
                                        app:on_bitmap="@drawable/greenglobe_on"
                                        app:off_bitmap="@drawable/greenglobe_off"  
-                                       android:layout_weight="1" />
+                                       android:layout_weight="1" 
+                                       app:update_action="DATA_PRECHARGE"   />
          
       </LinearLayout>          
       
@@ -44,8 +45,9 @@
                  android:layout_weight="0"
                  android:gravity="center_horizontal"
                  android:textSize="18pt"
-                 app:main_text="0.0" 
-                 app:label_text=" V   " />
+                 app:textbox_text="0.0" 
+                 app:label_text=" V   " 
+                 app:update_action="DATA_MAIN_BATTERY_VLT"   />
          
       </LinearLayout>          
           
@@ -63,8 +65,9 @@
                  android:layout_height="wrap_content"
                  android:gravity="center_horizontal"
                  android:textSize="18pt"
-                 app:main_text="0.0" 
-                 app:label_text=" AH" />
+                 app:textbox_text="0.0" 
+                 app:label_text=" AH" 
+                 app:update_action="DATA_MAIN_BATTERY_AH"   />
          
       </LinearLayout>    
       

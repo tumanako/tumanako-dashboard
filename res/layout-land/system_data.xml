@@ -25,7 +25,8 @@
                     android:layout_margin="10dp"
                     android:layout_gravity="center|right"
                     app:off_bitmap="@drawable/greenglobe_off"
-                    app:on_bitmap="@drawable/greenglobe_on" />
+                    app:on_bitmap="@drawable/greenglobe_on" 
+                    app:update_action="DATA_PRECHARGE"   />
       </FrameLayout>
       
       <LinearLayout android:background="@drawable/round_border" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_margin="3dp" android:padding="3dp" >
@@ -40,7 +41,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="14pt"
                     app:label_text=" V   "
-                    app:main_text="0.0" />
+                    app:textbox_text="0.0" 
+                    app:update_action="DATA_MAIN_BATTERY_VLT"   />
       </LinearLayout>
                 
       <LinearLayout android:background="@drawable/round_border" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:layout_margin="3dp" android:padding="3dp" >
@@ -55,7 +57,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="14pt"
                     app:label_text=" AH"
-                    app:main_text="0.0" />
+                    app:textbox_text="0.0" 
+                    app:update_action="DATA_MAIN_BATTERY_AH"   />
       </LinearLayout>
 
     </LinearLayout>  

@@ -29,17 +29,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:gravity="left"
-            android:text="User: "
+            android:text="Token: "
             android:textSize="8pt" />
 
         <EditText
-            android:id="@+id/editTextUser"
+            android:id="@+id/editTextToken"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.7"
             android:ems="8"
             android:inputType="text"
-            android:text="jeremy@rhtech.co.nz" />
+            android:text="@string/stringSecurityToken" />
     </LinearLayout>
 
     <LinearLayout
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:gravity="left"
-            android:text="Password: "
+            android:text="Secret: "
             android:textSize="8pt" />
 
         <EditText
@@ -64,7 +64,7 @@
             android:layout_weight="0.7"
             android:ems="8"
             android:inputType="textPassword"
-            android:text="tumanakotest99" />
+            android:text="@string/stringSecurityPassword" />
     </LinearLayout>
 
     <LinearLayout
@@ -120,26 +120,29 @@
         android:orientation="horizontal"
         android:padding="5dp" >
 
-        <Button
+       
+        <com.tumanako.ui.ExtButton
             android:id="@+id/buttonConnectToNode"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="0.34"
-            android:text="Connect" />
+            android:text="Connect"
+            app:click_action="CLICK_CHARGECONNECT" />
 
-        <Button
-            android:id="@+id/buttonChargeStart"
+        <com.tumanako.ui.ExtButton
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="0.33"
-            android:text="START Charge" />
+            android:text="START Charge"
+            app:click_action="CLICK_CHARGESTART" />
 
-        <Button
-            android:id="@+id/buttonChargeStop"
+        <com.tumanako.ui.ExtButton
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="0.33"
-            android:text="STOP Charge" />
+            android:text="STOP Charge"
+            app:click_action="CLICK_CHARGESTOP" />
+        
     </LinearLayout>
 
     <WebView

@@ -2,72 +2,270 @@
 
 <!-- PORTRAIT Layout!! -->
 
-  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
-                android:id="@+id/layoutSecondaryData"
-                android:orientation="vertical"     
-                android:padding="5dp"        
-                android:layout_width="fill_parent"  android:layout_height="fill_parent" android:layout_weight="0"  >
-  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.tumanako.ui"
+    android:id="@+id/layoutSecondaryData"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="0"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Road Data"
+        android:textSize="10pt" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:padding="3dp"
+            android:text="Drive Time: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textDriveTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text="       "
+            app:textbox_text="00:00" 
+            app:update_action="DATA_DRIVE_TIME"   />
+    </LinearLayout>
+
       
-      <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="10pt" android:text="Secondary Data" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:padding="3dp"
+            android:text="Drive Range: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textDriveRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text=" km "
+            app:textbox_text="0" 
+            app:update_action="DATA_DRIVE_RANGE"   />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:text="Acc Batt: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textAccBatteryVlts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text=" V    "
+            app:textbox_text="00.0" 
+            app:update_action="DATA_ACC_BATTERY_VLT"   />
+    </LinearLayout>
+
+    
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:text="GPS Time: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textGPSTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text="       "
+            app:textbox_text="000000" 
+            app:update_action="DATA_GPS_TIME"   />
+    </LinearLayout>
+    
+    
+        <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:text="GPS Speed: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textGPSSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text=" kph    "
+            app:textbox_text="0.0" 
+            app:update_action="DATA_GPS_SPEED"   />
+    </LinearLayout>
+    
+    
+        <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:text="GPS Satallites: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textGPSSats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text="           "
+            app:textbox_text="0" 
+            app:update_action="DATA_GPS_NSATS"   />
+    </LinearLayout>
+    
+
+
+    
+        <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:text="Latitude: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textGPSSats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text="           "
+            app:textbox_text="0" 
+            app:update_action="DATA_GPS_LAT"  />
+            <!-- app:update_action="GPS_GGA" -->
+    </LinearLayout>
         
-      
-      
-      <LinearLayout android:background="@drawable/round_border" android:layout_margin="3dp" android:padding="3dp" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="horizontal" android:gravity="bottom|center_horizontal" android:layout_weight="0">
-
-          <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="bottom|left"
-                    android:textSize="10pt"
-                    android:padding="3dp"
-                    android:layout_weight="1"
-                    android:text="Drive Time: " />
-         
-          <com.tumanako.ui.TextWithLabel android:id="@+id/textDriveTime"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:gravity="center_horizontal"
-                 android:textSize="18pt"
-                 android:layout_weight="0"
-                 app:main_text="00:00" 
-                 app:label_text="       " />
-         
-      </LinearLayout>          
-          
-
-      
-      
-      <LinearLayout android:background="@drawable/round_border" android:layout_margin="3dp" android:padding="3dp" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="horizontal" android:gravity="bottom|center_horizontal" android:layout_weight="0">
-
-          <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="bottom|left"
-                    android:textSize="10pt"
-                    android:padding="3dp"
-                    android:layout_weight="1"
-                    android:text="Drive Range: " />
-         
-          <com.tumanako.ui.TextWithLabel android:id="@+id/textDriveRange"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:gravity="center_horizontal"
-                 android:textSize="18pt"
-                 android:layout_weight="0"
-                 app:main_text="0" 
-                 app:label_text=" km " />
-         
-      </LinearLayout>
-
-      <LinearLayout android:background="@drawable/round_border" android:layout_margin="3dp" android:padding="3dp" android:layout_width="fill_parent"  android:layout_height="wrap_content"  android:orientation="horizontal" android:gravity="bottom|center_horizontal" android:layout_weight="0">
-      
-          <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"   android:gravity="bottom|left"
-                    android:textSize="10pt"
-                    android:text="Acc Batt: " 
-                    android:layout_weight="1" />
         
-          <com.tumanako.ui.TextWithLabel android:id="@+id/textAccBatteryVlts"
-                 android:layout_width="wrap_content"  android:layout_height="wrap_content"
-                 android:gravity="center_horizontal"
-                 android:textSize="18pt"  
-                 app:main_text="00.0" 
-                 app:label_text=" V    "  />
-      
-      </LinearLayout>
-      
-  </LinearLayout>
+    
+        <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="0"
+        android:background="@drawable/round_border"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|left"
+            android:text="Longitude: "
+            android:textSize="10pt" />
+
+        <com.tumanako.ui.TextWithLabel
+            android:id="@+id/textGPSSats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18pt"
+            app:label_text="           "
+            app:textbox_text="0" 
+            app:update_action="DATA_GPS_LON"   />
+           <!-- app:update_action="GPS_VTG" -->
+    </LinearLayout>
+        
+        
+
+</LinearLayout>

@@ -11,7 +11,7 @@
       
       <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center"
                 android:textSize="10pt"
-                android:text="Secondary Data" />
+                android:text="Road Data" />
         
       
       
@@ -27,8 +27,9 @@
                  android:layout_gravity="bottom|right"                 
                  android:gravity="center_horizontal"
                  android:textSize="18pt"
-                 app:main_text="00:00" 
-                 app:label_text="       " />
+                 app:textbox_text="00:00" 
+                 app:label_text="       " 
+                 app:update_action="DATA_DRIVE_TIME"  />
       </FrameLayout>          
           
       
@@ -44,8 +45,9 @@
                  android:layout_gravity="bottom|right"
                  android:gravity="center_horizontal"
                  android:textSize="18pt"
-                 app:main_text="0" 
-                 app:label_text=" km " />
+                 app:textbox_text="0" 
+                 app:label_text=" km " 
+                 app:update_action="DATA_DRIVE_RANGE"   />
       </FrameLayout>
 
 
@@ -61,8 +63,9 @@
                  android:layout_gravity="bottom|right"
                  android:gravity="center_horizontal"
                  android:textSize="18pt"  
-                 app:main_text="00.0" 
-                 app:label_text=" V    "  />
+                 app:textbox_text="00.0" 
+                 app:label_text=" V    " 
+                 app:update_action="DATA_ACC_BATTERY_VLT"  />
       </FrameLayout>
 
       

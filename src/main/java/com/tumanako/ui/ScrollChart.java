@@ -111,6 +111,12 @@ public class ScrollChart extends View
     }
   
   
+ public void reset()
+   {  
+   // Resets the scroll chart... 
+   // Currently, this has no effect!
+   }
+  
   
   
   private Path MakeChartFill()
